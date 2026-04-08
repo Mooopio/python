@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Core Basics — GOD MODE Learning System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Tajawal:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-mode">
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="logo">
+      <span class="logo-icon">⟨/⟩</span>
+      <span class="logo-text">PyGOD<em>MODE</em></span>
+    </div>
+  </div>
+  <div class="topbar-center">
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="ابحث في المحتوى..." autocomplete="off">
+      <span class="search-icon">⌕</span>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="progress-pill" id="progressPill">
+      <span id="progressText">0%</span>
+      <div class="progress-ring">
+        <svg viewBox="0 0 36 36"><circle class="bg" cx="18" cy="18" r="15"/><circle class="fg" id="progressCircle" cx="18" cy="18" r="15"/></svg>
+      </div>
+    </div>
+    <button class="theme-toggle" id="themeToggle" title="تبديل الوضع">☀</button>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <nav class="sidebar-nav">
+    <div class="nav-label">المحتوى</div>
+    <ul id="sidebarList">
+      <li><a href="#foundations" class="nav-link" data-section="foundations"><span class="nav-icon">🧠</span>الأساسيات</a></li>
+      <li><a href="#variables" class="nav-link" data-section="variables"><span class="nav-icon">📦</span>Variables</a></li>
+      <li><a href="#datatypes" class="nav-link" data-section="datatypes"><span class="nav-icon">🔢</span>Data Types</a></li>
+      <li><a href="#typeconversion" class="nav-link" data-section="typeconversion"><span class="nav-icon">🔄</span>Type Conversion</a></li>
+      <li><a href="#operators" class="nav-link" data-section="operators"><span class="nav-icon">⚙️</span>Operators</a></li>
+      <li><a href="#inputoutput" class="nav-link" data-section="inputoutput"><span class="nav-icon">💬</span>Input / Output</a></li>
+      <li><a href="#pipeline" class="nav-link" data-section="pipeline"><span class="nav-icon">🔧</span>Data Engineering</a></li>
+      <li><a href="#interview" class="nav-link" data-section="interview"><span class="nav-icon">💼</span>Interview Prep</a></li>
+      <li><a href="#cheatsheet" class="nav-link" data-section="cheatsheet"><span class="nav-icon">📋</span>Cheat Sheet</a></li>
+    </ul>
+    <div class="nav-label" style="margin-top:2rem">تقدمك</div>
+    <div class="sidebar-progress">
+      <div class="sidebar-progress-bar"><div id="sidebarProgressFill"></div></div>
+      <span id="sidebarProgressLabel">0 / 9 أقسام</span>
+    </div>
+    <button class="reset-btn" id="resetProgress">🔄 إعادة التقدم</button>
+  </nav>
+</aside>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay"></div>
+
+<!-- MAIN CONTENT -->
+<main class="main-content" id="mainContent">
+
+  <!-- HERO -->
+  <section class="hero-section">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-badge">GOD MODE — Python Focus</div>
+      <h1 class="hero-title">Syntax &amp; Core Basics</h1>
+      <p class="hero-subtitle">Variables · Data Types · Type Conversion · Operators · Input/Output</p>
+      <div class="hero-meta">
+        <span>🎯 من صفر إلى مستوى Senior</span>
+        <span>💼 Interview Ready</span>
+        <span>🚀 Data Engineering Focused</span>
+      </div>
+      <div class="pipeline-visual">
+        <div class="pipe-step">Input</div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">Variable</div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">Data Type</div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">Operators</div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step accent">Output</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION: FOUNDATIONS -->
+  <section class="content-section" id="foundations" data-section="foundations">
+    <div class="section-header collapsible" data-target="foundations-body">
+      <div class="section-title-wrap">
+        <span class="section-num">01</span>
+        <h2>الأساسيات — Mental Model</h2>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="section-body" id="foundations-body">
+      <div class="concept-grid">
+        <div class="concept-card red">
+          <h3>ما هو هذا الموضوع فعليًا؟</h3>
+          <p>ده اللغة الأساسية اللي الكمبيوتر بيفهم بيها بياناتك وتعليماتك.</p>
+        </div>
+        <div class="concept-card blue">
+          <h3>أي برنامج في الدنيا بيعمل 3 حاجات</h3>
+          <ol class="styled-list">
+            <li>يستقبل <strong>Data</strong></li>
+            <li>يعالج <strong>Data</strong></li>
+            <li>يطلع <strong>Result</strong></li>
+          </ol>
+        </div>
+        <div class="concept-card green">
+          <h3>الفكرة في جملة واحدة</h3>
+          <blockquote>البرمجة = تخزين بيانات + تعديلها + اتخاذ قرارات عليها</blockquote>
+        </div>
+      </div>
+
+      <div class="info-block warning">
+        <div class="info-icon">⚠️</div>
+        <div>
+          <h4>قبل وجود هذه المفاهيم</h4>
+          <p>كان لازم المبرمج يتعامل مع Memory Addresses مباشرة، يحدد نوع كل بايت يدويًا، ويعمل كل تحويل بنفسه — وده كان <strong>جحيم</strong>.</p>
+        </div>
+      </div>
+
+      <div class="info-block info">
+        <div class="info-icon">🔧</div>
+        <div>
+          <h4>ليه Data Engineer لازم يفهم ده؟</h4>
+          <p>كل Pipeline بتتعامل مع:</p>
+          <div class="pipeline-mini">
+            <span>Raw Data</span><span>→</span><span>Parse</span><span>→</span><span>Validate</span><span>→</span><span>Transform</span><span>→</span><span>Store</span>
+          </div>
+          <p style="margin-top:0.75rem">لو مش فاهم الأنواع والتحويلات: هتكسر Pipelines، هتعمل Data Corruption، هتخزن غلط، وهتعمل Bugs صعب تتشاف.</p>
+        </div>
+      </div>
+
+      <div class="read-check"><label><input type="checkbox" class="section-check" data-section="foundations"> قرأت هذا القسم ✓</label></div>
+    </div>
+  </section>
+
+  <!-- SECTION: VARIABLES -->
+  <section class="content-section" id="variables" data-section="variables">
+    <div class="section-header collapsible" data-target="variables-body">
+      <div class="section-title-wrap">
+        <span class="section-num">02</span>
+        <h2>Variables — المتغيرات</h2>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="section-body" id="variables-body">
+
+      <div class="concept-card blue full-width">
+        <h3>🧠 Mental Model</h3>
+        <p><strong>Variable = Label على مكان في الذاكرة.</strong></p>
+        <p>لما بتكتب <code>x = 10</code>، مش معناها "x هو 10". معناها: <em>اربط الاسم x بالقيمة 10 الموجودة في الذاكرة.</em></p>
+      </div>
+
+      <h3 class="sub-heading">Memory Representation</h3>
+      <div class="two-col">
+        <div class="code-block-wrap">
+          <div class="code-label">RAM (تمثيل مبسط)</div>
+          <pre class="code-block"><code><span class="c"># RAM:</span>
+Address    Value
+1001       10
+
+<span class="c"># Variable Table:</span>
+x  ->  1001</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+        <div class="code-block-wrap">
+          <div class="code-label">مثال عملي</div>
+          <pre class="code-block"><code><span class="kw">x</span> = <span class="num">10</span>
+<span class="kw">name</span> = <span class="str">"Ahmed"</span>
+<span class="kw">is_valid</span> = <span class="bool">True</span>
+
+<span class="c"># المتغير يشير للقيمة في الذاكرة</span>
+<span class="c"># Python manages memory for you</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+      </div>
+
+      <h3 class="sub-heading">Naming Rules — قواعد التسمية</h3>
+      <div class="two-col">
+        <div class="code-block-wrap">
+          <div class="code-label">✅ صح</div>
+          <pre class="code-block"><code>user_name = <span class="str">"Ali"</span>
+age2 = <span class="num">20</span>
+_private = <span class="num">1</span>
+CONSTANT_VALUE = <span class="num">100</span>
+camelCase = <span class="str">"ok too"</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+        <div class="code-block-wrap">
+          <div class="code-label">❌ غلط</div>
+          <pre class="code-block"><code>2age = <span class="num">20</span>       <span class="c"># يبدأ برقم</span>
+user-name = <span class="str">"Ali"</span> <span class="c"># بيحتوي -</span>
+class = <span class="num">10</span>      <span class="c"># reserved word</span>
+my var = <span class="num">5</span>     <span class="c"># فيه مسافة</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+      </div>
+
+      <h3 class="sub-heading">ليه Variables مهمة؟ — Without vs With</h3>
+      <div class="two-col">
+        <div class="code-block-wrap">
+          <div class="code-label">❌ بدون Variables — كود سيء</div>
+          <pre class="code-block"><code>print(<span class="num">5</span> + <span class="num">10</span>)
+print(<span class="num">5</span> + <span class="num">10</span>)
+print(<span class="num">5</span> + <span class="num">10</span>)
+<span class="c"># لو القيمة اتغيرت، لازم تغير في 3 أماكن</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+        <div class="code-block-wrap">
+          <div class="code-label">✅ مع Variables — كود جيد</div>
+          <pre class="code-block"><code>result = <span class="num">5</span> + <span class="num">10</span>
+print(result)
+print(result)
+print(result)
+<span class="c"># تغيير في مكان واحد فقط</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+      </div>
+
+      <div class="mistakes-box">
+        <h3>⚠️ Common Mistakes</h3>
+        <div class="mistake-item">
+          <div class="mistake-title">1) استخدام متغير قبل تعريفه</div>
+          <pre class="code-block inline"><code>print(x)  <span class="c"># NameError: name 'x' is not defined</span>
+x = <span class="num">5</span></code></pre>
+        </div>
+        <div class="mistake-item">
+          <div class="mistake-title">2) الخلط بين Reassignment والـ Math</div>
+          <pre class="code-block inline"><code>x = <span class="num">5</span>
+x = x + <span class="num">1</span>  <span class="c"># مش contradiction!</span>
+<span class="c"># المعنى: خذ القيمة الحالية لـ x، زودها 1، وخزن الناتج مكانها</span>
+<span class="c"># x الآن = 6</span></code></pre>
+        </div>
+      </div>
+
+      <div class="ai-enhance">
+        <span class="ai-badge">AI Enhancement</span>
+        <h4>Python Memory Model — Reference vs Value</h4>
+        <p>في Python، المتغيرات هي <strong>references</strong> وليست containers. يعني لما بتعمل <code>a = b</code>، الاتنين بيشيروا لنفس الـ object في الذاكرة.</p>
+        <pre class="code-block inline"><code>a = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+b = a          <span class="c"># b يشير لنفس الـ list</span>
+b.append(<span class="num">4</span>)
+print(a)       <span class="c"># [1, 2, 3, 4] — a اتغيرت!</span>
+
+<span class="c"># للـ immutable types (int, str, tuple): مختلف</span>
+x = <span class="num">5</span>
+y = x
+y = <span class="num">10</span>
+print(x)       <span class="c"># 5 — x ما اتغيرتش</span></code></pre>
+      </div>
+
+      <div class="read-check"><label><input type="checkbox" class="section-check" data-section="variables"> قرأت هذا القسم ✓</label></div>
+    </div>
+  </section>
+
+  <!-- SECTION: DATA TYPES -->
+  <section class="content-section" id="datatypes" data-section="datatypes">
+    <div class="section-header collapsible" data-target="datatypes-body">
+      <div class="section-title-wrap">
+        <span class="section-num">03</span>
+        <h2>Data Types — أنواع البيانات</h2>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="section-body" id="datatypes-body">
+
+      <div class="concept-card blue full-width">
+        <h3>🧠 Mental Model</h3>
+        <p><strong>نوع البيانات = وصف للكمبيوتر يخبره كيف يفسر الـ Bits.</strong></p>
+        <p>بدون أنواع، الكمبيوتر مبيعرفش هل <code>01000001</code> ده رقم 65 أم حرف "A".</p>
+      </div>
+
+      <h3 class="sub-heading">الأنواع الأساسية في Python</h3>
+      <div class="types-grid">
+        <div class="type-card">
+          <div class="type-icon">🔢</div>
+          <div class="type-name">int</div>
+          <div class="type-example"><code>x = 10</code></div>
+          <div class="type-desc">عدد صحيح — بدون كسور</div>
+        </div>
+        <div class="type-card">
+          <div class="type-icon">📊</div>
+          <div class="type-name">float</div>
+          <div class="type-example"><code>x = 3.14</code></div>
+          <div class="type-desc">عدد عشري — مع كسور</div>
+        </div>
+        <div class="type-card">
+          <div class="type-icon">📝</div>
+          <div class="type-name">str</div>
+          <div class="type-example"><code>x = "Ahmed"</code></div>
+          <div class="type-desc">نص — سلسلة حروف</div>
+        </div>
+        <div class="type-card">
+          <div class="type-icon">✅</div>
+          <div class="type-name">bool</div>
+          <div class="type-example"><code>x = True</code></div>
+          <div class="type-desc">صح / غلط فقط</div>
+        </div>
+        <div class="type-card">
+          <div class="type-icon">∅</div>
+          <div class="type-name">NoneType</div>
+          <div class="type-example"><code>x = None</code></div>
+          <div class="type-desc">عدم وجود قيمة</div>
+        </div>
+        <div class="type-card ai-type">
+          <div class="type-icon">📋</div>
+          <div class="type-name">list</div>
+          <div class="type-example"><code>x = [1,2,3]</code></div>
+          <div class="type-desc">قائمة قابلة للتعديل</div>
+        </div>
+        <div class="type-card ai-type">
+          <div class="type-icon">📦</div>
+          <div class="type-name">tuple</div>
+          <div class="type-example"><code>x = (1,2,3)</code></div>
+          <div class="type-desc">قائمة ثابتة immutable</div>
+        </div>
+        <div class="type-card ai-type">
+          <div class="type-icon">🗂️</div>
+          <div class="type-name">dict</div>
+          <div class="type-example"><code>x = {"k":"v"}</code></div>
+          <div class="type-desc">مفتاح وقيمة — JSON-like</div>
+        </div>
+      </div>
+
+      <div class="info-block warning">
+        <div class="info-icon">💡</div>
+        <div>
+          <h4>ليه النوع مهم جدًا؟</h4>
+          <pre class="code-block inline"><code><span class="str">"5"</span> + <span class="str">"5"</span> = <span class="str">"55"</span>   <span class="c"># string concatenation</span>
+<span class="num">5</span>   + <span class="num">5</span>   = <span class="num">10</span>     <span class="c"># integer addition</span>
+<span class="c"># نفس الشكل تقريبًا، لكن المعنى مختلف تمامًا!</span></code></pre>
+        </div>
+      </div>
+
+      <h3 class="sub-heading">Dynamic Typing في Python</h3>
+      <div class="two-col">
+        <div class="code-block-wrap">
+          <div class="code-label">Python — Dynamic Typing</div>
+          <pre class="code-block"><code>x = <span class="num">5</span>
+print(type(x))   <span class="c"># &lt;class 'int'&gt;</span>
+
+x = <span class="str">"hello"</span>
+print(type(x))   <span class="c"># &lt;class 'str'&gt;</span>
+
+<span class="c"># مسموح — Python يغير النوع</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+        <div class="code-block-wrap">
+          <div class="code-label">⚠️ الخطر في Dynamic Typing</div>
+          <pre class="code-block"><code>x = <span class="str">"5"</span>
+print(x + <span class="num">1</span>)
+<span class="c"># TypeError: can only concatenate str</span>
+<span class="c"># (not "int") to str</span>
+
+<span class="c"># الحل: كن واضح دايمًا في الأنواع</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+      </div>
+
+      <h3 class="sub-heading">Type Checking</h3>
+      <div class="code-block-wrap">
+        <div class="code-label">كيف تتحقق من النوع</div>
+        <pre class="code-block"><code>x = <span class="num">42</span>
+
+<span class="c"># Method 1: type()</span>
+print(type(x))              <span class="c"># &lt;class 'int'&gt;</span>
+print(type(x) == int)       <span class="c"># True</span>
+
+<span class="c"># Method 2: isinstance() — الأفضل</span>
+print(isinstance(x, int))   <span class="c"># True</span>
+print(isinstance(x, (int, float)))  <span class="c"># True — check multiple types</span>
+
+<span class="c"># [AI Enhancement] Method 3: type hints (Python 3.5+)</span>
+def process_age(age: int) -> str:
+    return f"العمر: {age}"</code></pre>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+
+      <div class="ai-enhance">
+        <span class="ai-badge">AI Enhancement</span>
+        <h4>Truthiness في Python — Falsy Values</h4>
+        <p>القيم التالية تُعامَل كـ <strong>False</strong> في السياقات المنطقية:</p>
+        <pre class="code-block inline"><code><span class="c"># Falsy values</span>
+bool(<span class="num">0</span>)       <span class="c"># False</span>
+bool(<span class="str">""</span>)      <span class="c"># False — string فارغ</span>
+bool([])      <span class="c"># False — list فارغة</span>
+bool({})      <span class="c"># False — dict فارغ</span>
+bool(<span class="kw">None</span>)    <span class="c"># False</span>
+
+<span class="c"># Truthy values</span>
+bool(<span class="str">"False"</span>) <span class="c"># True — string غير فارغ (حتى لو محتواه "False")</span>
+bool(<span class="num">-1</span>)      <span class="c"># True — أي رقم غير صفر</span>
+bool([<span class="num">0</span>])     <span class="c"># True — list فيها عنصر (حتى لو صفر)</span></code></pre>
+      </div>
+
+      <div class="read-check"><label><input type="checkbox" class="section-check" data-section="datatypes"> قرأت هذا القسم ✓</label></div>
+    </div>
+  </section>
+
+  <!-- SECTION: TYPE CONVERSION -->
+  <section class="content-section" id="typeconversion" data-section="typeconversion">
+    <div class="section-header collapsible" data-target="typeconversion-body">
+      <div class="section-title-wrap">
+        <span class="section-num">04</span>
+        <h2>Type Conversion — تحويل الأنواع</h2>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="section-body" id="typeconversion-body">
+
+      <div class="concept-card green full-width">
+        <h3>🧠 ما هو؟</h3>
+        <p>تحويل قيمة من Type لنوع آخر. البيانات تأتي غالبًا كنصوص — خاصة من <code>input()</code> أو CSV أو APIs.</p>
+      </div>
+
+      <div class="two-col">
+        <div class="code-block-wrap">
+          <div class="code-label">❌ بدون Conversion — Error</div>
+          <pre class="code-block"><code>age = input(<span class="str">"Age: "</span>)   <span class="c"># "25" — string!</span>
+print(age + <span class="num">5</span>)
+<span class="c"># TypeError: can only concatenate</span>
+<span class="c"># str (not "int") to str</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+        <div class="code-block-wrap">
+          <div class="code-label">✅ مع Conversion — يشتغل</div>
+          <pre class="code-block"><code>age = int(input(<span class="str">"Age: "</span>))  <span class="c"># 25 — int!</span>
+print(age + <span class="num">5</span>)
+<span class="c"># Output: 30</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+      </div>
+
+      <h3 class="sub-heading">Explicit Conversion — التحويل الصريح</h3>
+      <div class="code-block-wrap">
+        <div class="code-label">دوال التحويل الأساسية</div>
+        <pre class="code-block"><code><span class="c"># String → Number</span>
+int(<span class="str">"5"</span>)        <span class="c"># 5</span>
+float(<span class="str">"3.14"</span>)   <span class="c"># 3.14</span>
+
+<span class="c"># Number → String</span>
+str(<span class="num">10</span>)         <span class="c"># "10"</span>
+str(<span class="num">3.14</span>)      <span class="c"># "3.14"</span>
+
+<span class="c"># → Boolean</span>
+bool(<span class="num">1</span>)         <span class="c"># True</span>
+bool(<span class="num">0</span>)         <span class="c"># False</span>
+bool(<span class="str">"hello"</span>)   <span class="c"># True</span>
+bool(<span class="str">""</span>)        <span class="c"># False</span>
+
+<span class="c"># → Integer من Boolean</span>
+int(<span class="bool">True</span>)      <span class="c"># 1</span>
+int(<span class="bool">False</span>)     <span class="c"># 0</span></code></pre>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+
+      <h3 class="sub-heading">Implicit Conversion — التحويل التلقائي</h3>
+      <div class="code-block-wrap">
+        <div class="code-label">Python يحول تلقائيًا في بعض الحالات</div>
+        <pre class="code-block"><code>result = <span class="num">5</span> + <span class="num">2.5</span>
+<span class="c"># Python يحول 5 إلى 5.0 تلقائيًا</span>
+print(result)       <span class="c"># 7.5 (float)</span>
+print(type(result)) <span class="c"># &lt;class 'float'&gt;</span>
+
+<span class="c"># int + bool = int</span>
+print(<span class="num">10</span> + <span class="bool">True</span>)  <span class="c"># 11</span>
+print(<span class="num">10</span> + <span class="bool">False</span>) <span class="c"># 10</span></code></pre>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+
+      <h3 class="sub-heading">⚠️ Edge Cases — الحالات الخطيرة</h3>
+      <div class="concept-grid">
+        <div class="code-block-wrap">
+          <div class="code-label">Invalid Conversion</div>
+          <pre class="code-block"><code>int(<span class="str">"hello"</span>)
+<span class="c"># ValueError: invalid literal</span>
+<span class="c"># for int() with base 10: 'hello'</span>
+
+int(<span class="str">"3.14"</span>)
+<span class="c"># ValueError: ده float مش int مباشرة</span>
+<span class="c"># الصح: int(float("3.14"))</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+        <div class="code-block-wrap">
+          <div class="code-label">Precision Loss — فقدان الدقة</div>
+          <pre class="code-block"><code>int(<span class="num">3.9</span>)   <span class="c"># 3 — مش 4!</span>
+int(<span class="num">3.1</span>)   <span class="c"># 3</span>
+int(<span class="num">-3.9</span>)  <span class="c"># -3 — مش -4!</span>
+
+<span class="c"># ده truncation وليس rounding</span>
+<span class="c"># لو عايز rounding:</span>
+round(<span class="num">3.9</span>)  <span class="c"># 4</span>
+round(<span class="num">3.5</span>)  <span class="c"># 4 — banker's rounding</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+      </div>
+
+      <div class="ai-enhance">
+        <span class="ai-badge">AI Enhancement</span>
+        <h4>Safe Conversion في Data Engineering</h4>
+        <pre class="code-block inline"><code><span class="c"># الطريقة الاحترافية — دايمًا use try/except</span>
+def safe_int(value, default=None):
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default
+
+<span class="c"># استخدام في Pipeline</span>
+rows = [<span class="str">"25"</span>, <span class="str">"abc"</span>, <span class="str">"30"</span>, <span class="kw">None</span>]
+ages = [safe_int(row, default=<span class="num">0</span>) for row in rows]
+print(ages)  <span class="c"># [25, 0, 30, 0]</span>
+
+<span class="c"># [AI Enhancement] pandas approach</span>
+<span class="c"># pd.to_numeric(series, errors='coerce')  → NaN for bad values</span></code></pre>
+      </div>
+
+      <div class="read-check"><label><input type="checkbox" class="section-check" data-section="typeconversion"> قرأت هذا القسم ✓</label></div>
+    </div>
+  </section>
+
+  <!-- SECTION: OPERATORS -->
+  <section class="content-section" id="operators" data-section="operators">
+    <div class="section-header collapsible" data-target="operators-body">
+      <div class="section-title-wrap">
+        <span class="section-num">05</span>
+        <h2>Operators — المعاملات</h2>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="section-body" id="operators-body">
+
+      <h3 class="sub-heading">Arithmetic Operators</h3>
+      <div class="operators-table-wrap">
+        <table class="operators-table">
+          <thead><tr><th>Operator</th><th>الاسم</th><th>مثال</th><th>النتيجة</th><th>Use Case</th></tr></thead>
+          <tbody>
+            <tr><td><code>+</code></td><td>Addition</td><td><code>5 + 3</code></td><td><code>8</code></td><td>جمع قيم</td></tr>
+            <tr><td><code>-</code></td><td>Subtraction</td><td><code>5 - 3</code></td><td><code>2</code></td><td>فرق قيم</td></tr>
+            <tr><td><code>*</code></td><td>Multiplication</td><td><code>5 * 3</code></td><td><code>15</code></td><td>ضرب</td></tr>
+            <tr class="highlight-row"><td><code>/</code></td><td>True Division</td><td><code>5 / 2</code></td><td><code>2.5</code></td><td>دايمًا float</td></tr>
+            <tr class="highlight-row"><td><code>//</code></td><td>Floor Division</td><td><code>5 // 2</code></td><td><code>2</code></td><td>Pagination, Batching</td></tr>
+            <tr class="highlight-row"><td><code>%</code></td><td>Modulo</td><td><code>5 % 2</code></td><td><code>1</code></td><td>فردي/زوجي، دوري</td></tr>
+            <tr><td><code>**</code></td><td>Power</td><td><code>2 ** 10</code></td><td><code>1024</code></td><td>Scaling, ML features</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="concept-grid">
+        <div class="code-block-wrap">
+          <div class="code-label">الفرق الحاسم: / vs //</div>
+          <pre class="code-block"><code><span class="num">5</span> / <span class="num">2</span>   <span class="c"># 2.5  — True Division</span>
+<span class="num">5</span> // <span class="num">2</span>  <span class="c"># 2    — Floor Division</span>
+<span class="num">-5</span> // <span class="num">2</span> <span class="c"># -3   — يقرب للأسفل دايمًا!</span>
+
+<span class="c"># Use case: Pagination</span>
+total_records = <span class="num">105</span>
+page_size = <span class="num">10</span>
+total_pages = -(-total_records // page_size)  <span class="c"># 11 — ceiling</span>
+<span class="c"># أو</span>
+import math
+total_pages = math.ceil(total_records / page_size)  <span class="c"># 11</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+        <div class="code-block-wrap">
+          <div class="code-label">Modulo — استخدامات كتير</div>
+          <pre class="code-block"><code><span class="c"># زوجي / فردي</span>
+n % <span class="num">2</span> == <span class="num">0</span>   <span class="c"># زوجي</span>
+n % <span class="num">2</span> != <span class="num">0</span>   <span class="c"># فردي</span>
+
+<span class="c"># دوري — Cyclic Logic</span>
+for i in range(<span class="num">10</span>):
+    print(i % <span class="num">3</span>)  <span class="c"># 0,1,2,0,1,2,0,1,2,0</span>
+
+<span class="c"># Partitioning Data</span>
+partition = record_id % num_partitions
+
+<span class="c"># Check divisibility</span>
+<span class="num">100</span> % <span class="num">5</span> == <span class="num">0</span>   <span class="c"># True — 100 divisible by 5</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+      </div>
+
+      <h3 class="sub-heading">Comparison Operators</h3>
+      <div class="code-block-wrap">
+        <div class="code-label">المقارنة — دايمًا بترجع bool</div>
+        <pre class="code-block"><code><span class="num">5</span> == <span class="num">5</span>    <span class="c"># True  — يساوي</span>
+<span class="num">5</span> != <span class="num">3</span>    <span class="c"># True  — لا يساوي</span>
+<span class="num">5</span> &gt; <span class="num">3</span>     <span class="c"># True  — أكبر من</span>
+<span class="num">5</span> &lt; <span class="num">3</span>     <span class="c"># False — أصغر من</span>
+<span class="num">5</span> &gt;= <span class="num">5</span>    <span class="c"># True  — أكبر من أو يساوي</span>
+<span class="num">5</span> &lt;= <span class="num">4</span>    <span class="c"># False — أصغر من أو يساوي</span>
+
+<span class="c"># مهم: == مش = !</span>
+<span class="c"># = للتعيين (Assignment)</span>
+<span class="c"># == للمقارنة (Comparison)</span>
+
+<span class="c"># [AI Enhancement] Chaining comparisons</span>
+<span class="num">0</span> &lt; age &lt; <span class="num">120</span>    <span class="c"># Pythonic! يكافئ: 0 < age and age < 120</span></code></pre>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+
+      <h3 class="sub-heading">Logical Operators</h3>
+      <div class="code-block-wrap">
+        <div class="code-label">and / or / not</div>
+        <pre class="code-block"><code><span class="c"># and — الاتنين لازم يكونوا True</span>
+age > <span class="num">18</span> and salary > <span class="num">5000</span>
+
+<span class="c"># or — واحد بس كافي</span>
+is_admin or is_superuser
+
+<span class="c"># not — عكس القيمة</span>
+not is_banned
+
+<span class="c"># [AI Enhancement] Short-circuit evaluation</span>
+<span class="c"># and: لو الأول False → مش بيقيّم الثاني</span>
+<span class="c"># or:  لو الأول True  → مش بيقيّم الثاني</span>
+user = <span class="kw">None</span>
+name = user and user.name  <span class="c"># None — مش بيقيّم user.name</span></code></pre>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+
+      <h3 class="sub-heading">Assignment Operators</h3>
+      <div class="code-block-wrap">
+        <div class="code-label">Shorthand operators</div>
+        <pre class="code-block"><code>x = <span class="num">10</span>
+x += <span class="num">5</span>   <span class="c"># x = x + 5  → 15</span>
+x -= <span class="num">3</span>   <span class="c"># x = x - 3  → 12</span>
+x *= <span class="num">2</span>   <span class="c"># x = x * 2  → 24</span>
+x /= <span class="num">4</span>   <span class="c"># x = x / 4  → 6.0</span>
+x //= <span class="num">2</span>  <span class="c"># x = x // 2 → 3.0</span>
+x %= <span class="num">2</span>   <span class="c"># x = x % 2  → 1.0</span>
+x **= <span class="num">3</span>  <span class="c"># x = x ** 3 → 1.0</span></code></pre>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+
+      <div class="info-block warning">
+        <div class="info-icon">⚡</div>
+        <div>
+          <h4>Operator Precedence — الأولوية</h4>
+          <pre class="code-block inline"><code><span class="num">2</span> + <span class="num">3</span> * <span class="num">4</span>   <span class="c"># 14 — مش 20! (الضرب أولاً)</span>
+(<span class="num">2</span> + <span class="num">3</span>) * <span class="num">4</span> <span class="c"># 20 — القوسين بتحل المشكلة</span>
+
+<span class="c"># الترتيب: ** → * / // % → + - → == != > < → not → and → or</span>
+<span class="c"># Best Practice: استخدم قوسين دايمًا لو مش متأكد</span></code></pre>
+        </div>
+      </div>
+
+      <div class="read-check"><label><input type="checkbox" class="section-check" data-section="operators"> قرأت هذا القسم ✓</label></div>
+    </div>
+  </section>
+
+  <!-- SECTION: INPUT/OUTPUT -->
+  <section class="content-section" id="inputoutput" data-section="inputoutput">
+    <div class="section-header collapsible" data-target="inputoutput-body">
+      <div class="section-title-wrap">
+        <span class="section-num">06</span>
+        <h2>Input / Output — الإدخال والإخراج</h2>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="section-body" id="inputoutput-body">
+
+      <div class="concept-card red full-width">
+        <h3>🚨 القاعدة الذهبية</h3>
+        <p><code>input()</code> دايمًا وأبدًا ترجع <strong>String</strong> — حتى لو المستخدم كتب رقم!</p>
+      </div>
+
+      <h3 class="sub-heading">Input Function</h3>
+      <div class="code-block-wrap">
+        <div class="code-label">input() — الاستخدام الصح</div>
+        <pre class="code-block"><code><span class="c"># Basic usage</span>
+name = input(<span class="str">"Enter Name: "</span>)
+print(type(name))  <span class="c"># &lt;class 'str'&gt; — دايمًا!</span>
+
+<span class="c"># لو عايز رقم — لازم تحوله</span>
+age = int(input(<span class="str">"Enter Age: "</span>))
+salary = float(input(<span class="str">"Enter Salary: "</span>))
+
+<span class="c"># Safe input مع validation</span>
+while <span class="bool">True</span>:
+    try:
+        age = int(input(<span class="str">"Enter Age: "</span>))
+        if <span class="num">0</span> &lt;= age &lt;= <span class="num">150</span>:
+            break
+        print(<span class="str">"العمر لازم يكون بين 0 و 150"</span>)
+    except ValueError:
+        print(<span class="str">"أدخل رقم صحيح!"</span>)</code></pre>
+        <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+      </div>
+
+      <h3 class="sub-heading">Output — print() و Formatting</h3>
+      <div class="concept-grid">
+        <div class="code-block-wrap">
+          <div class="code-label">f-strings — الأفضل (Python 3.6+)</div>
+          <pre class="code-block"><code>name = <span class="str">"Ali"</span>
+age = <span class="num">25</span>
+salary = <span class="num">5000.5</span>
+
+<span class="c"># f-string — الأسرع والأوضح</span>
+print(f<span class="str">"الاسم: {name}"</span>)
+print(f<span class="str">"العمر: {age}"</span>)
+print(f<span class="str">"الراتب: {salary:.2f}"</span>)  <span class="c"># 5000.50</span>
+
+<span class="c"># Expressions inside f-strings</span>
+print(f<span class="str">"عمر بعد 5 سنين: {age + 5}"</span>)
+
+<span class="c"># [AI Enhancement] Formatting numbers</span>
+big_num = <span class="num">1000000</span>
+print(f<span class="str">"{big_num:,}"</span>)        <span class="c"># 1,000,000</span>
+print(f<span class="str">"{salary:.2f}"</span>)      <span class="c"># 5000.50</span>
+print(f<span class="str">"{0.857:.1%}"</span>)       <span class="c"># 85.7%</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+        <div class="code-block-wrap">
+          <div class="code-label">Methods قديمة — تعرف عليها</div>
+          <pre class="code-block"><code><span class="c"># .format() method</span>
+print(<span class="str">"Hello {}"</span>.format(name))
+print(<span class="str">"Age: {0}, Name: {1}"</span>.format(age, name))
+
+<span class="c"># % formatting (legacy)</span>
+print(<span class="str">"Name: %s"</span> % name)
+print(<span class="str">"Age: %d"</span> % age)
+
+<span class="c"># print() parameters</span>
+print(<span class="str">"a"</span>, <span class="str">"b"</span>, <span class="str">"c"</span>, sep=<span class="str">"-"</span>)   <span class="c"># a-b-c</span>
+print(<span class="str">"a"</span>, end=<span class="str">" | "</span>)           <span class="c"># a |</span>
+print(<span class="str">"b"</span>)                      <span class="c"># b</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+      </div>
+
+      <div class="info-block info">
+        <div class="info-icon">🔧</div>
+        <div>
+          <h4>ليه Formatting مهم في Data Engineering؟</h4>
+          <ul class="styled-list">
+            <li><strong>Logging:</strong> تسجيل الأخطاء والعمليات</li>
+            <li><strong>Debugging:</strong> طباعة قيم لتتبع الأخطاء</li>
+            <li><strong>SQL Generation:</strong> بناء queries ديناميكية</li>
+            <li><strong>Reports:</strong> تقارير منسقة</li>
+            <li><strong>Dynamic Queries:</strong> استعلامات متغيرة</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="read-check"><label><input type="checkbox" class="section-check" data-section="inputoutput"> قرأت هذا القسم ✓</label></div>
+    </div>
+  </section>
+
+  <!-- SECTION: DATA ENGINEERING PIPELINE -->
+  <section class="content-section" id="pipeline" data-section="pipeline">
+    <div class="section-header collapsible" data-target="pipeline-body">
+      <div class="section-title-wrap">
+        <span class="section-num">07</span>
+        <h2>Data Engineering — الاستخدام الحقيقي</h2>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="section-body" id="pipeline-body">
+
+      <div class="concept-grid">
+        <div class="code-block-wrap">
+          <div class="code-label">Parsing CSV Row</div>
+          <pre class="code-block"><code>row = [<span class="str">"Ahmed"</span>, <span class="str">"25"</span>, <span class="str">"5000"</span>]
+
+name   = row[<span class="num">0</span>]          <span class="c"># str — ok</span>
+age    = int(row[<span class="num">1</span>])     <span class="c"># 25</span>
+salary = float(row[<span class="num">2</span>])  <span class="c"># 5000.0</span>
+
+<span class="c"># Validate</span>
+if age &lt; <span class="num">0</span> or age &gt; <span class="num">150</span>:
+    raise ValueError(f<span class="str">"Invalid age: {age}"</span>)</code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+        <div class="code-block-wrap">
+          <div class="code-label">Feature Engineering</div>
+          <pre class="code-block"><code>monthly_income = <span class="num">5000</span>
+tax_rate = <span class="num">0.14</span>
+months_per_year = <span class="num">12</span>
+
+income_per_year = monthly_income * months_per_year
+<span class="c"># 60000</span>
+
+net_income = income_per_year * (<span class="num">1</span> - tax_rate)
+<span class="c"># 51600.0</span>
+
+<span class="c"># Use constants — not magic numbers!</span>
+TAX_RATE = <span class="num">0.14</span>  <span class="c"># واضح ومعبر</span></code></pre>
+          <button class="copy-btn" onclick="copyCode(this)">نسخ</button>
+        </div>
+      </div>
+
+      <h3 class="sub-heading">Batch vs Streaming</h3>
+      <div class="two-col">
+        <div class="concept-card blue">
+          <h3>Batch Processing</h3>
+          <p>تعالج ملايين Records دفعة واحدة. أي Type Bug يكسر Job بالكامل.</p>
+          <pre class="code-block inline"><code><span class="c"># Type Bug يكسر Pipeline</span>
+for row in millions_of_rows:
+    age = int(row[<span class="str">"age"</span>])  <span class="c"># ValueError!</span>
+    <span class="c"># الـ Job بيوقف هنا</span></code></pre>
+        </div>
+        <div class="concept-card green">
+          <h3>Streaming Processing</h3>
+          <p>لازم Conversion يكون سريع جدًا — latency بتأثر على كل Record.</p>
+          <pre class="code-block inline"><code><span class="c"># Avoid repeated conversion</span>
+<span class="c"># Bad — بطيء جدًا</span>
+for row in stream:
+    int(row[<span class="str">"age"</span>])
+
+<span class="c"># Good — validate schema once</span>
+schema = {<span class="str">"age"</span>: int, <span class="str">"name"</span>: str}</code></pre>
+        </div>
+      </div>
+
+      <div class="ai-enhance">
+        <span class="ai-badge">AI Enhancement</span>
+        <h4>Production Pipeline — Complete Example</h4>
+        <pre class="code-block inline"><code>import logging
+
+logging.basicConfig(level=logging.INFO)
+
+def parse_record(row: list) -> dict:
+    """Parse and validate a CSV row safely."""
+    try:
+        return {
+            <span class="str">"name"</span>: str(row[<span class="num">0</span>]).strip(),
+            <span class="str">"age"</span>: int(row[<span class="num">1</span>]),
+            <span class="str">"salary"</span>: float(row[<span class="num">2</span>]),
+        }
+    except (ValueError, IndexError) as e:
+        logging.warning(f<span class="str">"Bad record {row}: {e}"</span>)
+        return <span class="kw">None</span>
+
+def validate_record(record: dict) -> bool:
+    """Business rules validation."""
+    if record is <span class="kw">None</span>:
+        return <span class="bool">False</span>
+    if not (<span class="num">0</span> &lt; record[<span class="str">"age"</span>] &lt;= <span class="num">150</span>):
+        return <span class="bool">False</span>
+    if record[<span class="str">"salary"</span>] &lt; <span class="num">0</span>:
+        return <span class="bool">False</span>
+    return <span class="bool">True</span>
+
+<span class="c"># Pipeline</span>
+raw_data = [
+    [<span class="str">"Ahmed"</span>, <span class="str">"25"</span>, <span class="str">"5000"</span>],
+    [<span class="str">"Ali"</span>, <span class="str">"abc"</span>, <span class="str">"3000"</span>],   <span class="c"># bad age</span>
+    [<span class="str">"Sara"</span>, <span class="str">"30"</span>, <span class="str">"7000"</span>],
+]
+
+valid_records = [
+    record for row in raw_data
+    if (record := parse_record(row)) and validate_record(record)
+]
+
+print(valid_records)
+<span class="c"># [{'name': 'Ahmed', 'age': 25, 'salary': 5000.0},</span>
+<span class="c">#  {'name': 'Sara', 'age': 30, 'salary': 7000.0}]</span></code></pre>
+      </div>
+
+      <div class="read-check"><label><input type="checkbox" class="section-check" data-section="pipeline"> قرأت هذا القسم ✓</label></div>
+    </div>
+  </section>
+
+  <!-- SECTION: INTERVIEW -->
+  <section class="content-section" id="interview" data-section="interview">
+    <div class="section-header collapsible" data-target="interview-body">
+      <div class="section-title-wrap">
+        <span class="section-num">08</span>
+        <h2>💼 Interview Preparation — تحضير المقابلات</h2>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="section-body" id="interview-body">
+
+      <!-- Basic -->
+      <div class="interview-level basic">
+        <div class="level-badge">🟢 Basic Questions</div>
+        <div class="qa-list">
+
+          <div class="qa-item">
+            <div class="question" onclick="toggleAnswer(this)">
+              <span>Q1: ما الفرق بين <code>=</code> و <code>==</code> ؟</span>
+              <span class="qa-toggle">▼</span>
+            </div>
+            <div class="answer">
+              <p><strong>=</strong> هو Assignment — بيخزن قيمة في متغير: <code>x = 5</code></p>
+              <p><strong>==</strong> هو Comparison — بيقارن قيمتين وبيرجع bool: <code>x == 5</code> → <code>True</code></p>
+              <div class="follow-up">🔄 Follow-up: "لو عملت <code>if x = 5:</code> ايه اللي بيحصل؟" → <code>SyntaxError</code> في Python.</div>
+            </div>
+          </div>
+
+          <div class="qa-item">
+            <div class="question" onclick="toggleAnswer(this)">
+              <span>Q2: ليه <code>input()</code> بترجع String دايمًا؟</span>
+              <span class="qa-toggle">▼</span>
+            </div>
+            <div class="answer">
+              <p>لأن المستخدم بيدخل نص خام من الـ terminal، واللغة لا تفترض النوع تلقائيًا — المسؤولية على المبرمج.</p>
+              <pre class="code-block inline"><code>user_input = input(<span class="str">"Enter age: "</span>)
+print(type(user_input))  <span class="c"># &lt;class 'str'&gt; دايمًا</span></code></pre>
+            </div>
+          </div>
+
+          <div class="qa-item">
+            <div class="question" onclick="toggleAnswer(this)">
+              <span>Q3: ما الفرق بين <code>/</code> و <code>//</code> في Python؟</span>
+              <span class="qa-toggle">▼</span>
+            </div>
+            <div class="answer">
+              <p><code>/</code> True Division — دايمًا بيرجع <code>float</code>: <code>5 / 2 = 2.5</code></p>
+              <p><code>//</code> Floor Division — بيرجع <code>int</code> ويقرب للأسفل: <code>5 // 2 = 2</code></p>
+              <div class="follow-up">🔄 Follow-up: "ايه نتيجة <code>-5 // 2</code> ؟" → <code>-3</code> مش <code>-2</code> (floor = أصغر integer)</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tricky -->
+      <div class="interview-level tricky">
+        <div class="level-badge">🟡 Tricky Questions</div>
+        <div class="qa-list">
+
+          <div class="qa-item">
+            <div class="question" onclick="toggleAnswer(this)">
+              <span>Q4: ما نتيجة <code>bool("False")</code> ؟</span>
+              <span class="qa-toggle">▼</span>
+            </div>
+            <div class="answer">
+              <p><strong>True</strong> 🎯</p>
+              <p>لأن أي String غير فارغ = True — بغض النظر عن محتواه. <code>"False"</code> هي string فيها حروف، مش القيمة المنطقية False.</p>
+              <pre class="code-block inline"><code>bool(<span class="str">"False"</span>)  <span class="c"># True</span>
+bool(<span class="str">""</span>)      <span class="c"># False — فارغ فقط</span>
+bool(<span class="str">"0"</span>)     <span class="c"># True — غير فارغ!</span></code></pre>
+            </div>
+          </div>
+
+          <div class="qa-item">
+            <div class="question" onclick="toggleAnswer(this)">
+              <span>Q5: ما نتيجة <code>int(True)</code> و <code>int(False)</code> ؟</span>
+              <span class="qa-toggle">▼</span>
+            </div>
+            <div class="answer">
+              <p><code>int(True) = 1</code> و <code>int(False) = 0</code></p>
+              <p>في Python، <code>bool</code> هو subclass من <code>int</code>. True = 1، False = 0.</p>
+              <pre class="code-block inline"><code>print(<span class="bool">True</span> + <span class="bool">True</span>)    <span class="c"># 2</span>
+print(<span class="bool">True</span> * <span class="num">10</span>)     <span class="c"># 10</span>
+print(sum([<span class="bool">True</span>, <span class="bool">False</span>, <span class="bool">True</span>, <span class="bool">True</span>]))  <span class="c"># 3 — count of True!</span></code></pre>
+            </div>
+          </div>
+
+          <div class="qa-item">
+            <div class="question" onclick="toggleAnswer(this)">
+              <span>Q6: ليه <code>int(3.99) = 3</code> وليس 4؟</span>
+              <span class="qa-toggle">▼</span>
+            </div>
+            <div class="answer">
+              <p>لأن <code>int()</code> بيعمل <strong>truncation</strong> (بتر الكسر) وليس <strong>rounding</strong> (تقريب).</p>
+              <pre class="code-block inline"><code>int(<span class="num">3.99</span>)    <span class="c"># 3  — truncation</span>
+int(<span class="num">3.1</span>)     <span class="c"># 3  — truncation</span>
+int(<span class="num">-3.9</span>)   <span class="c"># -3 — truncation (ليس -4)</span>
+round(<span class="num">3.9</span>)  <span class="c"># 4  — rounding</span>
+round(<span class="num">3.5</span>)  <span class="c"># 4  — banker's rounding (round to even)</span></code></pre>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Advanced -->
+      <div class="interview-level advanced">
+        <div class="level-badge">🔴 Advanced / System Thinking</div>
+        <div class="qa-list">
+
+          <div class="qa-item">
+            <div class="question" onclick="toggleAnswer(this)">
+              <span>Q7: لو CSV فيه age كنصوص، هتعمل Validation إزاي في Production Pipeline؟</span>
+              <span class="qa-toggle">▼</span>
+            </div>
+            <div class="answer">
+              <p><strong>Senior Answer:</strong></p>
+              <ol class="styled-list">
+                <li><strong>Parse safely:</strong> استخدم try/except حول كل conversion</li>
+                <li><strong>Handle conversion errors:</strong> مش بتـbreak — بتـlog وبتـquarantine</li>
+                <li><strong>Validate range/business rules:</strong> <code>0 &lt; age &lt;= 150</code></li>
+                <li><strong>Reject/Quarantine bad records:</strong> اعمل Dead Letter Queue</li>
+              </ol>
+              <pre class="code-block inline"><code><span class="c"># Production Pattern</span>
+valid_records = []
+bad_records = []
+
+for row in csv_rows:
+    try:
+        age = int(row[<span class="str">"age"</span>])
+        assert <span class="num">0</span> &lt; age &lt;= <span class="num">150</span>, f<span class="str">"Invalid age: {age}"</span>
+        valid_records.append(row)
+    except (ValueError, AssertionError) as e:
+        bad_records.append({<span class="str">"row"</span>: row, <span class="str">"error"</span>: str(e)})
+
+<span class="c"># Process valid, alert on bad</span>
+process(valid_records)
+alert_team(bad_records)</code></pre>
+            </div>
+          </div>
+
+          <div class="qa-item">
+            <div class="question" onclick="toggleAnswer(this)">
+              <span>Q8: ما هو Dynamic Typing وما مخاطره في Data Engineering؟</span>
+              <span class="qa-toggle">▼</span>
+            </div>
+            <div class="answer">
+              <p>Dynamic Typing = Python يسمح لنفس المتغير يحمل أنواع مختلفة في أوقات مختلفة.</p>
+              <p><strong>المخاطر في Data Engineering:</strong></p>
+              <ul class="styled-list">
+                <li>Schema drift — العمود بييجي int في batch أول وstring في batch تاني</li>
+                <li>Silent bugs — الـ Pipeline مش بتكسر، بس بتعمل نتائج غلط</li>
+                <li>Late failures — الـ Bug بيظهر في آخر الـ Pipeline مش في الأول</li>
+              </ul>
+              <p><strong>الحل:</strong> استخدم Type Hints + Pydantic + schema validation في مدخل الـ Pipeline.</p>
+            </div>
+          </div>
+
+          <div class="qa-item">
+            <div class="question" onclick="toggleAnswer(this)">
+              <span>Q9: [AI Enhancement] ما الفرق بين is و == في Python؟</span>
+              <span class="qa-toggle">▼</span>
+            </div>
+            <div class="answer">
+              <p><code>==</code> بيقارن <strong>القيم</strong>. <code>is</code> بيقارن <strong>الهوية في الذاكرة</strong> (نفس الـ object).</p>
+              <pre class="code-block inline"><code>a = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+b = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>]
+
+a == b   <span class="c"># True  — نفس القيمة</span>
+a is b   <span class="c"># False — object مختلف في الذاكرة</span>
+
+<span class="c"># الاستخدام الصح لـ is:</span>
+x is <span class="kw">None</span>   <span class="c"># الصح للـ None check</span>
+x == <span class="kw">None</span>  <span class="c"># بيشتغل بس أقل Pythonic</span></code></pre>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="wrong-answers">
+        <h3>🚫 Wrong Answers Alert — أخطاء شائعة في الإنترفيو</h3>
+        <div class="wrong-item">
+          <span class="wrong-badge">❌ غلط</span>
+          <span>"Python يعرف النوع من اسم المتغير"</span>
+          <span class="wrong-reason">لا — Python يحدد النوع من القيمة المُعيَّنة، مش من الاسم.</span>
+        </div>
+        <div class="wrong-item">
+          <span class="wrong-badge">❌ غلط</span>
+          <span>"المتغير نفسه بيخزن البيانات"</span>
+          <span class="wrong-reason">لا — المتغير reference (مؤشر) على القيمة في الذاكرة.</span>
+        </div>
+        <div class="wrong-item">
+          <span class="wrong-badge">❌ غلط</span>
+          <span>"int(3.9) = 4"</span>
+          <span class="wrong-reason">لا — int() يعمل truncation مش rounding. النتيجة 3.</span>
+        </div>
+      </div>
+
+      <div class="read-check"><label><input type="checkbox" class="section-check" data-section="interview"> قرأت هذا القسم ✓</label></div>
+    </div>
+  </section>
+
+  <!-- SECTION: CHEAT SHEET -->
+  <section class="content-section" id="cheatsheet" data-section="cheatsheet">
+    <div class="section-header collapsible" data-target="cheatsheet-body">
+      <div class="section-title-wrap">
+        <span class="section-num">09</span>
+        <h2>📋 Cheat Sheet + نصائح الاحترافية</h2>
+      </div>
+      <span class="collapse-icon">▼</span>
+    </div>
+    <div class="section-body" id="cheatsheet-body">
+
+      <div class="cheat-grid">
+        <div class="cheat-card">
+          <div class="cheat-title">📦 VARIABLE</div>
+          <code>x = value</code>
+          <p>اسم يشير لقيمة في الذاكرة</p>
+        </div>
+        <div class="cheat-card">
+          <div class="cheat-title">🔢 DATA TYPES</div>
+          <code>int · float · str · bool · None</code>
+          <p>كيف الكمبيوتر يفسر البيانات</p>
+        </div>
+        <div class="cheat-card">
+          <div class="cheat-title">🔄 CONVERSION</div>
+          <code>int() · float() · str() · bool()</code>
+          <p>تحويل بين الأنواع — كن صريحًا</p>
+        </div>
+        <div class="cheat-card">
+          <div class="cheat-title">⚙️ ARITHMETIC</div>
+          <code>+ − * / // % **</code>
+          <p>/ دايمًا float، // floor</p>
+        </div>
+        <div class="cheat-card">
+          <div class="cheat-title">🔍 COMPARISON</div>
+          <code>== != &gt; &lt; &gt;= &lt;=</code>
+          <p>دايمًا بترجع True أو False</p>
+        </div>
+        <div class="cheat-card">
+          <div class="cheat-title">🧠 LOGICAL</div>
+          <code>and · or · not</code>
+          <p>Short-circuit evaluation</p>
+        </div>
+        <div class="cheat-card">
+          <div class="cheat-title">📥 INPUT</div>
+          <code>input()</code>
+          <p>دايمًا بترجع str — حوّل!</p>
+        </div>
+        <div class="cheat-card">
+          <div class="cheat-title">📤 OUTPUT</div>
+          <code>print(f"...")</code>
+          <p>f-strings الأفضل والأسرع</p>
+        </div>
+      </div>
+
+      <h3 class="sub-heading">🚀 إضافات احترافية — Tips لتوظيف أسرع</h3>
+
+      <div class="pro-tips">
+        <div class="pro-tip">
+          <div class="tip-num">01</div>
+          <div class="tip-content">
+            <h4>Validate كل External Input</h4>
+            <p>APIs تكذب. CSV يكذب. JSON يكذب. DB Schema أحيانًا يكذب. دايمًا افترض إن الـ Data ممكن تكون غلط.</p>
+            <pre class="code-block inline"><code>try:
+    age = int(user_input)
+except ValueError:
+    log_and_reject(user_input)</code></pre>
+          </div>
+        </div>
+        <div class="pro-tip">
+          <div class="tip-num">02</div>
+          <div class="tip-content">
+            <h4>كن Explicit دايمًا</h4>
+            <p>اكتب <code>price = float(raw_price)</code> بدل الاعتماد على implicit assumptions.</p>
+          </div>
+        </div>
+        <div class="pro-tip">
+          <div class="tip-num">03</div>
+          <div class="tip-content">
+            <h4>Avoid Magic Literals</h4>
+            <pre class="code-block inline"><code><span class="c"># Bad</span>
+total = price * <span class="num">1.14</span>
+
+<span class="c"># Good</span>
+TAX_RATE = <span class="num">0.14</span>
+total = price * (<span class="num">1</span> + TAX_RATE)</code></pre>
+          </div>
+        </div>
+        <div class="pro-tip">
+          <div class="tip-num">04</div>
+          <div class="tip-content">
+            <h4>Use Type Hints في Functions</h4>
+            <pre class="code-block inline"><code><span class="c"># [AI Enhancement] Modern Python</span>
+def calculate_tax(price: float, rate: float = <span class="num">0.14</span>) -> float:
+    return price * rate</code></pre>
+          </div>
+        </div>
+        <div class="pro-tip">
+          <div class="tip-num">05</div>
+          <div class="tip-content">
+            <h4>اعرف الفرق بين Truncation و Rounding</h4>
+            <p><code>int()</code> = truncation. <code>round()</code> = rounding. <code>math.floor()</code> = floor. <code>math.ceil()</code> = ceiling.</p>
+          </div>
+        </div>
+        <div class="pro-tip">
+          <div class="tip-num">06</div>
+          <div class="tip-content">
+            <h4>Use Walrus Operator للـ Pipelines المضغوطة (Python 3.8+)</h4>
+            <pre class="code-block inline"><code><span class="c"># [AI Enhancement]</span>
+valid = [r for row in data if (r := parse(row)) and validate(r)]</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mini Exam -->
+      <h3 class="sub-heading">🧪 Mini Self-Check Exam</h3>
+      <div id="miniExam">
+        <div class="exam-q" data-answer="55">
+          <p><strong>Q1:</strong> ما نتيجة: <code>x = "5"; y = 5; print(x + str(y))</code></p>
+          <input type="text" class="exam-input" placeholder="اكتب إجابتك...">
+          <button class="exam-check-btn" onclick="checkAnswer(this)">تحقق</button>
+          <span class="exam-feedback"></span>
+        </div>
+        <div class="exam-q" data-answer="3">
+          <p><strong>Q2:</strong> ما نتيجة: <code>print(10 // 3)</code></p>
+          <input type="text" class="exam-input" placeholder="اكتب إجابتك...">
+          <button class="exam-check-btn" onclick="checkAnswer(this)">تحقق</button>
+          <span class="exam-feedback"></span>
+        </div>
+        <div class="exam-q" data-answer="False">
+          <p><strong>Q3:</strong> ما نتيجة: <code>print(bool(""))</code></p>
+          <input type="text" class="exam-input" placeholder="اكتب إجابتك...">
+          <button class="exam-check-btn" onclick="checkAnswer(this)">تحقق</button>
+          <span class="exam-feedback"></span>
+        </div>
+        <div class="exam-q" data-answer="str">
+          <p><strong>Q4:</strong> <code>type(input())</code> بترجع؟ (اكتب اسم الـ type)</p>
+          <input type="text" class="exam-input" placeholder="اكتب إجابتك...">
+          <button class="exam-check-btn" onclick="checkAnswer(this)">تحقق</button>
+          <span class="exam-feedback"></span>
+        </div>
+        <div class="exam-q" data-answer="3">
+          <p><strong>Q5:</strong> ما نتيجة: <code>int(3.99)</code> ؟ وليه؟</p>
+          <input type="text" class="exam-input" placeholder="اكتب إجابتك...">
+          <button class="exam-check-btn" onclick="checkAnswer(this)">تحقق</button>
+          <span class="exam-feedback"></span>
+        </div>
+      </div>
+
+      <div class="read-check"><label><input type="checkbox" class="section-check" data-section="cheatsheet"> قرأت هذا القسم ✓</label></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- SCROLL TO TOP -->
+<button class="scroll-top" id="scrollTop" title="للأعلى">↑</button>
+
+<script src="script.js"></script>
+</body>
+</html>
