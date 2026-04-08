@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Control Flow — Data Engineering Mastery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --bg2: #141418;
+    --bg3: #1c1c22;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.14);
+    --accent: #e8ff47;
+    --accent2: #47d9ff;
+    --accent3: #ff6b6b;
+    --accent4: #b47aff;
+    --text: #f0f0ee;
+    --text2: #9b9b96;
+    --text3: #66665f;
+    --code-bg: #0a0a0c;
+    --sidebar-w: 280px;
+    --progress-color: #e8ff47;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'Lora', serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --radius: 10px;
+  }
+  [data-theme="light"] {
+    --bg: #f7f7f3;
+    --bg2: #ffffff;
+    --bg3: #eeeee8;
+    --border: rgba(0,0,0,0.08);
+    --border2: rgba(0,0,0,0.15);
+    --text: #1a1a16;
+    --text2: #555550;
+    --text3: #999990;
+    --code-bg: #1a1a22;
+    --progress-color: #2d9e00;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-body); background: var(--bg); color: var(--text); line-height: 1.75; font-size: 16px; transition: background .3s, color .3s; }
+
+  /* SCROLL PROGRESS */
+  #scroll-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--accent); z-index: 9999; transition: width .1s; width: 0%; }
+
+  /* SIDEBAR */
+  #sidebar {
+    position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh;
+    background: var(--bg2); border-right: 1px solid var(--border);
+    overflow-y: auto; z-index: 100; display: flex; flex-direction: column;
+    transform: translateX(0); transition: transform .3s cubic-bezier(.4,0,.2,1);
+  }
+  #sidebar.hidden { transform: translateX(calc(-1 * var(--sidebar-w))); }
+  .sidebar-header { padding: 24px 20px 16px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo { font-family: var(--font-head); font-size: 13px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); }
+  .sidebar-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; color: var(--text); margin-top: 4px; line-height: 1.3; }
+  .sidebar-search { margin: 12px 16px; position: relative; }
+  .sidebar-search input { width: 100%; padding: 8px 12px 8px 34px; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; transition: border .2s; }
+  .sidebar-search input:focus { border-color: var(--border2); }
+  .sidebar-search::before { content: '⌕'; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 16px; pointer-events: none; }
+  .nav-section { padding: 4px 0; }
+  .nav-section-label { font-family: var(--font-head); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--text3); padding: 12px 20px 4px; }
+  .nav-item { display: flex; align-items: center; gap: 8px; padding: 8px 20px; font-size: 13px; color: var(--text2); cursor: pointer; border-left: 2px solid transparent; transition: all .15s; text-decoration: none; }
+  .nav-item:hover { color: var(--text); background: var(--bg3); }
+  .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: var(--bg3); font-weight: 500; }
+  .nav-item .nav-check { width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--border2); flex-shrink: 0; transition: all .2s; }
+  .nav-item.done .nav-check { background: var(--accent); border-color: var(--accent); }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); margin-top: auto; }
+  .progress-wrap { }
+  .progress-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-family: var(--font-head); }
+  .progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width .4s; }
+
+  /* TOPBAR */
+  #topbar {
+    position: fixed; top: 0; left: var(--sidebar-w); right: 0; height: 52px;
+    background: var(--bg2); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; padding: 0 28px;
+    z-index: 99; transition: left .3s;
+  }
+  #topbar.full { left: 0; }
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
+  #menu-btn { background: none; border: 1px solid var(--border); color: var(--text2); width: 34px; height: 34px; border-radius: 7px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all .15s; }
+  #menu-btn:hover { color: var(--text); border-color: var(--border2); }
+  .topbar-title { font-family: var(--font-head); font-size: 14px; font-weight: 600; color: var(--text2); }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .tb-btn { background: none; border: 1px solid var(--border); color: var(--text2); padding: 6px 14px; border-radius: 7px; cursor: pointer; font-size: 12px; font-family: var(--font-head); font-weight: 600; letter-spacing: .06em; transition: all .15s; }
+  .tb-btn:hover { color: var(--text); border-color: var(--border2); }
+  .tb-btn.accent { background: var(--accent); color: #0d0d0f; border-color: var(--accent); }
+
+  /* MAIN CONTENT */
+  #main { margin-left: var(--sidebar-w); padding-top: 52px; transition: margin-left .3s; min-height: 100vh; }
+  #main.full { margin-left: 0; }
+
+  .content-wrap { max-width: 820px; margin: 0 auto; padding: 56px 40px 100px; }
+
+  /* HERO */
+  .hero { padding: 56px 0 48px; border-bottom: 1px solid var(--border); margin-bottom: 56px; }
+  .hero-tag { display: inline-flex; align-items: center; gap: 6px; background: rgba(232,255,71,0.1); border: 1px solid rgba(232,255,71,0.25); color: var(--accent); font-family: var(--font-head); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 4px 12px; border-radius: 100px; margin-bottom: 20px; }
+  .hero h1 { font-family: var(--font-head); font-size: clamp(36px, 5vw, 58px); font-weight: 800; line-height: 1.1; letter-spacing: -.02em; color: var(--text); margin-bottom: 20px; }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub { font-size: 17px; color: var(--text2); max-width: 560px; line-height: 1.65; margin-bottom: 32px; }
+  .hero-stats { display: flex; gap: 28px; flex-wrap: wrap; }
+  .stat-chip { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 18px; }
+  .stat-chip .num { font-family: var(--font-head); font-size: 24px; font-weight: 800; color: var(--text); }
+  .stat-chip .lbl { font-size: 11px; color: var(--text3); font-family: var(--font-head); letter-spacing: .06em; text-transform: uppercase; }
+
+  /* SECTIONS */
+  .section { margin-bottom: 80px; scroll-margin-top: 72px; }
+  .section-badge { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-head); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; padding: 3px 10px; border-radius: 100px; margin-bottom: 14px; }
+  .badge-foundation { background: rgba(71,217,255,.1); color: var(--accent2); border: 1px solid rgba(71,217,255,.2); }
+  .badge-concepts { background: rgba(232,255,71,.1); color: var(--accent); border: 1px solid rgba(232,255,71,.2); }
+  .badge-engineering { background: rgba(180,122,255,.1); color: var(--accent4); border: 1px solid rgba(180,122,255,.2); }
+  .badge-interview { background: rgba(255,107,107,.1); color: var(--accent3); border: 1px solid rgba(255,107,107,.2); }
+  .badge-senior { background: rgba(255,200,100,.1); color: #ffc864; border: 1px solid rgba(255,200,100,.2); }
+  .badge-revision { background: rgba(100,255,150,.1); color: #64ffaa; border: 1px solid rgba(100,255,150,.2); }
+  .section > h2 { font-family: var(--font-head); font-size: 30px; font-weight: 800; line-height: 1.2; letter-spacing: -.02em; color: var(--text); margin-bottom: 12px; }
+  .section > .section-desc { color: var(--text2); font-size: 15px; margin-bottom: 36px; }
+  .subsection { margin-bottom: 48px; }
+  .subsection h3 { font-family: var(--font-head); font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .subsection h4 { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--text2); margin: 20px 0 10px; text-transform: uppercase; letter-spacing: .08em; font-size: 12px; }
+  p { color: var(--text2); margin-bottom: 14px; font-size: 15.5px; }
+  p strong { color: var(--text); font-weight: 600; font-style: normal; }
+
+  /* CALLOUT */
+  .callout { border-left: 3px solid var(--accent); background: rgba(232,255,71,.05); border-radius: 0 var(--radius) var(--radius) 0; padding: 16px 20px; margin: 20px 0; }
+  .callout.blue { border-left-color: var(--accent2); background: rgba(71,217,255,.05); }
+  .callout.red { border-left-color: var(--accent3); background: rgba(255,107,107,.05); }
+  .callout.purple { border-left-color: var(--accent4); background: rgba(180,122,255,.05); }
+  .callout strong { display: block; font-family: var(--font-head); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 6px; color: var(--accent); }
+  .callout.blue strong { color: var(--accent2); }
+  .callout.red strong { color: var(--accent3); }
+  .callout.purple strong { color: var(--accent4); }
+  .callout p { margin: 0; font-size: 14px; }
+
+  /* CODE BLOCKS */
+  .code-block { position: relative; margin: 18px 0; }
+  .code-block pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; overflow-x: auto; font-family: var(--font-mono); font-size: 13.5px; line-height: 1.65; color: #cdd6f4; }
+  .code-label { position: absolute; top: -1px; left: 0; font-family: var(--font-head); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; background: var(--bg3); border: 1px solid var(--border); border-bottom: none; padding: 3px 10px; border-radius: var(--radius) var(--radius) 0 0; color: var(--text3); margin-top: 0; }
+  .code-block pre { margin-top: 0; }
+  .code-block.has-label pre { border-top-left-radius: 0; }
+  .copy-btn { position: absolute; top: 8px; right: 8px; background: var(--bg3); border: 1px solid var(--border); color: var(--text3); padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-family: var(--font-head); font-weight: 600; letter-spacing: .06em; transition: all .15s; }
+  .copy-btn:hover { color: var(--text); border-color: var(--border2); }
+  .copy-btn.copied { color: var(--accent); border-color: var(--accent); }
+  /* Syntax highlight */
+  .kw { color: #cba6f7; } .fn { color: #89b4fa; } .st { color: #a6e3a1; } .cm { color: #585b70; } .nm { color: #fab387; } .op { color: #89dceb; } .bi { color: #f5c2e7; }
+
+  /* CONCEPT CARDS */
+  .concept-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin: 24px 0; }
+  .concept-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; transition: border-color .2s, transform .2s; cursor: default; }
+  .concept-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+  .cc-icon { font-size: 22px; margin-bottom: 10px; }
+  .cc-name { font-family: var(--font-head); font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .cc-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+  /* LAYERS */
+  .layer-tabs { display: flex; gap: 6px; margin-bottom: 0; }
+  .layer-tab { font-family: var(--font-head); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 6px 14px; border-radius: 6px 6px 0 0; border: 1px solid var(--border); border-bottom: none; cursor: pointer; color: var(--text3); background: var(--bg3); transition: all .15s; }
+  .layer-tab.active { color: var(--text); background: var(--bg2); border-color: var(--border2); }
+  .layer-content { background: var(--bg2); border: 1px solid var(--border2); border-radius: 0 var(--radius) var(--radius) var(--radius); padding: 24px; }
+  .layer-panel { display: none; }
+  .layer-panel.active { display: block; }
+
+  /* TABLES */
+  .table-wrap { overflow-x: auto; margin: 20px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { font-family: var(--font-head); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); padding: 8px 14px; border-bottom: 1px solid var(--border); text-align: left; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--text2); }
+  tr:last-child td { border-bottom: none; }
+  td code { font-family: var(--font-mono); font-size: 12px; background: var(--bg3); padding: 2px 6px; border-radius: 4px; color: var(--accent2); }
+
+  /* INTERVIEW Q&A */
+  .qa-list { display: flex; flex-direction: column; gap: 14px; }
+  .qa-item { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .qa-q { padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; transition: background .15s; }
+  .qa-q:hover { background: var(--bg3); }
+  .qa-q-text { font-family: var(--font-head); font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.4; }
+  .qa-q-meta { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .diff-badge { font-family: var(--font-head); font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
+  .diff-basic { background: rgba(100,255,150,.12); color: #64ffaa; }
+  .diff-mid { background: rgba(232,255,71,.12); color: var(--accent); }
+  .diff-adv { background: rgba(255,107,107,.12); color: var(--accent3); }
+  .diff-trick { background: rgba(180,122,255,.12); color: var(--accent4); }
+  .qa-arrow { color: var(--text3); font-size: 18px; transition: transform .2s; flex-shrink: 0; }
+  .qa-item.open .qa-arrow { transform: rotate(90deg); }
+  .qa-a { display: none; padding: 0 20px 20px; border-top: 1px solid var(--border); }
+  .qa-item.open .qa-a { display: block; }
+  .qa-a-label { font-family: var(--font-head); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin: 14px 0 8px; }
+  .qa-answer { font-size: 14.5px; color: var(--text2); line-height: 1.65; }
+  .why-strong { background: rgba(232,255,71,.07); border: 1px solid rgba(232,255,71,.15); border-radius: 7px; padding: 12px 16px; margin-top: 12px; font-size: 13px; color: var(--text2); }
+  .why-strong::before { content: '★ Why this answer is strong: '; font-family: var(--font-head); font-size: 11px; font-weight: 700; color: var(--accent); letter-spacing: .05em; }
+
+  /* CHEAT SHEET */
+  .cheat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 24px 0; }
+  .cheat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+  .cheat-card .kw-head { font-family: var(--font-mono); font-size: 16px; font-weight: 500; color: var(--accent2); margin-bottom: 8px; }
+  .cheat-card .kw-def { font-size: 13px; color: var(--text2); line-height: 1.45; }
+  .cheat-card .kw-tip { font-size: 11px; color: var(--text3); margin-top: 8px; font-style: italic; }
+
+  /* PITFALLS */
+  .pitfall-list { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+  .pitfall { background: rgba(255,107,107,.06); border: 1px solid rgba(255,107,107,.18); border-radius: var(--radius); padding: 16px 20px; }
+  .pitfall-head { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--accent3); margin-bottom: 6px; display: flex; align-items: center; gap: 7px; }
+  .pitfall-body { font-size: 13.5px; color: var(--text2); }
+
+  /* TOP 20 */
+  .top20-list { counter-reset: top20; display: flex; flex-direction: column; gap: 10px; margin: 20px 0; }
+  .top20-item { counter-increment: top20; display: flex; gap: 14px; align-items: flex-start; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; font-size: 14.5px; color: var(--text2); transition: border-color .15s; }
+  .top20-item:hover { border-color: var(--border2); }
+  .top20-item::before { content: counter(top20, decimal-leading-zero); font-family: var(--font-mono); font-size: 13px; color: var(--accent); font-weight: 500; flex-shrink: 0; padding-top: 1px; }
+
+  /* FLOW DIAGRAM */
+  .flow-diagram { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; margin: 24px 0; text-align: center; font-family: var(--font-mono); font-size: 13px; color: var(--text2); white-space: pre; overflow-x: auto; line-height: 1.5; }
+
+  /* MARK COMPLETE BTN */
+  .complete-btn { display: inline-flex; align-items: center; gap: 8px; margin-top: 24px; background: none; border: 1px solid var(--border); color: var(--text3); padding: 8px 18px; border-radius: 8px; cursor: pointer; font-family: var(--font-head); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; transition: all .2s; }
+  .complete-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .complete-btn.done { background: rgba(232,255,71,.1); border-color: var(--accent); color: var(--accent); }
+
+  /* RANGE DISPLAY */
+  .range-demo { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin: 20px 0; }
+  .range-demo label { font-family: var(--font-head); font-size: 12px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: 8px; }
+  .range-row { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+  .range-row input[type=number] { background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 6px; font-family: var(--font-mono); font-size: 14px; width: 80px; outline: none; }
+  .range-row input[type=number]:focus { border-color: var(--accent); }
+  .range-row span { color: var(--text3); font-size: 13px; }
+  #range-output { font-family: var(--font-mono); font-size: 14px; color: var(--accent); padding: 8px 0; min-height: 28px; }
+
+  /* SEARCH HIGHLIGHT */
+  mark { background: rgba(232,255,71,.25); color: var(--text); border-radius: 2px; }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    :root { --sidebar-w: 260px; }
+    #sidebar { transform: translateX(calc(-1 * var(--sidebar-w))); }
+    #sidebar.mobile-open { transform: translateX(0); }
+    #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 99; }
+    #sidebar-overlay.show { display: block; }
+    #topbar { left: 0 !important; }
+    #main { margin-left: 0 !important; }
+    .content-wrap { padding: 40px 20px 80px; }
+    .hero h1 { font-size: 32px; }
+    .concept-grid { grid-template-columns: 1fr; }
+  }
+  @media (min-width: 769px) {
+    #sidebar-overlay { display: none !important; }
+  }
+
+  /* BOOKMARKS */
+  .bookmark-btn { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 16px; padding: 2px 4px; transition: color .15s; }
+  .bookmark-btn:hover, .bookmark-btn.saved { color: #ffc864; }
+
+  /* AI ENHANCEMENT LABELS */
+  .ai-label { display: inline-block; background: rgba(180,122,255,.12); color: var(--accent4); border: 1px solid rgba(180,122,255,.25); border-radius: 4px; font-family: var(--font-head); font-size: 10px; font-weight: 700; letter-spacing: .08em; padding: 1px 7px; margin-left: 6px; vertical-align: middle; }
+
+  /* QUIZ */
+  .quiz-block { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; margin: 20px 0; }
+  .quiz-q { font-family: var(--font-head); font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 16px; }
+  .quiz-q code { font-family: var(--font-mono); font-size: 13px; background: var(--code-bg); border: 1px solid var(--border); padding: 2px 7px; border-radius: 4px; color: var(--accent2); }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { background: var(--bg3); border: 1px solid var(--border); border-radius: 7px; padding: 10px 14px; cursor: pointer; font-size: 14px; color: var(--text2); font-family: var(--font-mono); transition: all .15s; }
+  .quiz-opt:hover { border-color: var(--border2); color: var(--text); }
+  .quiz-opt.correct { background: rgba(100,255,150,.1); border-color: #64ffaa; color: #64ffaa; }
+  .quiz-opt.wrong { background: rgba(255,107,107,.1); border-color: var(--accent3); color: var(--accent3); }
+  .quiz-feedback { margin-top: 12px; font-size: 13.5px; color: var(--text2); display: none; }
+  .quiz-feedback.show { display: block; }
+
+  /* ANCHOR LINKS */
+  h2 .anchor, h3 .anchor { opacity: 0; margin-left: 6px; color: var(--text3); text-decoration: none; font-size: .85em; font-weight: 400; }
+  h2:hover .anchor, h3:hover .anchor { opacity: 1; }
+</style>
+</head>
+<body>
+<div id="scroll-bar"></div>
+<div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">Python Mastery</div>
+    <div class="sidebar-title">Control Flow</div>
+  </div>
+  <div class="sidebar-search">
+    <input type="text" id="search-input" placeholder="Search concepts..." oninput="liveSearch(this.value)">
+  </div>
+  <div id="nav-list"></div>
+  <div class="sidebar-footer">
+    <div class="progress-wrap">
+      <div class="progress-label" id="progress-label">0 / 9 sections complete</div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+</nav>
+
+<!-- TOPBAR -->
+<header id="topbar">
+  <div class="topbar-left">
+    <button id="menu-btn" onclick="toggleSidebar()" title="Toggle sidebar">☰</button>
+    <span class="topbar-title" id="topbar-section">Control Flow — Data Engineering</span>
+  </div>
+  <div class="topbar-right">
+    <button class="tb-btn" onclick="toggleTheme()" id="theme-btn">☀ Light</button>
+    <button class="tb-btn" onclick="bookmarksView()">⌖ Bookmarks</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main id="main">
+<div class="content-wrap" id="content">
+
+<!-- HERO -->
+<div class="hero" id="sec-hero">
+  <div class="hero-tag">📐 Chapter 2</div>
+  <h1>Python <span>Control Flow</span></h1>
+  <p class="hero-sub">Master the logic and iteration primitives that power every data pipeline, ETL system, and production application — from fundamentals to FAANG interview-ready depth.</p>
+  <div class="hero-stats">
+    <div class="stat-chip"><div class="num">9</div><div class="lbl">Sections</div></div>
+    <div class="stat-chip"><div class="num">9</div><div class="lbl">Keywords</div></div>
+    <div class="stat-chip"><div class="num">20+</div><div class="lbl">Interview Qs</div></div>
+    <div class="stat-chip"><div class="num">3</div><div class="lbl">Learning Layers</div></div>
+  </div>
+</div>
+
+<!-- ===== SECTION 1: FOUNDATIONS ===== -->
+<section class="section" id="sec-foundations">
+  <div class="section-badge badge-foundation">Foundation</div>
+  <h2>What Is Control Flow? <a href="#sec-foundations" class="anchor">#</a></h2>
+  <p class="section-desc">The mental model that makes every concept click.</p>
+
+  <div class="subsection">
+    <h3>The Core Idea</h3>
+    <p>Without control flow, a Python program executes statements one by one, top to bottom — a straight line. <strong>Control flow</strong> is the system that decides <em>which</em> line runs next. It gives your code decision-making and repetition abilities.</p>
+
+    <div class="callout blue">
+      <strong>One-Sentence Definition</strong>
+      <p>Control Flow = Decision Logic + Iteration Logic. Every non-trivial program depends on it.</p>
+    </div>
+
+    <div class="layer-tabs">
+      <div class="layer-tab active" onclick="switchLayer(this, 'cf-beginner')">Beginner</div>
+      <div class="layer-tab" onclick="switchLayer(this, 'cf-mid')">Intermediate</div>
+      <div class="layer-tab" onclick="switchLayer(this, 'cf-adv')">Advanced</div>
+    </div>
+    <div class="layer-content">
+      <div class="layer-panel active" id="cf-beginner">
+        <p>Imagine a recipe. Sometimes it says "if you don't have butter, use oil." That's a decision. Sometimes it says "stir for 3 minutes." That's repetition. Control flow is how your code does the same — makes choices and repeats actions.</p>
+      </div>
+      <div class="layer-panel" id="cf-mid">
+        <p>Control flow structures alter the default sequential execution order. <strong>Conditionals</strong> (<code>if/elif/else</code>) evaluate boolean expressions to select code branches. <strong>Loops</strong> (<code>for</code>, <code>while</code>) repeat code blocks until an iterable is exhausted or a condition turns false.</p>
+      </div>
+      <div class="layer-panel" id="cf-adv">
+        <p>At the bytecode level, control flow compiles to <code>JUMP_IF_FALSE</code>, <code>FOR_ITER</code>, and related opcodes. Python's <code>for</code> loop calls <code>iter()</code> on the iterable and repeatedly invokes <code>next()</code>, catching <code>StopIteration</code> to terminate. The GIL interacts with long-running loops, which is why CPU-bound Python loops can be bottlenecks compared to vectorized NumPy or Spark operations.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>Why Data Engineers Must Master This</h3>
+    <div class="concept-grid">
+      <div class="concept-card"><div class="cc-icon">🔍</div><div class="cc-name">Row Filtering</div><div class="cc-desc">Skip invalid records in ETL pipelines using <code>continue</code> and <code>if</code>.</div></div>
+      <div class="concept-card"><div class="cc-icon">🔄</div><div class="cc-name">Transformation Logic</div><div class="cc-desc">Apply different transformations per region, data type, or business rule.</div></div>
+      <div class="concept-card"><div class="cc-icon">🔁</div><div class="cc-name">Retry Loops</div><div class="cc-desc"><code>while</code> loops power exponential back-off and retry mechanisms for API calls.</div></div>
+      <div class="concept-card"><div class="cc-icon">📦</div><div class="cc-name">Batch Processing</div><div class="cc-desc">Iterate over chunks of data files or database cursor results.</div></div>
+      <div class="concept-card"><div class="cc-icon">⚡</div><div class="cc-name">Streaming Consumers</div><div class="cc-desc"><code>while True</code> loops drive Kafka and queue consumers.</div></div>
+      <div class="concept-card"><div class="cc-icon">✅</div><div class="cc-name">Validation Rules</div><div class="cc-desc">Enforce schema contracts and data quality checks before loading.</div></div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>The Taxonomy</h3>
+    <div class="flow-diagram">Control Flow
+│
+├── Decision Making
+│   └── if / elif / else
+│
+├── Repetition
+│   ├── for         ← known iterable
+│   └── while       ← condition-based
+│
+└── Loop Manipulation
+    ├── break       ← exit loop
+    ├── continue    ← skip iteration
+    └── pass        ← placeholder</div>
+  </div>
+  <button class="complete-btn" id="btn-foundations" onclick="markComplete('foundations')">✓ Mark Section Complete</button>
+</section>
+
+<!-- ===== SECTION 2: IF/ELIF/ELSE ===== -->
+<section class="section" id="sec-if">
+  <div class="section-badge badge-concepts">Core Concept</div>
+  <h2>if / elif / else <a href="#sec-if" class="anchor">#</a>
+    <button class="bookmark-btn" onclick="toggleBookmark('sec-if', 'if / elif / else')" id="bm-sec-if" title="Bookmark">⌖</button>
+  </h2>
+  <p class="section-desc">Branching — the fork in the road of your program's execution.</p>
+
+  <div class="subsection">
+    <h3>Syntax & Execution Model</h3>
+    <div class="code-block has-label">
+      <div class="code-label">Python</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="kw">if</span> condition:
+    <span class="cm"># block executes if condition is True</span>
+    ...
+<span class="kw">elif</span> another_condition:
+    <span class="cm"># only checked if first condition was False</span>
+    ...
+<span class="kw">else</span>:
+    <span class="cm"># executes if NO previous branch matched</span>
+    ...</pre>
+    </div>
+    <div class="callout">
+      <strong>Key Execution Rule</strong>
+      <p>Python evaluates branches top-to-bottom and executes <em>only the first matching branch</em>. Once a branch runs, all others are skipped — even if they would also evaluate to True.</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>Truthy and Falsy Values</h3>
+    <p>Python treats these values as <strong>False</strong> in a boolean context. Everything else is <strong>True</strong>.</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Value</th><th>Type</th><th>Why Falsy</th></tr>
+        <tr><td><code>False</code></td><td>bool</td><td>Literal false</td></tr>
+        <tr><td><code>None</code></td><td>NoneType</td><td>Null/missing value</td></tr>
+        <tr><td><code>0</code>, <code>0.0</code>, <code>0j</code></td><td>numeric</td><td>Numerical zero</td></tr>
+        <tr><td><code>""</code>, <code>''</code></td><td>str</td><td>Empty string</td></tr>
+        <tr><td><code>[]</code>, <code>()</code>, <code>{}</code>, <code>set()</code></td><td>collections</td><td>Empty containers</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>Common Mistakes</h3>
+    <div class="callout red">
+      <strong>Mistake #1 — Wrong OR logic</strong>
+      <p>Writing <code>if x == 1 or 2:</code> is logically wrong. Python parses this as <code>(x == 1) or (2)</code>. Since <code>2</code> is truthy, the condition is <em>always True</em>.</p>
+    </div>
+    <div class="code-block">
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="cm"># Wrong ❌ — always True because 2 is truthy</span>
+<span class="kw">if</span> x == <span class="nm">1</span> <span class="kw">or</span> <span class="nm">2</span>:
+
+<span class="cm"># Correct ✅ — two explicit comparisons</span>
+<span class="kw">if</span> x == <span class="nm">1</span> <span class="kw">or</span> x == <span class="nm">2</span>:
+
+<span class="cm"># Pythonic ✅✅ — use membership test</span>
+<span class="kw">if</span> x <span class="kw">in</span> (<span class="nm">1</span>, <span class="nm">2</span>):</pre>
+    </div>
+    <div class="callout red">
+      <strong>Mistake #2 — elif after True if</strong>
+      <p>If the <code>if</code> block executes, <code>elif</code> is <em>never evaluated</em>, even if its condition is True. This is not a bug — it's by design — but many beginners expect both to run.</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>Data Engineering Patterns</h3>
+    <div class="code-block has-label">
+      <div class="code-label">Validation</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="kw">def</span> <span class="fn">validate_record</span>(row):
+    <span class="kw">if</span> row[<span class="st">"age"</span>] &lt; <span class="nm">0</span>:
+        <span class="kw">raise</span> <span class="bi">ValueError</span>(<span class="st">f"Invalid age: </span>{row[<span class="st">'age'</span>]}<span class="st">"</span>)
+    <span class="kw">elif</span> row[<span class="st">"age"</span>] &gt; <span class="nm">120</span>:
+        <span class="kw">return</span> <span class="st">"suspect"</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span> <span class="st">"valid"</span></pre>
+    </div>
+    <div class="code-block has-label">
+      <div class="code-label">Conditional Transformation</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="kw">def</span> <span class="fn">normalize_currency</span>(row):
+    <span class="kw">if</span> row[<span class="st">"country"</span>] == <span class="st">"EG"</span>:
+        <span class="kw">return</span> row[<span class="st">"amount"</span>] / <span class="nm">48.0</span>  <span class="cm"># EGP to USD</span>
+    <span class="kw">elif</span> row[<span class="st">"country"</span>] == <span class="st">"GB"</span>:
+        <span class="kw">return</span> row[<span class="st">"amount"</span>] * <span class="nm">1.27</span>  <span class="cm"># GBP to USD</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span> row[<span class="st">"amount"</span>]</pre>
+    </div>
+  </div>
+  <button class="complete-btn" id="btn-if" onclick="markComplete('if')">✓ Mark Section Complete</button>
+</section>
+
+<!-- ===== SECTION 3: FOR / WHILE ===== -->
+<section class="section" id="sec-loops">
+  <div class="section-badge badge-concepts">Core Concept</div>
+  <h2>for / while Loops <a href="#sec-loops" class="anchor">#</a>
+    <button class="bookmark-btn" onclick="toggleBookmark('sec-loops', 'for / while Loops')" id="bm-sec-loops" title="Bookmark">⌖</button>
+  </h2>
+  <p class="section-desc">The two fundamental repetition mechanisms.</p>
+
+  <div class="subsection">
+    <h3>The <code>for</code> Loop</h3>
+    <div class="layer-tabs">
+      <div class="layer-tab active" onclick="switchLayer(this, 'for-b')">Beginner</div>
+      <div class="layer-tab" onclick="switchLayer(this, 'for-m')">Intermediate</div>
+      <div class="layer-tab" onclick="switchLayer(this, 'for-a')">Advanced</div>
+    </div>
+    <div class="layer-content">
+      <div class="layer-panel active" id="for-b"><p>A <code>for</code> loop says: "for each item in this collection, do this." You use it when you know what you're looping over.</p></div>
+      <div class="layer-panel" id="for-m"><p>A <code>for</code> loop iterates over any <em>iterable</em> — lists, tuples, strings, dicts, generators, file handles, etc. The loop variable is assigned each element in sequence.</p></div>
+      <div class="layer-panel" id="for-a">
+        <p>Python compiles <code>for</code> to call <code>iter(iterable)</code>, then repeatedly calls <code>next()</code> on the resulting iterator object. When <code>StopIteration</code> is raised, the loop exits. This is the <strong>Iterator Protocol</strong>. Any object implementing <code>__iter__</code> and <code>__next__</code> is a valid loop target. <span class="ai-label">AI Enhancement</span></p>
+        <div class="code-block">
+          <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="cm"># What Python actually does under the hood:</span>
+iterator = <span class="bi">iter</span>([<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>])
+<span class="kw">while</span> <span class="bi">True</span>:
+    <span class="kw">try</span>:
+        x = <span class="bi">next</span>(iterator)
+        <span class="fn">print</span>(x)
+    <span class="kw">except</span> <span class="bi">StopIteration</span>:
+        <span class="kw">break</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="code-block has-label">
+      <div class="code-label">for loop — data engineering example</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button"><span class="kw">for</span> row <span class="kw">in</span> dataset:
+    transformed = transform(row)
+    warehouse.insert(transformed)
+
+<span class="cm"># Iterate over files in a directory</span>
+<span class="kw">import</span> pathlib
+<span class="kw">for</span> file <span class="kw">in</span> pathlib.Path(<span class="st">"data/"</span>).glob(<span class="st">"*.csv"</span>):
+    process(file)</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>The <code>while</code> Loop</h3>
+    <div class="code-block has-label">
+      <div class="code-label">Retry pattern — real world</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button">import time
+
+retries = <span class="nm">0</span>
+MAX_RETRIES = <span class="nm">3</span>
+
+<span class="kw">while</span> retries &lt; MAX_RETRIES:
+    <span class="kw">try</span>:
+        response = api.call()
+        <span class="kw">break</span>  <span class="cm"># success — exit loop</span>
+    <span class="kw">except</span> <span class="bi">Exception</span> <span class="kw">as</span> e:
+        retries += <span class="nm">1</span>
+        time.sleep(<span class="nm">2</span> ** retries)  <span class="cm"># exponential back-off</span>
+        <span class="fn">print</span>(<span class="st">f"Retry </span>{retries}<span class="st">...</span>")</pre>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Feature</th><th><code>for</code></th><th><code>while</code></th></tr>
+        <tr><td>Use when</td><td>Iterating a known collection</td><td>Condition-based repetition</td></tr>
+        <tr><td>Termination</td><td>Exhausts iterable automatically</td><td>Must change condition or use <code>break</code></td></tr>
+        <tr><td>Infinite loop risk</td><td>Low</td><td>High — always check termination</td></tr>
+        <tr><td>Common uses</td><td>Row processing, file iteration</td><td>Retry logic, polling, consumers</td></tr>
+      </table>
+    </div>
+
+    <div class="callout red">
+      <strong>Danger: Infinite Loops</strong>
+      <p>If a <code>while</code> loop's condition never becomes False and there's no <code>break</code>, the program hangs indefinitely. Always ensure the loop state changes on each iteration.</p>
+    </div>
+  </div>
+  <button class="complete-btn" id="btn-loops" onclick="markComplete('loops')">✓ Mark Section Complete</button>
+</section>
+
+<!-- ===== SECTION 4: BREAK/CONTINUE/PASS ===== -->
+<section class="section" id="sec-control">
+  <div class="section-badge badge-concepts">Core Concept</div>
+  <h2>break / continue / pass <a href="#sec-control" class="anchor">#</a>
+    <button class="bookmark-btn" onclick="toggleBookmark('sec-control', 'break / continue / pass')" id="bm-sec-control" title="Bookmark">⌖</button>
+  </h2>
+  <p class="section-desc">Fine-grained control over loop execution.</p>
+
+  <div class="subsection">
+    <h3>break — Exit the Loop Immediately</h3>
+    <p><code>break</code> terminates the <em>innermost enclosing loop</em> immediately, jumping to the first statement after the loop.</p>
+    <div class="code-block">
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button"><span class="cm"># Search until target found</span>
+<span class="kw">for</span> row <span class="kw">in</span> rows:
+    <span class="kw">if</span> row[<span class="st">"id"</span>] == target_id:
+        result = row
+        <span class="kw">break</span>  <span class="cm"># no point scanning further</span>
+
+<span class="cm"># Output: 0 1 2 3 4 (stops at 5)</span>
+<span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">10</span>):
+    <span class="kw">if</span> x == <span class="nm">5</span>: <span class="kw">break</span>
+    <span class="fn">print</span>(x)</pre>
+    </div>
+    <div class="callout">
+      <strong>Data Engineering Use Case</strong>
+      <p>Stop reading a file once a sentinel row is encountered. Stop consuming a queue once a shutdown signal arrives.</p>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>continue — Skip This Iteration</h3>
+    <p><code>continue</code> jumps to the <em>next iteration</em> of the loop, skipping the remaining code in the current iteration block.</p>
+    <div class="code-block">
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button"><span class="cm"># Skip dirty/invalid records — classic ETL pattern</span>
+<span class="kw">for</span> row <span class="kw">in</span> rows:
+    <span class="kw">if</span> <span class="kw">not</span> is_valid(row):
+        bad_record_log.append(row)
+        <span class="kw">continue</span>  <span class="cm"># skip to next row</span>
+    
+    <span class="cm"># Only valid records reach here</span>
+    transformed = transform(row)
+    warehouse.write(transformed)
+
+<span class="cm"># Numeric example — Output: 0 1 3 4 (skips 2)</span>
+<span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>):
+    <span class="kw">if</span> x == <span class="nm">2</span>: <span class="kw">continue</span>
+    <span class="fn">print</span>(x)</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>pass — Syntactic Placeholder</h3>
+    <p>Python requires a body for every block (if, for, while, function, class). <code>pass</code> satisfies this requirement while doing nothing. It is purely a placeholder for future code.</p>
+    <div class="code-block">
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button"><span class="cm"># Stub a function you'll implement later</span>
+<span class="kw">def</span> <span class="fn">process_batch</span>(batch):
+    <span class="kw">pass</span>  <span class="cm"># TODO: implement</span>
+
+<span class="cm"># Temporarily ignore a condition</span>
+<span class="kw">for</span> row <span class="kw">in</span> rows:
+    <span class="kw">if</span> row[<span class="st">"type"</span>] == <span class="st">"LEGACY"</span>:
+        <span class="kw">pass</span>  <span class="cm"># handle later</span>
+    <span class="kw">else</span>:
+        process(row)</pre>
+    </div>
+    <div class="callout red">
+      <strong>Critical Distinction — pass vs continue</strong>
+      <p><code>pass</code> does nothing and <em>continues executing the rest of the loop body</em>. <code>continue</code> <em>skips the rest of the loop body</em> and jumps to the next iteration. They are completely different.</p>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="quiz-block">
+    <div class="quiz-q">Quick Check: What is the output of this code?<br><br><code>for i in range(5):&nbsp;&nbsp;if i == 3: continue&nbsp;&nbsp;print(i)</code></div>
+    <div class="quiz-options" id="q1-opts">
+      <div class="quiz-opt" onclick="answerQuiz('q1', this, false)">0 1 2 3 4</div>
+      <div class="quiz-opt" onclick="answerQuiz('q1', this, true)">0 1 2 4</div>
+      <div class="quiz-opt" onclick="answerQuiz('q1', this, false)">0 1 2</div>
+      <div class="quiz-opt" onclick="answerQuiz('q1', this, false)">1 2 4 5</div>
+    </div>
+    <div class="quiz-feedback" id="q1-feedback">✅ Correct! <code>continue</code> skips the <code>print(i)</code> when <code>i == 3</code>, so 3 is never printed. The loop continues normally for 4.</div>
+  </div>
+
+  <button class="complete-btn" id="btn-control" onclick="markComplete('control')">✓ Mark Section Complete</button>
+</section>
+
+<!-- ===== SECTION 5: RANGE/ENUMERATE/ZIP ===== -->
+<section class="section" id="sec-helpers">
+  <div class="section-badge badge-concepts">Core Concept</div>
+  <h2>range / enumerate / zip <a href="#sec-helpers" class="anchor">#</a>
+    <button class="bookmark-btn" onclick="toggleBookmark('sec-helpers', 'range / enumerate / zip')" id="bm-sec-helpers" title="Bookmark">⌖</button>
+  </h2>
+  <p class="section-desc">Iteration helpers that make your loops cleaner and more Pythonic.</p>
+
+  <div class="subsection">
+    <h3>range() — Sequence Generator</h3>
+    <p><code>range</code> generates a sequence of integers lazily. It is <strong>memory efficient</strong> — it does not create a list in memory, regardless of the size of the range.</p>
+
+    <!-- INTERACTIVE RANGE DEMO -->
+    <div class="range-demo">
+      <label>Interactive range() Explorer</label>
+      <div class="range-row">
+        <input type="number" id="r-start" value="0" placeholder="start">
+        <span>,</span>
+        <input type="number" id="r-stop" value="10" placeholder="stop">
+        <span>,</span>
+        <input type="number" id="r-step" value="1" placeholder="step">
+        <button style="background:var(--accent);color:#0d0d0f;border:none;padding:7px 16px;border-radius:7px;font-family:var(--font-head);font-weight:700;font-size:12px;cursor:pointer;letter-spacing:.06em;" onclick="runRange()">→ Generate</button>
+      </div>
+      <div id="range-output">→ [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]</div>
+    </div>
+
+    <div class="code-block">
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button"><span class="fn">range</span>(<span class="nm">5</span>)          <span class="cm"># → 0 1 2 3 4 (stop only, start=0, step=1)</span>
+<span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">6</span>)       <span class="cm"># → 1 2 3 4 5 (start=1, stop=6)</span>
+<span class="fn">range</span>(<span class="nm">0</span>, <span class="nm">10</span>, <span class="nm">2</span>)   <span class="cm"># → 0 2 4 6 8 (even numbers)</span>
+<span class="fn">range</span>(<span class="nm">10</span>, <span class="nm">0</span>, <span class="nm">-1</span>)  <span class="cm"># → 10 9 8 7 6 5 4 3 2 1 (countdown)</span>
+
+<span class="cm"># ⚠️ Stop is ALWAYS exclusive</span>
+<span class="fn">list</span>(<span class="fn">range</span>(<span class="nm">5</span>))  <span class="cm"># → [0, 1, 2, 3, 4] — NOT [0,1,2,3,4,5]</span>
+
+<span class="cm"># 🚀 Memory efficient — range(1_000_000) uses ~48 bytes</span>
+<span class="kw">import</span> sys
+sys.getsizeof(<span class="fn">range</span>(<span class="nm">1_000_000</span>))  <span class="cm"># → 48 bytes always</span></pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>enumerate() — Index + Value Together</h3>
+    <div class="callout blue">
+      <strong>Why enumerate() exists</strong>
+      <p>Accessing both the index and value of a list used to require clunky <code>range(len(...))</code> patterns. <code>enumerate()</code> is the clean, Pythonic solution.</p>
+    </div>
+    <div class="code-block">
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button"><span class="cm"># Old (bad) way ❌</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="bi">len</span>(items)):
+    <span class="fn">print</span>(i, items[i])
+
+<span class="cm"># Pythonic way ✅</span>
+<span class="kw">for</span> index, value <span class="kw">in</span> <span class="fn">enumerate</span>(items):
+    <span class="fn">print</span>(index, value)
+
+<span class="cm"># Custom start index</span>
+<span class="kw">for</span> i, v <span class="kw">in</span> <span class="fn">enumerate</span>(items, start=<span class="nm">1</span>):
+    <span class="fn">print</span>(<span class="st">f"Row {i}: {v}"</span>)
+
+<span class="cm"># Data engineering: log which row caused an error</span>
+<span class="kw">for</span> row_num, row <span class="kw">in</span> <span class="fn">enumerate</span>(dataset, start=<span class="nm">1</span>):
+    <span class="kw">if</span> <span class="kw">not</span> is_valid(row):
+        logger.warning(<span class="st">f"Invalid row at index </span>{row_num}<span class="st">"</span>)</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>zip() — Parallel Iteration</h3>
+    <div class="code-block">
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button">names = [<span class="st">"Ali"</span>, <span class="st">"Sara"</span>, <span class="st">"Mona"</span>]
+scores = [<span class="nm">88</span>, <span class="nm">95</span>, <span class="nm">72</span>]
+
+<span class="kw">for</span> name, score <span class="kw">in</span> <span class="fn">zip</span>(names, scores):
+    <span class="fn">print</span>(<span class="st">f"{name}: {score}"</span>)
+
+<span class="cm"># ⚠️ zip stops at the SHORTEST iterable</span>
+<span class="fn">list</span>(<span class="fn">zip</span>([<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>], [<span class="nm">4</span>]))  <span class="cm"># → [(1, 4)] — only 1 pair!</span>
+
+<span class="cm"># If you need all pairs, use itertools.zip_longest</span>
+<span class="kw">from</span> itertools <span class="kw">import</span> zip_longest
+<span class="fn">list</span>(<span class="fn">zip_longest</span>([<span class="nm">1</span>,<span class="nm">2</span>,<span class="nm">3</span>], [<span class="nm">4</span>], fillvalue=<span class="nm">0</span>))
+<span class="cm"># → [(1, 4), (2, 0), (3, 0)]</span></pre>
+    </div>
+    <div class="callout purple">
+      <strong>Data Engineering Pattern — zip for schema mapping</strong>
+      <p>Zip column headers with row values to create dictionaries on the fly: <code>dict(zip(headers, row_values))</code>. This is a common pattern when parsing CSV without a library.</p>
+    </div>
+  </div>
+  <button class="complete-btn" id="btn-helpers" onclick="markComplete('helpers')">✓ Mark Section Complete</button>
+</section>
+
+<!-- ===== SECTION 6: DATA ENGINEERING ===== -->
+<section class="section" id="sec-de">
+  <div class="section-badge badge-engineering">Data Engineering</div>
+  <h2>Production Data Engineering Patterns <a href="#sec-de" class="anchor">#</a>
+    <button class="bookmark-btn" onclick="toggleBookmark('sec-de', 'Data Engineering Patterns')" id="bm-sec-de" title="Bookmark">⌖</button>
+  </h2>
+  <p class="section-desc">How control flow is applied in real pipelines, ETL systems, and streaming consumers.</p>
+
+  <div class="subsection">
+    <h3>Complete ETL Loop Pattern</h3>
+    <div class="code-block has-label">
+      <div class="code-label">Production ETL</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button"><span class="kw">def</span> <span class="fn">run_pipeline</span>(source, sink):
+    stats = {<span class="st">"processed"</span>: <span class="nm">0</span>, <span class="st">"skipped"</span>: <span class="nm">0</span>, <span class="st">"errors"</span>: <span class="nm">0</span>}
+    
+    <span class="kw">for</span> batch_num, batch <span class="kw">in</span> <span class="fn">enumerate</span>(source.read_batches(), start=<span class="nm">1</span>):
+        <span class="fn">print</span>(<span class="st">f"Processing batch </span>{batch_num}<span class="st">"</span>)
+        
+        <span class="kw">for</span> row <span class="kw">in</span> batch:
+            <span class="kw">if</span> <span class="kw">not</span> is_valid(row):
+                stats[<span class="st">"skipped"</span>] += <span class="nm">1</span>
+                <span class="kw">continue</span>  <span class="cm"># skip bad rows</span>
+            
+            <span class="kw">try</span>:
+                transformed = transform(row)
+                sink.write(transformed)
+                stats[<span class="st">"processed"</span>] += <span class="nm">1</span>
+            <span class="kw">except</span> <span class="bi">Exception</span> <span class="kw">as</span> e:
+                stats[<span class="st">"errors"</span>] += <span class="nm">1</span>
+                logger.error(<span class="st">f"Row failed: </span>{e}<span class="st">"</span>)
+    
+    <span class="kw">return</span> stats</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>Streaming Consumer Pattern</h3>
+    <div class="code-block has-label">
+      <div class="code-label">Kafka-style consumer</div>
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button"><span class="kw">while</span> <span class="bi">True</span>:  <span class="cm"># consume indefinitely</span>
+    messages = consumer.poll(timeout_ms=<span class="nm">1000</span>)
+    
+    <span class="kw">if</span> <span class="kw">not</span> messages:
+        <span class="kw">continue</span>  <span class="cm"># no messages — try again</span>
+    
+    <span class="kw">for</span> msg <span class="kw">in</span> messages:
+        <span class="kw">if</span> msg.value == <span class="st">"SHUTDOWN"</span>:
+            consumer.close()
+            <span class="kw">break</span>  <span class="cm"># graceful shutdown</span>
+        process(msg)</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>Performance Considerations <span class="ai-label">AI Enhancement</span></h3>
+    <div class="callout red">
+      <strong>Python Loops Are Slow at Scale</strong>
+      <p>Pure Python loops are interpreted, not compiled. For millions of rows, they can be 10–100x slower than vectorized alternatives. Know when to use each approach.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Scenario</th><th>Use Python Loop?</th><th>Better Alternative</th></tr>
+        <tr><td>&lt; 10k rows, business logic</td><td>✅ Yes</td><td>—</td></tr>
+        <tr><td>Millions of rows, math ops</td><td>❌ No</td><td>Pandas / NumPy vectorized ops</td></tr>
+        <tr><td>Distributed data (TB+)</td><td>❌ No</td><td>Apache Spark transformations</td></tr>
+        <tr><td>SQL-compatible operations</td><td>❌ No</td><td>SQL set-based processing</td></tr>
+        <tr><td>File I/O, API calls</td><td>✅ Yes</td><td>asyncio for concurrency</td></tr>
+        <tr><td>Queue/stream consumers</td><td>✅ Yes</td><td><code>while True</code> + async optional</td></tr>
+      </table>
+    </div>
+  </div>
+  <button class="complete-btn" id="btn-de" onclick="markComplete('de')">✓ Mark Section Complete</button>
+</section>
+
+<!-- ===== SECTION 7: SENIOR SECRETS ===== -->
+<section class="section" id="sec-senior">
+  <div class="section-badge badge-senior">Senior Engineer Secrets</div>
+  <h2>Senior-Level Patterns & Best Practices <a href="#sec-senior" class="anchor">#</a>
+    <button class="bookmark-btn" onclick="toggleBookmark('sec-senior', 'Senior-Level Patterns')" id="bm-sec-senior" title="Bookmark">⌖</button>
+  </h2>
+  <p class="section-desc">What separates mid-level from senior engineers in how they write loops and conditions.</p>
+
+  <div class="subsection">
+    <h3>1 — Prefer Declarative Over Imperative</h3>
+    <div class="code-block">
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button"><span class="cm"># Imperative — verbose, harder to read</span>
+result = []
+<span class="kw">for</span> x <span class="kw">in</span> nums:
+    <span class="kw">if</span> x > <span class="nm">0</span>:
+        result.append(x * <span class="nm">2</span>)
+
+<span class="cm"># Declarative — list comprehension ✅</span>
+result = [x * <span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> nums <span class="kw">if</span> x > <span class="nm">0</span>]
+
+<span class="cm"># Even better for large data — generator (lazy)</span>
+result = (x * <span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> nums <span class="kw">if</span> x > <span class="nm">0</span>)</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>2 — Guard Clauses Over Deep Nesting</h3>
+    <div class="code-block">
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button"><span class="cm"># Bad — pyramid of doom ❌</span>
+<span class="kw">def</span> <span class="fn">process</span>(row):
+    <span class="kw">if</span> row:
+        <span class="kw">if</span> row.get(<span class="st">"id"</span>):
+            <span class="kw">if</span> row[<span class="st">"amount"</span>] > <span class="nm">0</span>:
+                <span class="cm"># actual logic 3 levels deep</span>
+                <span class="kw">return</span> transform(row)
+
+<span class="cm"># Good — guard clauses ✅</span>
+<span class="kw">def</span> <span class="fn">process</span>(row):
+    <span class="kw">if not</span> row: <span class="kw">return None</span>
+    <span class="kw">if not</span> row.get(<span class="st">"id"</span>): <span class="kw">return None</span>
+    <span class="kw">if</span> row[<span class="st">"amount"</span>] <= <span class="nm">0</span>: <span class="kw">return None</span>
+    <span class="kw">return</span> transform(row)  <span class="cm"># main logic at top level</span></pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>3 — Never Mutate a List While Iterating <span class="ai-label">AI Enhancement</span></h3>
+    <div class="code-block">
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button"><span class="cm"># Dangerous ❌ — undefined behavior, may skip items</span>
+<span class="kw">for</span> x <span class="kw">in</span> my_list:
+    <span class="kw">if</span> x < <span class="nm">0</span>:
+        my_list.remove(x)
+
+<span class="cm"># Safe ✅ — iterate a copy, modify original</span>
+<span class="kw">for</span> x <span class="kw">in</span> my_list[:]:  <span class="cm"># copy</span>
+    <span class="kw">if</span> x < <span class="nm">0</span>:
+        my_list.remove(x)
+
+<span class="cm"># More Pythonic ✅✅ — filter comprehension</span>
+my_list = [x <span class="kw">for</span> x <span class="kw">in</span> my_list <span class="kw">if</span> x >= <span class="nm">0</span>]</pre>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>4 — for/else and while/else <span class="ai-label">AI Enhancement</span></h3>
+    <p>Python's <code>for/else</code> construct is little-known but powerful. The <code>else</code> block runs only if the loop completed <em>without</em> hitting a <code>break</code>.</p>
+    <div class="code-block">
+      <pre><button class="copy-btn" onclick="copyCode(this)">Copy</button"><span class="kw">for</span> row <span class="kw">in</span> rows:
+    <span class="kw">if</span> row[<span class="st">"id"</span>] == target:
+        <span class="fn">print</span>(<span class="st">"Found!"</span>)
+        <span class="kw">break</span>
+<span class="kw">else</span>:
+    <span class="cm"># Only runs if break was NEVER hit</span>
+    <span class="fn">print</span>(<span class="st">"Not found in dataset"</span>)</pre>
+    </div>
+  </div>
+  <button class="complete-btn" id="btn-senior" onclick="markComplete('senior')">✓ Mark Section Complete</button>
+</section>
+
+<!-- ===== SECTION 8: INTERVIEW ===== -->
+<section class="section" id="sec-interview">
+  <div class="section-badge badge-interview">Interview Prep</div>
+  <h2>Interview Preparation System <a href="#sec-interview" class="anchor">#</a></h2>
+  <p class="section-desc">20+ real interview questions with model answers, difficulty ratings, and why each answer is strong.</p>
+
+  <div class="qa-list">
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-q">
+        <div class="qa-q-text">What is the difference between <code>for</code> and <code>while</code> loops? When would you choose one over the other?</div>
+        <div class="qa-q-meta"><span class="diff-badge diff-basic">Basic</span><span class="qa-arrow">›</span></div>
+      </div>
+      <div class="qa-a">
+        <div class="qa-a-label">Model Answer</div>
+        <div class="qa-answer">A <code>for</code> loop iterates over a known iterable — list, range, file, generator, etc. — and terminates automatically when the iterable is exhausted. A <code>while</code> loop repeats as long as a condition remains true, requiring you to manage termination manually.<br><br>Choose <code>for</code> when you know the collection you're iterating over. Choose <code>while</code> for condition-based repetition like retry logic, polling, or consuming a stream until a shutdown signal arrives.</div>
+        <div class="why-strong">Mentions both the "known iterable" and "condition-based" distinction. Gives concrete real-world use cases for each. Shows practical thinking, not just definitions.</div>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-q">
+        <div class="qa-q-text">Why is <code>enumerate()</code> preferred over <code>range(len(iterable))</code>?</div>
+        <div class="qa-q-meta"><span class="diff-badge diff-basic">Basic</span><span class="qa-arrow">›</span></div>
+      </div>
+      <div class="qa-a">
+        <div class="qa-a-label">Model Answer</div>
+        <div class="qa-answer"><code>enumerate()</code> is cleaner, more readable, and less error-prone. <code>range(len(x))</code> forces you to manually index <code>x[i]</code>, which is verbose and introduces the risk of off-by-one errors or using the wrong variable name. <code>enumerate()</code> directly yields <code>(index, value)</code> pairs, makes the loop body cleaner, and works with any iterable — not just lists that support indexing.</div>
+        <div class="why-strong">Goes beyond "it's cleaner" and explains the specific bugs avoided. Also mentions that enumerate works with any iterable, showing depth.</div>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-q">
+        <div class="qa-q-text">What is the difference between <code>break</code>, <code>continue</code>, and <code>pass</code>? Give a use case for each.</div>
+        <div class="qa-q-meta"><span class="diff-badge diff-mid">Intermediate</span><span class="qa-arrow">›</span></div>
+      </div>
+      <div class="qa-a">
+        <div class="qa-a-label">Model Answer</div>
+        <div class="qa-answer"><strong><code>break</code></strong> exits the loop entirely. Use case: scanning rows for a specific record — once found, break to avoid unnecessary iterations.<br><br><strong><code>continue</code></strong> skips the rest of the current iteration and jumps to the next one. Use case: filtering invalid rows in an ETL pipeline — <code>if not is_valid(row): continue</code>.<br><br><strong><code>pass</code></strong> does nothing — it's a syntactic placeholder required when Python expects an indented block but you have no code yet. Use case: stubbing a function or class body during development.</div>
+        <div class="why-strong">Each keyword gets a concrete, practical use case. The ETL example for continue shows real-world relevance for a data engineering role.</div>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-q">
+        <div class="qa-q-text">What happens when you call <code>zip()</code> on two lists of different lengths?</div>
+        <div class="qa-q-meta"><span class="diff-badge diff-mid">Intermediate</span><span class="qa-arrow">›</span></div>
+      </div>
+      <div class="qa-a">
+        <div class="qa-a-label">Model Answer</div>
+        <div class="qa-answer"><code>zip()</code> stops at the shortest iterable, silently discarding the extra elements of the longer one. For example, <code>zip([1,2,3], [4])</code> produces only <code>(1, 4)</code>. This is a common source of silent data bugs. If you need all pairs, use <code>itertools.zip_longest(fillvalue=None)</code>.</div>
+        <div class="why-strong">Correctly identifies the silent failure risk — interviewers love seeing awareness of silent bugs. Mentioning <code>zip_longest</code> shows production awareness.</div>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-q">
+        <div class="qa-q-text">What is the output of this code? <code>for i in range(3): pass</code> followed by <code>print(i)</code></div>
+        <div class="qa-q-meta"><span class="diff-badge diff-trick">Trick</span><span class="qa-arrow">›</span></div>
+      </div>
+      <div class="qa-a">
+        <div class="qa-a-label">Model Answer</div>
+        <div class="qa-answer">The output is <code>2</code>. In Python, the loop variable <code>i</code> persists after the loop ends, retaining its last value. Since <code>range(3)</code> iterates 0, 1, 2 — the last value is <code>2</code>. <code>pass</code> does nothing inside the loop, but the iteration still happens. Note: in Python 3, this doesn't apply to list comprehension variables, which are scoped to the comprehension.</div>
+        <div class="why-strong">Many candidates say "NameError" or "nothing" — both wrong. Knowing loop variable leakage exists and distinguishing it from comprehension scoping shows true Python mastery.</div>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-q">
+        <div class="qa-q-text">What is the difference between <code>while True: continue</code> and <code>while True: pass</code>?</div>
+        <div class="qa-q-meta"><span class="diff-badge diff-trick">Trick</span><span class="qa-arrow">›</span></div>
+      </div>
+      <div class="qa-a">
+        <div class="qa-a-label">Model Answer</div>
+        <div class="qa-answer">Both produce infinite loops that do nothing useful. Technically, <code>continue</code> jumps to re-evaluate the loop condition (short-circuiting any remaining code in the block), while <code>pass</code> falls through to the end of the block and then re-evaluates the condition. In practice with an empty body, the behavior is identical — both loop forever consuming 100% CPU. In production, always ensure a <code>while True</code> loop has a <code>break</code>, a <code>return</code>, or a system signal handler.</div>
+        <div class="why-strong">Correctly identifies both as infinite loops and explains the subtle execution difference. The production tip about break/return shows engineering maturity.</div>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-q">
+        <div class="qa-q-text">You're processing 50 million rows in a Python for loop and it's running too slowly. What are your options?</div>
+        <div class="qa-q-meta"><span class="diff-badge diff-adv">Advanced</span><span class="qa-arrow">›</span></div>
+      </div>
+      <div class="qa-a">
+        <div class="qa-a-label">Model Answer</div>
+        <div class="qa-answer">First, identify whether the operation is vectorizable. If it's arithmetic or filtering on a Pandas DataFrame, use vectorized operations (<code>df.apply()</code>, boolean indexing, <code>.map()</code>) which are backed by optimized C code. For distributed processing at petabyte scale, move to Apache Spark where transformations are compiled and executed across a cluster. If I/O-bound (API calls, file reads), use <code>asyncio</code> for concurrency. If CPU-bound and must stay in Python, use <code>multiprocessing</code> to bypass the GIL. As a last resort, profile with <code>cProfile</code> and optimize the hotspots, potentially rewriting inner loops in Cython or C extensions.</div>
+        <div class="why-strong">Shows systematic thinking — profiling first, then picking the right tool. Covers vectorization, Spark, async, multiprocessing. Mentions GIL awareness. This is senior-level thinking.</div>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-q">
+        <div class="qa-q-text">Design a retry mechanism in Python for an API call that should retry up to 3 times with exponential back-off.</div>
+        <div class="qa-q-meta"><span class="diff-badge diff-adv">Scenario</span><span class="qa-arrow">›</span></div>
+      </div>
+      <div class="qa-a">
+        <div class="qa-a-label">Model Answer</div>
+        <div class="qa-answer">
+          <div class="code-block"><pre><button class="copy-btn" onclick="copyCode(this)">Copy</button"><span class="kw">import</span> time
+
+<span class="kw">def</span> <span class="fn">call_with_retry</span>(api_fn, max_retries=<span class="nm">3</span>):
+    <span class="kw">for</span> attempt <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, max_retries + <span class="nm">1</span>):
+        <span class="kw">try</span>:
+            <span class="kw">return</span> api_fn()
+        <span class="kw">except</span> <span class="bi">Exception</span> <span class="kw">as</span> e:
+            <span class="kw">if</span> attempt == max_retries:
+                <span class="kw">raise</span>  <span class="cm"># re-raise on final attempt</span>
+            wait = <span class="nm">2</span> ** attempt
+            <span class="fn">print</span>(<span class="st">f"Attempt {attempt} failed: {e}. Retrying in {wait}s"</span>)
+            time.sleep(wait)</pre></div>
+        </div>
+        <div class="why-strong">Uses <code>for</code> with enumerate-style thinking via <code>range(1, n+1)</code>. Raises on final attempt (critical — don't swallow exceptions). Shows exponential back-off. Clean structure. This exact pattern appears in production Airflow operators.</div>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-q">
+        <div class="qa-q-text">What is <code>range</code>'s memory footprint compared to a list of the same size? Why does it matter?</div>
+        <div class="qa-q-meta"><span class="diff-badge diff-mid">Intermediate</span><span class="qa-arrow">›</span></div>
+      </div>
+      <div class="qa-a">
+        <div class="qa-a-label">Model Answer</div>
+        <div class="qa-answer"><code>range</code> is a lazy object that stores only three integers: start, stop, and step. It always uses ~48 bytes regardless of size. A list, by contrast, allocates memory proportional to its length. A list of 10 million integers uses hundreds of megabytes. This matters in data engineering where you might iterate large sequences — <code>range(10_000_000)</code> is cheap, while <code>list(range(10_000_000))</code> could OOM your container.</div>
+        <div class="why-strong">Gives the concrete 48-byte figure. Connects it directly to OOM risk in containers — shows production-aware thinking. This is the kind of detail that impresses technical interviewers.</div>
+      </div>
+    </div>
+
+    <div class="qa-item" onclick="toggleQA(this)">
+      <div class="qa-q">
+        <div class="qa-q-text">What is wrong with this code: <code>if x == 1 or 2:</code></div>
+        <div class="qa-q-meta"><span class="diff-badge diff-trick">Trick</span><span class="qa-arrow">›</span></div>
+      </div>
+      <div class="qa-a">
+        <div class="qa-a-label">Model Answer</div>
+        <div class="qa-answer">Python parses this as <code>(x == 1) or (2)</code>. The <code>or</code> operator short-circuits: it returns the first truthy value. Since <code>2</code> is always truthy, the entire expression is <em>always True</em> regardless of x. The correct ways are: <code>if x == 1 or x == 2:</code> or more Pythonically, <code>if x in (1, 2):</code>.</div>
+        <div class="why-strong">Names the exact Python parsing rule (operator precedence). Uses correct terminology (short-circuit evaluation). Provides two correct alternatives.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="complete-btn" id="btn-interview" onclick="markComplete('interview')">✓ Mark Section Complete</button>
+</section>
+
+<!-- ===== SECTION 9: REVISION ===== -->
+<section class="section" id="sec-revision">
+  <div class="section-badge badge-revision">Last-Minute Revision</div>
+  <h2>Interview Day Cheat Sheet <a href="#sec-revision" class="anchor">#</a></h2>
+  <p class="section-desc">Everything you need to review 30 minutes before the interview.</p>
+
+  <div class="subsection">
+    <h3>Quick Reference Cards</h3>
+    <div class="cheat-grid">
+      <div class="cheat-card"><div class="kw-head">if/elif/else</div><div class="kw-def">Branching. First True branch runs, rest skipped.</div><div class="kw-tip">Watch: truthy/falsy, or operator trap</div></div>
+      <div class="cheat-card"><div class="kw-head">for</div><div class="kw-def">Iterates any iterable. Uses Iterator Protocol internally.</div><div class="kw-tip">Loop var persists after loop ends</div></div>
+      <div class="cheat-card"><div class="kw-head">while</div><div class="kw-def">Loops while condition is True. Requires manual termination.</div><div class="kw-tip">Danger: infinite loops if condition never changes</div></div>
+      <div class="cheat-card"><div class="kw-head">break</div><div class="kw-def">Exits the innermost loop immediately.</div><div class="kw-tip">Use for early-exit, search, graceful shutdown</div></div>
+      <div class="cheat-card"><div class="kw-head">continue</div><div class="kw-def">Skips rest of current iteration, goes to next.</div><div class="kw-tip">Classic pattern: filter invalid rows</div></div>
+      <div class="cheat-card"><div class="kw-head">pass</div><div class="kw-def">Does nothing. Syntactic placeholder.</div><div class="kw-tip">≠ continue. Does NOT skip iteration.</div></div>
+      <div class="cheat-card"><div class="kw-head">range(s,e,st)</div><div class="kw-def">Lazy sequence. Stop is exclusive. ~48 bytes always.</div><div class="kw-tip">Never materializes list in memory</div></div>
+      <div class="cheat-card"><div class="kw-head">enumerate()</div><div class="kw-def">Yields (index, value) pairs.</div><div class="kw-tip">Always prefer over range(len(x))</div></div>
+      <div class="cheat-card"><div class="kw-head">zip()</div><div class="kw-def">Parallel iteration. Stops at shortest.</div><div class="kw-tip">Silent bug if lengths differ! Use zip_longest.</div></div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>Top 20 Must-Know Points</h3>
+    <div class="top20-list">
+      <div class="top20-item">Control Flow = Decision Logic (if) + Iteration Logic (for/while). Every pipeline is built on this.</div>
+      <div class="top20-item">Python's <code>for</code> loop uses the Iterator Protocol: <code>iter()</code> → <code>next()</code> → <code>StopIteration</code>.</div>
+      <div class="top20-item">Falsy values: <code>False</code>, <code>None</code>, <code>0</code>, <code>""</code>, <code>[]</code>, <code>{}</code>, <code>()</code>, <code>set()</code>. Everything else is truthy.</div>
+      <div class="top20-item"><code>break</code> exits the loop. <code>continue</code> skips current iteration. <code>pass</code> does nothing — they are NOT interchangeable.</div>
+      <div class="top20-item">Only the first matching <code>if/elif</code> branch executes, even if later branches are also True.</div>
+      <div class="top20-item"><code>if x == 1 or 2:</code> is ALWAYS True. Correct form: <code>if x in (1, 2):</code>.</div>
+      <div class="top20-item"><code>range(stop)</code> is lazy — constant ~48 bytes regardless of size. Always prefer over building a list.</div>
+      <div class="top20-item">Stop in <code>range()</code> is exclusive. <code>range(5)</code> = 0,1,2,3,4 (NOT 5).</div>
+      <div class="top20-item"><code>enumerate(items, start=1)</code> is cleaner, safer, and more Pythonic than <code>range(len(items))</code>.</div>
+      <div class="top20-item"><code>zip()</code> silently stops at the shortest iterable. Use <code>itertools.zip_longest()</code> if you need all pairs.</div>
+      <div class="top20-item">Loop variables persist after the loop: <code>for i in range(3): pass; print(i)</code> → prints <code>2</code>.</div>
+      <div class="top20-item">Never mutate a list while iterating over it. Iterate a copy: <code>for x in my_list[:]:</code>.</div>
+      <div class="top20-item">Guard clauses over deep nesting. Fail fast, return early, keep main logic at the top level.</div>
+      <div class="top20-item"><code>for/else</code>: the <code>else</code> block only runs if the loop completes WITHOUT hitting a <code>break</code>.</div>
+      <div class="top20-item">Pure Python loops are 10–100x slower than vectorized NumPy/Pandas operations on large datasets.</div>
+      <div class="top20-item">For 50M+ rows: use Pandas vectorized ops, Spark, or SQL — not Python <code>for</code> loops.</div>
+      <div class="top20-item">Retry pattern: <code>while retries < MAX:</code> with exponential back-off. Always re-raise on final attempt.</div>
+      <div class="top20-item">Streaming consumers use <code>while True:</code> with <code>continue</code> for no-messages and <code>break</code> for shutdown signals.</div>
+      <div class="top20-item">List comprehension is declarative and faster than equivalent <code>for</code> + <code>.append()</code> loop.</div>
+      <div class="top20-item"><code>while True: continue</code> and <code>while True: pass</code> both infinite-loop and consume 100% CPU. Always add a <code>break</code> condition.</div>
+    </div>
+  </div>
+
+  <div class="subsection">
+    <h3>Common Pitfalls That Cause Rejection</h3>
+    <div class="pitfall-list">
+      <div class="pitfall"><div class="pitfall-head">✗ Confusing break and continue</div><div class="pitfall-body">Saying "break skips the current iteration" or "continue exits the loop" — both are wrong and immediately signal weak Python knowledge.</div></div>
+      <div class="pitfall"><div class="pitfall-head">✗ Saying pass and continue are the same</div><div class="pitfall-body"><code>pass</code> does nothing and execution continues in the loop body. <code>continue</code> jumps to the next iteration, skipping the rest. Confusing these fails basic Python questions.</div></div>
+      <div class="pitfall"><div class="pitfall-head">✗ Not mentioning zip()'s silent truncation</div><div class="pitfall-body">Saying "zip handles different lengths gracefully" is incorrect. It silently drops extra elements — a data bug in disguise.</div></div>
+      <div class="pitfall"><div class="pitfall-head">✗ Claiming Python loops are fine for millions of rows</div><div class="pitfall-body">For data engineering roles, this shows no understanding of performance. Always mention vectorized alternatives for large-scale data.</div></div>
+      <div class="pitfall"><div class="pitfall-head">✗ Not knowing range() is lazy</div><div class="pitfall-body">Saying "range(10M) creates a list of 10M elements" is false. This is a common misconception and a real interview question.</div></div>
+      <div class="pitfall"><div class="pitfall-head">✗ Writing infinite while loops with no break</div><div class="pitfall-body">Even in examples, showing a <code>while True</code> loop without a termination mechanism suggests you don't think about production safety.</div></div>
+    </div>
+  </div>
+
+  <button class="complete-btn" id="btn-revision" onclick="markComplete('revision')">✓ Mark Section Complete</button>
+</section>
+
+</div>
+</main>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const SECTIONS = [
+  {id: 'foundations', label: 'Foundations', navLabel: 'Mental Model', secId: 'sec-foundations'},
+  {id: 'if', label: 'if/elif/else', navLabel: 'Conditionals', secId: 'sec-if'},
+  {id: 'loops', label: 'for / while', navLabel: 'Loops', secId: 'sec-loops'},
+  {id: 'control', label: 'break/continue/pass', navLabel: 'Loop Control', secId: 'sec-control'},
+  {id: 'helpers', label: 'range/enumerate/zip', navLabel: 'Iteration Helpers', secId: 'sec-helpers'},
+  {id: 'de', label: 'Data Engineering', navLabel: 'DE Patterns', secId: 'sec-de'},
+  {id: 'senior', label: 'Senior Patterns', navLabel: 'Senior Secrets', secId: 'sec-senior'},
+  {id: 'interview', label: 'Interview Prep', navLabel: 'Interview Q&A', secId: 'sec-interview'},
+  {id: 'revision', label: 'Revision Cheat Sheet', navLabel: 'Last-Minute Revision', secId: 'sec-revision'},
+];
+
+let completed = JSON.parse(localStorage.getItem('cf_completed') || '[]');
+let bookmarks = JSON.parse(localStorage.getItem('cf_bookmarks') || '[]');
+let theme = localStorage.getItem('cf_theme') || 'dark';
+let sidebarOpen = window.innerWidth > 768;
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  applyTheme();
+  buildNav();
+  updateProgress();
+  updateBookmarkButtons();
+  updateCompleteButtons();
+  if (window.innerWidth <= 768) {
+    sidebarOpen = false;
+    document.getElementById('sidebar').classList.remove('mobile-open');
+  }
+}
+
+// ============================================================
+// NAV BUILD
+// ============================================================
+function buildNav() {
+  const nav = document.getElementById('nav-list');
+  nav.innerHTML = '';
+  const groups = [
+    {label: 'Core Concepts', ids: ['foundations','if','loops','control','helpers']},
+    {label: 'Applied', ids: ['de','senior']},
+    {label: 'Interview & Revision', ids: ['interview','revision']},
+  ];
+  groups.forEach(g => {
+    const sec = document.createElement('div');
+    sec.className = 'nav-section';
+    sec.innerHTML = `<div class="nav-section-label">${g.label}</div>`;
+    g.ids.forEach(id => {
+      const s = SECTIONS.find(x => x.id === id);
+      const a = document.createElement('a');
+      a.className = 'nav-item' + (completed.includes(id) ? ' done' : '');
+      a.href = '#' + s.secId;
+      a.dataset.id = id;
+      a.dataset.label = s.navLabel.toLowerCase();
+      a.innerHTML = `<span class="nav-check"></span>${s.navLabel}`;
+      a.onclick = (e) => { if (window.innerWidth <= 768) closeSidebar(); };
+      sec.appendChild(a);
+    });
+    nav.appendChild(sec);
+  });
+  activateNavOnScroll();
+}
+
+function activateNavOnScroll() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const match = document.querySelector(`.nav-item[href="#${id}"]`);
+        if (match) match.classList.add('active');
+        document.getElementById('topbar-section').textContent = e.target.querySelector('h2')?.textContent.replace('#','').trim().split('\n')[0] || 'Control Flow';
+      }
+    });
+  }, {threshold: 0.2});
+  SECTIONS.forEach(s => {
+    const el = document.getElementById(s.secId);
+    if (el) observer.observe(el);
+  });
+}
+
+// ============================================================
+// PROGRESS
+// ============================================================
+function markComplete(id) {
+  if (!completed.includes(id)) completed.push(id);
+  else completed = completed.filter(x => x !== id);
+  localStorage.setItem('cf_completed', JSON.stringify(completed));
+  updateProgress();
+  updateCompleteButtons();
+  buildNav();
+}
+
+function updateProgress() {
+  const pct = Math.round((completed.length / SECTIONS.length) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${completed.length} / ${SECTIONS.length} sections complete`;
+}
+
+function updateCompleteButtons() {
+  SECTIONS.forEach(s => {
+    const btn = document.getElementById('btn-' + s.id);
+    if (!btn) return;
+    if (completed.includes(s.id)) {
+      btn.classList.add('done');
+      btn.textContent = '✓ Completed';
+    } else {
+      btn.classList.remove('done');
+      btn.textContent = '✓ Mark Section Complete';
+    }
+  });
+}
+
+// ============================================================
+// SCROLL PROGRESS
+// ============================================================
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY;
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = total > 0 ? (scrolled / total) * 100 : 0;
+  document.getElementById('scroll-bar').style.width = pct + '%';
+});
+
+// ============================================================
+// THEME
+// ============================================================
+function applyTheme() {
+  document.documentElement.dataset.theme = theme === 'light' ? 'light' : '';
+  document.getElementById('theme-btn').textContent = theme === 'light' ? '☾ Dark' : '☀ Light';
+}
+
+function toggleTheme() {
+  theme = theme === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('cf_theme', theme);
+  applyTheme();
+}
+
+// ============================================================
+// SIDEBAR
+// ============================================================
+function toggleSidebar() {
+  if (window.innerWidth <= 768) {
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('sidebar-overlay');
+    if (sb.classList.contains('mobile-open')) {
+      sb.classList.remove('mobile-open');
+      ov.classList.remove('show');
+    } else {
+      sb.classList.add('mobile-open');
+      ov.classList.add('show');
+    }
+    return;
+  }
+  sidebarOpen = !sidebarOpen;
+  const sidebar = document.getElementById('sidebar');
+  const topbar = document.getElementById('topbar');
+  const main = document.getElementById('main');
+  if (sidebarOpen) {
+    sidebar.classList.remove('hidden');
+    topbar.classList.remove('full');
+    main.classList.remove('full');
+  } else {
+    sidebar.classList.add('hidden');
+    topbar.classList.add('full');
+    main.classList.add('full');
+  }
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sidebar-overlay').classList.remove('show');
+}
+
+// ============================================================
+// LAYERS (TABS)
+// ============================================================
+function switchLayer(tabEl, panelId) {
+  const tabGroup = tabEl.parentElement;
+  const contentGroup = tabGroup.nextElementSibling;
+  tabGroup.querySelectorAll('.layer-tab').forEach(t => t.classList.remove('active'));
+  contentGroup.querySelectorAll('.layer-panel').forEach(p => p.classList.remove('active'));
+  tabEl.classList.add('active');
+  const panel = document.getElementById(panelId);
+  if (panel) panel.classList.add('active');
+}
+
+// ============================================================
+// Q&A ACCORDION
+// ============================================================
+function toggleQA(item) {
+  item.classList.toggle('open');
+}
+
+// ============================================================
+// COPY CODE
+// ============================================================
+function copyCode(btn) {
+  const pre = btn.parentElement;
+  const text = pre.innerText.replace('Copy','').replace('Copied!','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ============================================================
+// LIVE SEARCH
+// ============================================================
+function liveSearch(query) {
+  const q = query.trim().toLowerCase();
+  if (!q) {
+    removeHighlights();
+    document.querySelectorAll('.nav-item').forEach(n => n.style.display = '');
+    return;
+  }
+  removeHighlights();
+  highlightText(document.getElementById('content'), q);
+  document.querySelectorAll('.nav-item').forEach(n => {
+    const label = n.dataset.label || '';
+    n.style.display = label.includes(q) ? '' : 'none';
+  });
+}
+
+function highlightText(el, q) {
+  if (!el) return;
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const nodes = [];
+  let node;
+  while (node = walker.nextNode()) nodes.push(node);
+  nodes.forEach(n => {
+    if (!n.parentElement || ['SCRIPT','STYLE','CODE','PRE'].includes(n.parentElement.tagName)) return;
+    const text = n.textContent;
+    const idx = text.toLowerCase().indexOf(q);
+    if (idx === -1) return;
+    const span = document.createElement('span');
+    span.innerHTML = text.substring(0, idx) + '<mark>' + text.substring(idx, idx+q.length) + '</mark>' + text.substring(idx+q.length);
+    n.parentElement.replaceChild(span, n);
+  });
+}
+
+function removeHighlights() {
+  document.querySelectorAll('mark').forEach(m => {
+    const parent = m.parentNode;
+    parent.replaceChild(document.createTextNode(m.textContent), m);
+    parent.normalize();
+  });
+}
+
+// ============================================================
+// BOOKMARKS
+// ============================================================
+function toggleBookmark(secId, label) {
+  const exists = bookmarks.find(b => b.id === secId);
+  if (exists) {
+    bookmarks = bookmarks.filter(b => b.id !== secId);
+  } else {
+    bookmarks.push({id: secId, label});
+  }
+  localStorage.setItem('cf_bookmarks', JSON.stringify(bookmarks));
+  updateBookmarkButtons();
+}
+
+function updateBookmarkButtons() {
+  document.querySelectorAll('.bookmark-btn').forEach(btn => {
+    const secId = btn.id.replace('bm-', '');
+    btn.classList.toggle('saved', bookmarks.some(b => b.id === secId));
+  });
+}
+
+function bookmarksView() {
+  if (!bookmarks.length) { alert('No bookmarks yet. Click the ⌖ icon next to any section heading.'); return; }
+  const list = bookmarks.map(b => `• ${b.label} → #${b.id}`).join('\n');
+  alert('Your Bookmarks:\n\n' + list + '\n\nClick any section\'s ⌖ icon to bookmark/unbookmark.');
+}
+
+// ============================================================
+// RANGE DEMO
+// ============================================================
+function runRange() {
+  const start = parseInt(document.getElementById('r-start').value) || 0;
+  const stop = parseInt(document.getElementById('r-stop').value);
+  const step = parseInt(document.getElementById('r-step').value) || 1;
+  if (isNaN(stop)) { document.getElementById('range-output').textContent = '→ Invalid input'; return; }
+  if (step === 0) { document.getElementById('range-output').textContent = '→ Error: step cannot be 0'; return; }
+  const result = [];
+  for (let i = start; step > 0 ? i < stop : i > stop; i += step) {
+    result.push(i);
+    if (result.length > 50) { result.push('...'); break; }
+  }
+  document.getElementById('range-output').textContent = '→ [' + result.join(', ') + ']';
+}
+
+// ============================================================
+// QUIZ
+// ============================================================
+function answerQuiz(qid, el, isCorrect) {
+  const opts = document.getElementById(qid + '-opts');
+  if (opts.dataset.answered) return;
+  opts.dataset.answered = '1';
+  el.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) opts.querySelectorAll('.quiz-opt').forEach(o => { if (o !== el) o.style.opacity = '.4'; });
+  const fb = document.getElementById(qid + '-feedback');
+  fb.classList.add('show');
+}
+
+// ============================================================
+// RUN
+// ============================================================
+init();
+</script>
+</body>
+</html>
