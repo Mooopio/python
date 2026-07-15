@@ -1,392 +1,576 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>كويز بايثون — من الأساسيات لغاية اللوبس</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/night-owl.min.css">
-<style>
-:root{
-  --bg: #0E1016;
-  --panel: #161927;
-  --panel-alt: #1C2033;
-  --border: #2A3049;
-  --text: #E9EBF3;
-  --muted: #8A90A8;
-  --blue: #4B8BBE;
-  --blue-soft: #6FA8D8;
-  --yellow: #FFD43B;
-  --green: #5FD3A0;
-  --red: #F26D6D;
-  --radius: 14px;
-  --font-ar: 'Tajawal', sans-serif;
-  --font-code: 'JetBrains Mono', monospace;
-}
-*{box-sizing:border-box; margin:0; padding:0;}
-html{scroll-behavior:smooth;}
-body{ background:var(--bg); color:var(--text); font-family:var(--font-ar); line-height:1.8; }
-code, pre{ direction:ltr; text-align:left; font-family:var(--font-code); }
-::selection{ background:var(--yellow); color:#0E1016; }
-body::before{
-  content:""; position:fixed; inset:0; z-index:-2;
-  background:
-    radial-gradient(circle at 15% 10%, rgba(75,139,190,0.12), transparent 40%),
-    radial-gradient(circle at 85% 85%, rgba(255,212,59,0.08), transparent 45%);
-  pointer-events:none;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Quiz — Basics to Loops</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/night-owl.min.css">
+    <style>
+        :root {
+            --bg: #0E1016;
+            --panel: #161927;
+            --panel-alt: #1C2033;
+            --border: #2A3049;
+            --text: #E9EBF3;
+            --muted: #8A90A8;
+            --blue: #4B8BBE;
+            --blue-soft: #6FA8D8;
+            --yellow: #FFD43B;
+            --green: #5FD3A0;
+            --red: #F26D6D;
+            --radius: 14px;
+            --font-body: 'Inter', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            line-height: 1.8;
+        }
+        code,
+        pre {
+            direction: ltr;
+            text-align: left;
+            font-family: var(--font-code);
+        }
+        ::selection {
+            background: var(--yellow);
+            color: #0E1016;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background:
+                radial-gradient(circle at 15% 10%, rgba(75, 139, 190, 0.12), transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(255, 212, 59, 0.08), transparent 45%);
+            pointer-events: none;
+        }
 
-header.top{
-  position:sticky; top:0; z-index:50;
-  background:rgba(14,16,22,0.9); backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--border);
-  padding:16px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
-}
-header.top .brand{ font-family:var(--font-code); font-weight:700; color:var(--yellow); font-size:1rem; }
-header.top .brand span{ color:var(--blue-soft); }
-#progress-pill{
-  font-family:var(--font-code); font-size:.8rem; background:var(--panel-alt); border:1px solid var(--border);
-  padding:7px 16px; border-radius:20px; color:var(--blue-soft);
-}
-.progress-bar-outer{ width:140px; height:6px; background:var(--panel-alt); border-radius:10px; overflow:hidden; border:1px solid var(--border); }
-.progress-bar-inner{ height:100%; width:0%; background:linear-gradient(90deg,var(--blue),var(--yellow)); transition:width .3s ease; }
+        header.top {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(14, 16, 22, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        header.top .brand {
+            font-family: var(--font-code);
+            font-weight: 700;
+            color: var(--yellow);
+            font-size: 1rem;
+        }
+        header.top .brand span {
+            color: var(--blue-soft);
+        }
+        #progress-pill {
+            font-family: var(--font-code);
+            font-size: .8rem;
+            background: var(--panel-alt);
+            border: 1px solid var(--border);
+            padding: 7px 16px;
+            border-radius: 20px;
+            color: var(--blue-soft);
+        }
+        .progress-bar-outer {
+            width: 140px;
+            height: 6px;
+            background: var(--panel-alt);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .progress-bar-inner {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--blue), var(--yellow));
+            transition: width .3s ease;
+        }
 
-.wrap{ max-width:820px; margin:0 auto; padding:40px 20px 120px; }
+        .wrap {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 40px 20px 120px;
+        }
 
-.intro{ text-align:center; margin-bottom:44px; }
-.eyebrow{ font-family:var(--font-code); color:var(--blue-soft); font-size:.8rem; letter-spacing:2px; margin-bottom:14px; direction:ltr; }
-.intro h1{ font-size:clamp(1.7rem,4vw,2.4rem); font-weight:800; margin-bottom:12px; }
-.intro h1 .hl{ color:var(--yellow); }
-.intro p{ color:var(--muted); max-width:600px; margin:0 auto; }
+        .intro {
+            text-align: center;
+            margin-bottom: 44px;
+        }
+        .eyebrow {
+            font-family: var(--font-code);
+            color: var(--blue-soft);
+            font-size: .8rem;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+            direction: ltr;
+        }
+        .intro h1 {
+            font-size: clamp(1.7rem, 4vw, 2.4rem);
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+        .intro h1 .hl {
+            color: var(--yellow);
+        }
+        .intro p {
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
 
-#result-card{
-  display:none; text-align:center; background:var(--panel); border:1px solid var(--yellow);
-  border-radius:var(--radius); padding:34px 24px; margin-bottom:40px;
-  box-shadow:0 20px 50px -20px rgba(255,212,59,.15);
-}
-#result-card .score{ font-family:var(--font-code); font-size:2.6rem; color:var(--yellow); font-weight:700; margin:10px 0; }
-#result-card .verdict{ font-size:1.1rem; color:var(--text); margin-bottom:8px; }
-#result-card .sub{ color:var(--muted); font-size:.9rem; }
+        #result-card {
+            display: none;
+            text-align: center;
+            background: var(--panel);
+            border: 1px solid var(--yellow);
+            border-radius: var(--radius);
+            padding: 34px 24px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 50px -20px rgba(255, 212, 59, .15);
+        }
+        #result-card .score {
+            font-family: var(--font-code);
+            font-size: 2.6rem;
+            color: var(--yellow);
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        #result-card .verdict {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        #result-card .sub {
+            color: var(--muted);
+            font-size: .9rem;
+        }
 
-.q-card{
-  background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
-  padding:22px; margin-bottom:18px; transition:border-color .3s;
-}
-.q-card.unanswered-flag{ border-color:var(--red); }
-.q-card .q-meta{ font-family:var(--font-code); font-size:.72rem; color:var(--muted); margin-bottom:8px; display:flex; justify-content:space-between; }
-.q-card .q-text{ font-size:1.05rem; font-weight:700; margin-bottom:16px; }
-.q-card .q-text code{ font-weight:400; }
-.options{ display:grid; gap:10px; }
-.opt{
-  display:block; width:100%; text-align:right; background:var(--panel-alt);
-  border:1px solid var(--border); color:var(--text); padding:12px 16px;
-  border-radius:10px; cursor:pointer; font-family:var(--font-ar); font-size:.95rem;
-  transition:.2s; direction:rtl;
-}
-.opt:hover:not(.locked){ border-color:var(--blue-soft); background:#212540; }
-.opt.selected{ border-color:var(--blue); background:rgba(75,139,190,.18); font-weight:700; }
-.opt.correct{ background:rgba(95,211,160,.15); border-color:var(--green); color:var(--green); font-weight:700; }
-.opt.wrong{ background:rgba(242,109,109,.15); border-color:var(--red); color:var(--red); font-weight:700; }
-.opt.locked{ cursor:default; }
-.explain{
-  display:none; margin-top:14px; padding-top:14px; border-top:1px dashed var(--border);
-  color:#c3c8d8; font-size:.92rem;
-}
-.explain.show{ display:block; }
-.explain b{ color:var(--yellow); }
-.q-result-icon{ font-family:var(--font-code); font-size:.75rem; padding:3px 10px; border-radius:20px; }
-.q-result-icon.ok{ background:rgba(95,211,160,.15); color:var(--green); }
-.q-result-icon.bad{ background:rgba(242,109,109,.15); color:var(--red); }
+        .q-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            margin-bottom: 18px;
+            transition: border-color .3s;
+        }
+        .q-card.unanswered-flag {
+            border-color: var(--red);
+        }
+        .q-card .q-meta {
+            font-family: var(--font-code);
+            font-size: .72rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .q-card .q-text {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .q-card .q-text code {
+            font-weight: 400;
+        }
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+        .opt {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: var(--panel-alt);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: var(--font-body);
+            font-size: .95rem;
+            transition: .2s;
+            direction: ltr;
+        }
+        .opt:hover:not(.locked) {
+            border-color: var(--blue-soft);
+            background: #212540;
+        }
+        .opt.selected {
+            border-color: var(--blue);
+            background: rgba(75, 139, 190, .18);
+            font-weight: 700;
+        }
+        .opt.correct {
+            background: rgba(95, 211, 160, .15);
+            border-color: var(--green);
+            color: var(--green);
+            font-weight: 700;
+        }
+        .opt.wrong {
+            background: rgba(242, 109, 109, .15);
+            border-color: var(--red);
+            color: var(--red);
+            font-weight: 700;
+        }
+        .opt.locked {
+            cursor: default;
+        }
+        .explain {
+            display: none;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--border);
+            color: #c3c8d8;
+            font-size: .92rem;
+        }
+        .explain.show {
+            display: block;
+        }
+        .explain b {
+            color: var(--yellow);
+        }
+        .q-result-icon {
+            font-family: var(--font-code);
+            font-size: .75rem;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+        .q-result-icon.ok {
+            background: rgba(95, 211, 160, .15);
+            color: var(--green);
+        }
+        .q-result-icon.bad {
+            background: rgba(242, 109, 109, .15);
+            color: var(--red);
+        }
 
-#submit-bar{
-  position:sticky; bottom:0; z-index:40; background:rgba(14,16,22,0.92); backdrop-filter:blur(10px);
-  border-top:1px solid var(--border); padding:16px 20px; display:flex; align-items:center; justify-content:center; gap:16px;
-  margin-top:20px;
-}
-#submit-btn{
-  font-family:var(--font-ar); font-weight:800; font-size:1rem; color:#0E1016;
-  background:var(--yellow); border:none; padding:14px 40px; border-radius:30px; cursor:pointer;
-  transition:.2s; box-shadow:0 10px 30px -10px rgba(255,212,59,.5);
-}
-#submit-btn:hover{ transform:translateY(-2px); }
-#submit-btn:disabled{ background:var(--panel-alt); color:var(--muted); cursor:not-allowed; box-shadow:none; }
-#submit-note{ color:var(--muted); font-size:.85rem; }
+        #submit-bar {
+            position: sticky;
+            bottom: 0;
+            z-index: 40;
+            background: rgba(14, 16, 22, 0.92);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        #submit-btn {
+            font-family: var(--font-body);
+            font-weight: 800;
+            font-size: 1rem;
+            color: #0E1016;
+            background: var(--yellow);
+            border: none;
+            padding: 14px 40px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: .2s;
+            box-shadow: 0 10px 30px -10px rgba(255, 212, 59, .5);
+        }
+        #submit-btn:hover {
+            transform: translateY(-2px);
+        }
+        #submit-btn:disabled {
+            background: var(--panel-alt);
+            color: var(--muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        #submit-note {
+            color: var(--muted);
+            font-size: .85rem;
+        }
 
-footer{ text-align:center; padding:30px 20px 50px; color:var(--muted); font-size:.85rem; }
+        footer {
+            text-align: center;
+            padding: 30px 20px 50px;
+            color: var(--muted);
+            font-size: .85rem;
+        }
 
-@media (prefers-reduced-motion: reduce){ *{ animation-duration:0.001ms !important; scroll-behavior:auto !important; } }
-</style>
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.001ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<header class="top">
-  <div class="brand">py<span>_</span>quiz</div>
-  <div style="display:flex; align-items:center; gap:12px;">
-    <div class="progress-bar-outer"><div class="progress-bar-inner" id="progress-bar"></div></div>
-    <div id="progress-pill">0 / 20</div>
-  </div>
-</header>
+    <header class="top">
+        <div class="brand">py<span>_</span>quiz</div>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <div class="progress-bar-outer"><div class="progress-bar-inner" id="progress-bar"></div></div>
+            <div id="progress-pill">0 / 20</div>
+        </div>
+    </header>
 
-<div class="wrap">
-  <div class="intro">
-    <div class="eyebrow">PYTHON QUIZ · BASICS → LOOPS</div>
-    <h1>كويز <span class="hl">شامل وملغبط</span> — من الأساسيات لغاية اللوبس</h1>
-    <p>٢٠ سؤال MCQ بيقيسوا فهمك الحقيقي مش الحفظ — فيهم أسئلة توقّع ناتج، فروق دقيقة، وحالات خدّاعة. جاوب على كل الأسئلة الأول، وبعدين دوس "اعرض النتيجة" في الآخر عشان تشوف نتيجتك وتصحيح كل سؤال.</p>
-  </div>
+    <div class="wrap">
+        <div class="intro">
+            <div class="eyebrow">PYTHON QUIZ · BASICS → LOOPS</div>
+            <h1>Comprehensive <span class="hl">Tricky</span> Python Quiz</h1>
+            <p>20 MCQ questions that test your real understanding — not memorization. Includes output prediction, subtle differences, and tricky edge cases. Answer all questions first, then hit "Show Results" to see your score and detailed explanations.</p>
+        </div>
 
-  <div id="result-card">
-    <div class="verdict" id="verdict-text"></div>
-    <div class="score" id="score-text">0 / 20</div>
-    <div class="sub">راجع تصحيح كل سؤال تحت 👇</div>
-  </div>
+        <div id="result-card">
+            <div class="verdict" id="verdict-text"></div>
+            <div class="score" id="score-text">0 / 20</div>
+            <div class="sub">Review the explanations for each question below 👇</div>
+        </div>
 
-  <div id="quiz-container"></div>
+        <div id="quiz-container"></div>
 
-  <div id="submit-bar">
-    <span id="submit-note">جاوب على كل الأسئلة عشان تقدر تعرض النتيجة</span>
-    <button id="submit-btn" disabled>اعرض النتيجة</button>
-  </div>
-</div>
+        <div id="submit-bar">
+            <span id="submit-note">Answer all questions to see your results</span>
+            <button id="submit-btn" disabled>Show Results</button>
+        </div>
+    </div>
 
-<footer>كويز بايثون الشامل · اتعمل بمحبة لطلاب بايثون 🐍</footer>
+    <footer>Comprehensive Python Quiz · Made with ❤️ for Python learners 🐍</footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
-<script>
-hljs.highlightAll();
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js">
+    </script>
+    <script>
+        hljs.highlightAll();
 
-/* ===================== TRICKY QUESTION BANK (20) ===================== */
-const questions = [
-  {
-    q: 'إيه ناتج <code>print(3 == 3.0)</code>؟',
-    options: ["True", "False", "TypeError", "None"],
-    correct: 0,
-    explain: "بايثون بتقارن <b>القيمة</b> في <code>==</code>، وبما إن 3 و 3.0 نفس القيمة الرقمية رغم اختلاف النوع (int/float)، الناتج <b>True</b>."
-  },
-  {
-    q: 'إيه ناتج <code>print(-7 // 2)</code>؟',
-    options: ["-3", "-4", "-3.5", "3"],
-    correct: 1,
-    explain: "الـ Floor Division دايمًا بتنزّل للأسفل (floor)، مش بتقرّب للصفر. <code>-7/2 = -3.5</code>، وأصغر عدد صحيح أقل منها هو <b>-4</b>."
-  },
-  {
-    q: 'إيه ناتج تنفيذ الكود؟<br><code>x = 5\ny = "5"\nprint(x == y)</code>',
-    options: ["True", "False", "TypeError", "SyntaxError"],
-    correct: 1,
-    explain: "المقارنة بين نوعين مختلفين تمامًا (int و str) بترجع <b>False</b> ببساطة، مش خطأ."
-  },
-  {
-    q: 'إيه ناتج <code>print(2 + 3 * 2 ** 2)</code>؟',
-    options: ["20", "14", "25", "16"],
-    correct: 1,
-    explain: "الأولوية: <code>**</code> أولًا (2**2=4)، بعدين الضرب (3*4=12)، بعدين الجمع (2+12=14)."
-  },
-  {
-    q: 'إيه ناتج الكود؟<br><code>a = [1]\nb = a\na = a + [2]\nprint(b)</code>',
-    options: ["[1]", "[1, 2]", "[]", "خطأ"],
-    correct: 0,
-    explain: "السطر <code>a = a + [2]</code> بيعمل object جديد ويربطه بـ a، وده مختلف عن التعديل المباشر على a. فـ b لسه بتشاور على الليست الأصلية <code>[1]</code>."
-  },
-  {
-    q: 'إيه ناتج <code>print(bool("False"))</code>؟',
-    options: ["True", "False", "خطأ", "None"],
-    correct: 0,
-    explain: "أي نص غير فاضي بيتحول لـ <b>True</b> بغض النظر عن محتواه — حتى لو كان النص نفسه \"False\"!"
-  },
-  {
-    q: 'إيه ناتج الكود؟<br><code>for i in range(3):\n    print(i)\nelse:\n    print("done")</code>',
-    options: ["0 1 2 (بدون done)", "0 1 2 done", "done فقط", "خطأ Syntax"],
-    correct: 1,
-    explain: "بلوك <code>else</code> بعد for بينفّذ لو الحلقة خلصت طبيعي بدون break، وهنا مفيش break فبيطبع done كمان."
-  },
-  {
-    q: 'إيه ناتج الكود؟<br><code>i = 0\nwhile i < 5:\n    i += 1\n    if i == 3:\n        continue\n    print(i)</code>',
-    options: ["1 2 4 5", "1 2 3 4 5", "1 2 4", "خطأ"],
-    correct: 0,
-    explain: "لما i تساوي 3، continue بتتخطى الطباعة بس مش بتوقف الحلقة، فالطباعة بتبقى: 1 2 (تتخطى 3) 4 5."
-  },
-  {
-    q: 'كام مرة هتتنفذ جملة print؟<br><code>for i in range(3):\n    for j in range(3):\n        if j == i:\n            break\n        print(i, j)</code>',
-    options: ["9", "6", "3", "0"],
-    correct: 2,
-    explain: "لكل قيمة i، اللوب الداخلي بيطبع j من 0 لحد ما j==i ويوقف. لـ i=0: 0 مرة. لـ i=1: مرة واحدة (j=0). لـ i=2: مرتين (j=0,1). المجموع = 0+1+2 = <b>3</b>."
-  },
-  {
-    q: 'إيه الفرق بين <code>break</code> و <code>continue</code> في اللوب المتداخل (nested)؟',
-    options: [
-      "لا فرق، بيوقفوا كل اللوبات",
-      "break بيوقف كل اللوبات المتداخلة مرة واحدة",
-      "كلاهما بيأثر على أقرب حلقة محيطة بيهم فقط (الداخلية)",
-      "continue بيوقف اللوب الخارجي فقط"
-    ],
-    correct: 2,
-    explain: "كل من <code>break</code> و <code>continue</code> بيأثروا بس على أقرب حلقة (for/while) محيطة بيهم، مش على كل اللوبات المتداخلة."
-  },
-  {
-    q: 'إيه ناتج <code>print(10 % -3)</code>؟',
-    options: ["1", "-1", "-2", "2"],
-    correct: 2,
-    explain: "في بايثون، إشارة نتيجة الـ modulus بتاخد إشارة المقسوم عليه (divisor). بما إن <code>floor(10 / -3) = -4</code>، فـ الباقي = <code>10 - (-4 * -3) = 10 - 12 = -2</code>."
-  },
-  {
-    q: 'إيه ناتج الكود؟<br><code>x = 1\nwhile x < 4:\n    print(x)\n    x += 1\nprint(x)</code>',
-    options: ["1 2 3 4", "1 2 3 (ثم 4)", "1 2 3 4 4", "0 1 2 3"],
-    correct: 1,
-    explain: "الحلقة بتطبع 1، 2، 3 (لأن الشرط بيبقى False عند x=4)، وبعد الحلقة الـ print الأخير بره اللوب بيطبع x اللي بقت 4."
-  },
-  {
-    q: 'أي عبارة صح عن <code>is</code> مقابل <code>==</code>؟',
-    options: [
-      "is و == دايمًا بيدوا نفس النتيجة",
-      "is بتقارن القيمة، == بتقارن الهوية",
-      "== بتقارن القيمة، is بتقارن هوية الـ object (نفس مكان الذاكرة)",
-      "is تُستخدم فقط مع الأرقام"
-    ],
-    correct: 2,
-    explain: "== بتفحص تساوي القيم، أما is بتفحص هل المتغيرين بيشاوروا على نفس الـ object في الذاكرة."
-  },
-  {
-    q: 'إيه ناتج <code>print("Py" + "3" * 2)</code>؟',
-    options: ["Py33", "PyPy3", "Py6", "خطأ TypeError"],
-    correct: 0,
-    explain: "أولوية <code>*</code> أعلى من <code>+</code>، فـ <code>\"3\" * 2</code> بتتنفذ الأول وتديك <code>\"33\"</code>، وبعدين <code>\"Py\" + \"33\" = \"Py33\"</code>."
-  },
-  {
-    q: 'إيه ناتج الكود؟<br><code>for i in range(5):\n    if i == 2:\n        pass\n    print(i)</code>',
-    options: ["0 1 3 4", "0 1 2 3 4", "0 1 (يوقف عند 2)", "خطأ"],
-    correct: 1,
-    explain: "<code>pass</code> معناها \"مفيش حاجة تحصل\" — البرنامج بيكمل عادي وبيطبع كل الأرقام من 0 لـ 4 عادي."
-  },
-  {
-    q: 'إيه ناتج تنفيذ <code>int("10") + int("5") * 2</code>؟',
-    options: ["30", "20", "105", "خطأ"],
-    correct: 1,
-    explain: "بعد التحويل: <code>10 + 5 * 2</code>. الضرب أولًا (5*2=10)، بعدين الجمع (10+10=20)."
-  },
-  {
-    q: 'إيه ناتج <code>print(not 0 and not "")</code>؟',
-    options: ["True", "False", "0", "خطأ"],
-    correct: 0,
-    explain: "<code>0</code> و <code>\"\"</code> قيمتهم Falsy، فـ <code>not 0 = True</code> و <code>not \"\" = True</code>، و <code>True and True = True</code>."
-  },
-  {
-    q: 'إيه ناتج الكود؟<br><code>count = 0\nfor i in range(10):\n    if i % 3 == 0:\n        count += 1\nprint(count)</code>',
-    options: ["3", "4", "5", "10"],
-    correct: 1,
-    explain: "الأرقام من 0 لـ 9 اللي بتقبل القسمة على 3 هي: 0, 3, 6, 9 → <b>4</b> أرقام."
-  },
-  {
-    q: 'إيه ناتج <code>print(5 > 3 > 1)</code>؟',
-    options: ["True", "False", "5", "خطأ Syntax"],
-    correct: 0,
-    explain: "دي Chained Comparison بتتحول لـ <code>(5 &gt; 3) and (3 &gt; 1)</code> → <code>True and True</code> → <b>True</b>."
-  },
-  {
-    q: 'إيه ناتج الكود؟<br><code>x = 1\nif x = 2:\n    print("yes")</code>',
-    options: ["yes", "لا حاجة يُطبع", "SyntaxError", "NameError"],
-    correct: 2,
-    explain: "استخدام <code>=</code> (التخصيص) بدل <code>==</code> (المقارنة) جوه شرط <code>if</code> بيرمي <b>SyntaxError</b> في بايثون العادية."
-  }
-];
+        /* ===================== TRICKY QUESTION BANK (20) ===================== */
+        const questions = [{
+            q: 'What is the output of <code>print(3 == 3.0)</code>?',
+            options: ["True", "False", "TypeError", "None"],
+            correct: 0,
+            explain: "Python compares <b>values</b> with <code>==</code>. Even though the types differ (int vs float), 3 and 3.0 represent the same numeric value, so the result is <b>True</b>."
+        }, {
+            q: 'What is the output of <code>print(-7 // 2)</code>?',
+            options: ["-3", "-4", "-3.5", "3"],
+            correct: 1,
+            explain: "Floor division always rounds <b>down</b> (toward negative infinity), not toward zero. <code>-7/2 = -3.5</code>, and the smallest integer less than or equal to that is <b>-4</b>."
+        }, {
+            q: 'What is the output of the code?<br><code>x = 5\ny = "5"\nprint(x == y)</code>',
+            options: ["True", "False", "TypeError", "SyntaxError"],
+            correct: 1,
+            explain: "Comparing two entirely different types (int and str) simply returns <b>False</b> — it does not raise an error."
+        }, {
+            q: 'What is the output of <code>print(2 + 3 * 2 ** 2)</code>?',
+            options: ["20", "14", "25", "16"],
+            correct: 1,
+            explain: "Operator precedence: <code>**</code> first (2**2 = 4), then multiplication (3*4 = 12), then addition (2+12 = <b>14</b>)."
+        }, {
+            q: 'What is the output of the code?<br><code>a = [1]\nb = a\na = a + [2]\nprint(b)</code>',
+            options: ["[1]", "[1, 2]", "[]", "Error"],
+            correct: 0,
+            explain: "The line <code>a = a + [2]</code> creates a <b>new</b> list object and rebinds <code>a</code> to it. <code>b</code> still references the original list <code>[1]</code>."
+        }, {
+            q: 'What is the output of <code>print(bool("False"))</code>?',
+            options: ["True", "False", "Error", "None"],
+            correct: 0,
+            explain: "Any non-empty string evaluates to <b>True</b> in a boolean context — even if the string itself is <code>\"False\"</code>!"
+        }, {
+            q: 'What is the output of the code?<br><code>for i in range(3):\n    print(i)\nelse:\n    print("done")</code>',
+            options: ["0 1 2 (no done)", "0 1 2 done", "done only", "SyntaxError"],
+            correct: 1,
+            explain: "The <code>else</code> block after a <code>for</code> loop runs if the loop completes normally (without a <code>break</code>). Here it prints <b>0 1 2 done</b>."
+        }, {
+            q: 'What is the output of the code?<br><code>i = 0\nwhile i < 5:\n    i += 1\n    if i == 3:\n        continue\n    print(i)</code>',
+            options: ["1 2 4 5", "1 2 3 4 5", "1 2 4", "Error"],
+            correct: 0,
+            explain: "When <code>i</code> reaches 3, <code>continue</code> skips the <code>print</code> but does not stop the loop. So it prints: 1, 2, (skip 3), 4, 5 → <b>1 2 4 5</b>."
+        }, {
+            q: 'How many times will the <code>print</code> statement execute?<br><code>for i in range(3):\n    for j in range(3):\n        if j == i:\n            break\n        print(i, j)</code>',
+            options: ["9", "6", "3", "0"],
+            correct: 2,
+            explain: "For each <code>i</code>, the inner loop prints <code>j</code> from 0 up to (but not including) <code>i</code>. i=0 → 0 prints, i=1 → 1 print (j=0), i=2 → 2 prints (j=0,1). Total = 0+1+2 = <b>3</b>."
+        }, {
+            q: 'What is the difference between <code>break</code> and <code>continue</code> in nested loops?',
+            options: [
+                "No difference — they stop all loops",
+                "break stops all nested loops at once",
+                "Both affect only the nearest enclosing loop (inner)",
+                "continue stops the outer loop only"
+            ],
+            correct: 2,
+            explain: "Both <code>break</code> and <code>continue</code> only affect the <b>nearest</b> enclosing loop (for/while), not all nested loops."
+        }, {
+            q: 'What is the output of <code>print(10 % -3)</code>?',
+            options: ["1", "-1", "-2", "2"],
+            correct: 2,
+            explain: "In Python, the sign of the modulo result matches the <b>divisor</b>. Since <code>floor(10 / -3) = -4</code>, the remainder is <code>10 - (-4 * -3) = 10 - 12 = -2</code>."
+        }, {
+            q: 'What is the output of the code?<br><code>x = 1\nwhile x < 4:\n    print(x)\n    x += 1\nprint(x)</code>',
+            options: ["1 2 3 4", "1 2 3 (then 4)", "1 2 3 4 4", "0 1 2 3"],
+            correct: 1,
+            explain: "The loop prints 1, 2, 3 (condition becomes False when x=4). After the loop, the final <code>print(x)</code> prints <b>4</b>."
+        }, {
+            q: 'Which statement is correct about <code>is</code> vs <code>==</code>?',
+            options: [
+                "is and == always give the same result",
+                "is compares values, == compares identity",
+                "== compares values, is compares object identity (same memory location)",
+                "is is only used with numbers"
+            ],
+            correct: 2,
+            explain: "<code>==</code> checks value equality, while <code>is</code> checks whether two variables refer to the <b>same object</b> in memory."
+        }, {
+            q: 'What is the output of <code>print("Py" + "3" * 2)</code>?',
+            options: ["Py33", "PyPy3", "Py6", "TypeError"],
+            correct: 0,
+            explain: "<code>*</code> has higher precedence than <code>+</code>, so <code>\"3\" * 2</code> is evaluated first, giving <code>\"33\"</code>, then <code>\"Py\" + \"33\" = \"Py33\"</code>."
+        }, {
+            q: 'What is the output of the code?<br><code>for i in range(5):\n    if i == 2:\n        pass\n    print(i)</code>',
+            options: ["0 1 3 4", "0 1 2 3 4", "0 1 (stops at 2)", "Error"],
+            correct: 1,
+            explain: "<code>pass</code> means \"do nothing\" — the program continues normally and prints all numbers from 0 to 4."
+        }, {
+            q: 'What is the output of <code>int("10") + int("5") * 2</code>?',
+            options: ["30", "20", "105", "Error"],
+            correct: 1,
+            explain: "After conversion: <code>10 + 5 * 2</code>. Multiplication first (5*2=10), then addition (10+10=<b>20</b>)."
+        }, {
+            q: 'What is the output of <code>print(not 0 and not "")</code>?',
+            options: ["True", "False", "0", "Error"],
+            correct: 0,
+            explain: "<code>0</code> and <code>\"\"</code> are falsy, so <code>not 0 = True</code> and <code>not \"\" = True</code>, and <code>True and True = True</code>."
+        }, {
+            q: 'What is the output of the code?<br><code>count = 0\nfor i in range(10):\n    if i % 3 == 0:\n        count += 1\nprint(count)</code>',
+            options: ["3", "4", "5", "10"],
+            correct: 1,
+            explain: "Numbers from 0 to 9 divisible by 3 are: 0, 3, 6, 9 → <b>4</b> numbers."
+        }, {
+            q: 'What is the output of <code>print(5 > 3 > 1)</code>?',
+            options: ["True", "False", "5", "SyntaxError"],
+            correct: 0,
+            explain: "This is a chained comparison: <code>(5 > 3) and (3 > 1)</code> → <code>True and True</code> → <b>True</b>."
+        }, {
+            q: 'What is the output of the code?<br><code>x = 1\nif x = 2:\n    print("yes")</code>',
+            options: ["yes", "nothing printed", "SyntaxError", "NameError"],
+            correct: 2,
+            explain: "Using <code>=</code> (assignment) instead of <code>==</code> (comparison) inside an <code>if</code> condition raises a <b>SyntaxError</b> in Python."
+        }];
 
-const answers = new Array(questions.length).fill(null);
-let submitted = false;
+        const answers = new Array(questions.length).fill(null);
+        let submitted = false;
 
-function renderQuiz(){
-  const container = document.getElementById('quiz-container');
-  questions.forEach((item, qi) => {
-    const card = document.createElement('div');
-    card.className = 'q-card';
-    card.id = `qcard-${qi}`;
-    card.innerHTML = `
-      <div class="q-meta"><span>سؤال ${qi + 1} من ${questions.length}</span><span class="q-result-icon" id="icon-${qi}" style="display:none;"></span></div>
-      <div class="q-text">${item.q}</div>
-      <div class="options">
-        ${item.options.map((opt, oi) => `<button class="opt" data-qi="${qi}" data-oi="${oi}">${opt}</button>`).join('')}
-      </div>
-      <div class="explain" id="explain-${qi}"><b>الشرح:</b> ${item.explain}</div>
-    `;
-    container.appendChild(card);
-  });
-  hljs.highlightAll();
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            questions.forEach((item, qi) => {
+                const card = document.createElement('div');
+                card.className = 'q-card';
+                card.id = `qcard-${qi}`;
+                card.innerHTML = `
+              <div class="q-meta"><span>Question ${qi + 1} of ${questions.length}</span><span class="q-result-icon" id="icon-${qi}" style="display:none;"></span></div>
+              <div class="q-text">${item.q}</div>
+              <div class="options">
+                ${item.options.map((opt, oi) => `<button class="opt" data-qi="${qi}" data-oi="${oi}">${opt}</button>`).join('')}
+              </div>
+              <div class="explain" id="explain-${qi}"><b>Explanation:</b> ${item.explain}</div>
+            `;
+                container.appendChild(card);
+            });
+            hljs.highlightAll();
 
-  container.addEventListener('click', (e) => {
-    if (submitted) return;
-    const btn = e.target.closest('.opt');
-    if (!btn) return;
-    const qi = Number(btn.dataset.qi);
-    const oi = Number(btn.dataset.oi);
-    answers[qi] = oi;
+            container.addEventListener('click', (e) => {
+                if (submitted) return;
+                const btn = e.target.closest('.opt');
+                if (!btn) return;
+                const qi = Number(btn.dataset.qi);
+                const oi = Number(btn.dataset.oi);
+                answers[qi] = oi;
 
-    const allOpts = btn.closest('.options').querySelectorAll('.opt');
-    allOpts.forEach(o => o.classList.remove('selected'));
-    btn.classList.add('selected');
+                const allOpts = btn.closest('.options').querySelectorAll('.opt');
+                allOpts.forEach(o => o.classList.remove('selected'));
+                btn.classList.add('selected');
 
-    document.getElementById(`qcard-${qi}`).classList.remove('unanswered-flag');
-    updateProgress();
-  });
-}
+                document.getElementById(`qcard-${qi}`).classList.remove('unanswered-flag');
+                updateProgress();
+            });
+        }
 
-function updateProgress(){
-  const answeredCount = answers.filter(a => a !== null).length;
-  document.getElementById('progress-pill').textContent = `${answeredCount} / ${questions.length}`;
-  document.getElementById('progress-bar').style.width = (answeredCount / questions.length * 100) + '%';
-  const submitBtn = document.getElementById('submit-btn');
-  const note = document.getElementById('submit-note');
-  if (answeredCount === questions.length){
-    submitBtn.disabled = false;
-    note.textContent = 'تمام، جاوبت على كل الأسئلة!';
-  } else {
-    submitBtn.disabled = true;
-    note.textContent = `جاوب على كل الأسئلة عشان تقدر تعرض النتيجة (${questions.length - answeredCount} متبقّي)`;
-  }
-}
+        function updateProgress() {
+            const answeredCount = answers.filter(a => a !== null).length;
+            document.getElementById('progress-pill').textContent = `${answeredCount} / ${questions.length}`;
+            document.getElementById('progress-bar').style.width = (answeredCount / questions.length * 100) + '%';
+            const submitBtn = document.getElementById('submit-btn');
+            const note = document.getElementById('submit-note');
+            if (answeredCount === questions.length) {
+                submitBtn.disabled = false;
+                note.textContent = 'All set! You\'ve answered every question.';
+            } else {
+                submitBtn.disabled = true;
+                note.textContent =
+                    `Answer all questions to see your results (${questions.length - answeredCount} remaining)`;
+            }
+        }
 
-document.getElementById('submit-btn').addEventListener('click', () => {
-  if (answers.some(a => a === null)) return;
-  submitted = true;
-  let correctCount = 0;
+        document.getElementById('submit-btn').addEventListener('click', () => {
+            if (answers.some(a => a === null)) return;
+            submitted = true;
+            let correctCount = 0;
 
-  questions.forEach((item, qi) => {
-    const card = document.getElementById(`qcard-${qi}`);
-    const allOpts = card.querySelectorAll('.opt');
-    allOpts.forEach(o => o.classList.add('locked'));
-    const chosen = answers[qi];
-    const icon = document.getElementById(`icon-${qi}`);
-    icon.style.display = 'inline-block';
+            questions.forEach((item, qi) => {
+                const card = document.getElementById(`qcard-${qi}`);
+                const allOpts = card.querySelectorAll('.opt');
+                allOpts.forEach(o => o.classList.add('locked'));
+                const chosen = answers[qi];
+                const icon = document.getElementById(`icon-${qi}`);
+                icon.style.display = 'inline-block';
 
-    if (chosen === item.correct){
-      allOpts[chosen].classList.add('correct');
-      icon.textContent = '✓ صح';
-      icon.classList.add('ok');
-      correctCount++;
-    } else {
-      allOpts[chosen].classList.add('wrong');
-      allOpts[item.correct].classList.add('correct');
-      icon.textContent = '✕ غلط';
-      icon.classList.add('bad');
-    }
-    document.getElementById(`explain-${qi}`).classList.add('show');
-  });
+                if (chosen === item.correct) {
+                    allOpts[chosen].classList.add('correct');
+                    icon.textContent = '✓ Correct';
+                    icon.classList.add('ok');
+                    correctCount++;
+                } else {
+                    allOpts[chosen].classList.add('wrong');
+                    allOpts[item.correct].classList.add('correct');
+                    icon.textContent = '✕ Wrong';
+                    icon.classList.add('bad');
+                }
+                document.getElementById(`explain-${qi}`).classList.add('show');
+            });
 
-  const resultCard = document.getElementById('result-card');
-  const pct = Math.round(correctCount / questions.length * 100);
-  let verdict = '';
-  if (pct >= 90) verdict = 'ممتاز جدًا! فاهم بايثون كويس أوي 🔥';
-  else if (pct >= 70) verdict = 'كويس جدًا! لسه في تفاصيل بسيطة تراجعها 👍';
-  else if (pct >= 50) verdict = 'مش بطال، بس محتاج تراجع كذا نقطة تانية 📘';
-  else verdict = 'محتاج تراجع الأساسيات واللوبس تاني بتركيز 💪';
+            const resultCard = document.getElementById('result-card');
+            const pct = Math.round(correctCount / questions.length * 100);
+            let verdict = '';
+            if (pct >= 90) verdict = 'Excellent! You really know Python inside out 🔥';
+            else if (pct >= 70) verdict = 'Very good! Just a few subtle details to brush up on 👍';
+            else if (pct >= 50) verdict = 'Not bad — but you\'ll want to review a few key concepts 📘';
+            else verdict = 'Time to revisit the fundamentals and loops more carefully 💪';
 
-  document.getElementById('verdict-text').textContent = verdict;
-  document.getElementById('score-text').textContent = `${correctCount} / ${questions.length} (${pct}%)`;
-  resultCard.style.display = 'block';
-  resultCard.scrollIntoView({ behavior:'smooth', block:'start' });
+            document.getElementById('verdict-text').textContent = verdict;
+            document.getElementById('score-text').textContent = `${correctCount} / ${questions.length} (${pct}%)`;
+            resultCard.style.display = 'block';
+            resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-  document.getElementById('submit-bar').style.display = 'none';
-});
+            document.getElementById('submit-bar').style.display = 'none';
+        });
 
-renderQuiz();
-</script>
+        renderQuiz();
+    </script>
 </body>
 </html>
