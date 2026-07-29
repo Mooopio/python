@@ -1,0 +1,1809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Sets — From Zero to Hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════ */
+:root {
+  --cream:      #FAFAF7;
+  --cream2:     #F2F1EC;
+  --cream3:     #E8E6DE;
+  --ink:        #141414;
+  --ink2:       #3D3D3D;
+  --ink3:       #757575;
+  --ink4:       #A8A8A8;
+
+  --violet:     #7C3AED;
+  --violet-l:   #EDE9FE;
+  --violet-m:   #C4B5FD;
+  --teal:       #0891B2;
+  --teal-l:     #E0F2FE;
+  --coral:      #E85D3A;
+  --coral-l:    #FEF0ED;
+  --green:      #15803D;
+  --green-l:    #DCFCE7;
+  --amber:      #B45309;
+  --amber-l:    #FEF3C7;
+
+  --font-d:     'Bricolage Grotesque', sans-serif;
+  --font-b:     'Source Serif 4', serif;
+  --font-c:     'JetBrains Mono', monospace;
+
+  --max:        880px;
+  --r:          12px;
+  --r-sm:       7px;
+}
+
+/* ══════════════════════════════════════════
+   BASE
+══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-b);
+  font-size: 17px;
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+::selection { background: var(--violet-l); color: var(--violet); }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--cream2); }
+::-webkit-scrollbar-thumb { background: var(--cream3); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink4); }
+
+/* ══════════════════════════════════════════
+   LAYOUT SHELL
+══════════════════════════════════════════ */
+#shell { display: flex; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+#sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0; left: 0;
+  height: 100vh;
+  background: var(--cream2);
+  border-right: 1px solid var(--cream3);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  z-index: 100;
+  transition: transform .3s ease;
+}
+#sidebar::-webkit-scrollbar { width: 3px; }
+
+.sb-logo {
+  padding: 28px 24px 22px;
+  border-bottom: 1px solid var(--cream3);
+}
+.sb-logo-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--font-d);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  padding: 7px 12px;
+  border-radius: var(--r-sm);
+}
+.sb-logo-sub {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--ink4);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-family: var(--font-d);
+}
+
+/* Progress */
+.sb-prog {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--cream3);
+}
+.sb-prog-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--ink4);
+  font-family: var(--font-d);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.sb-prog-track {
+  height: 5px;
+  background: var(--cream3);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.sb-prog-fill {
+  height: 100%;
+  background: var(--violet);
+  border-radius: 99px;
+  width: 0%;
+  transition: width .5s ease;
+}
+.sb-prog-txt {
+  font-size: 11px;
+  color: var(--ink3);
+  margin-top: 6px;
+  font-family: var(--font-d);
+}
+
+/* Nav groups */
+.sb-grp-label {
+  padding: 14px 24px 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--ink4);
+  font-family: var(--font-d);
+  font-weight: 700;
+}
+.sb-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 24px;
+  font-family: var(--font-d);
+  font-size: 13px;
+  color: var(--ink3);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all .15s;
+  text-decoration: none;
+}
+.sb-link:hover { color: var(--ink); background: var(--cream3); }
+.sb-link.active { color: var(--violet); border-left-color: var(--violet); background: var(--violet-l); font-weight: 600; }
+.sb-link.done   { color: var(--green); }
+.sb-link .si    { font-size: 14px; width: 17px; text-align: center; flex-shrink: 0; }
+.sb-done-dot {
+  margin-left: auto;
+  width: 15px; height: 15px;
+  border-radius: 50%;
+  border: 1.5px solid var(--cream3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; flex-shrink: 0; transition: all .3s;
+}
+.sb-link.done .sb-done-dot { background: var(--green); border-color: var(--green); color: #fff; }
+
+/* ── MAIN ── */
+#main { margin-left: 240px; flex: 1; }
+
+/* ── TOP BAR ── */
+#topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(250,250,247,.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--cream3);
+  height: 56px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+}
+.tb-crumb {
+  font-family: var(--font-d);
+  font-size: 13px;
+  color: var(--ink3);
+}
+.tb-crumb b { color: var(--ink); font-weight: 600; }
+.menu-btn {
+  display: none;
+  background: none;
+  border: 1px solid var(--cream3);
+  border-radius: var(--r-sm);
+  padding: 6px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+/* ── CONTENT ── */
+#content { padding: 64px 48px 120px; max-width: var(--max); }
+
+/* ══════════════════════════════════════════
+   HERO
+══════════════════════════════════════════ */
+.hero { margin-bottom: 88px; }
+
+.hero-eyebrow {
+  font-family: var(--font-d);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  color: var(--violet);
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 18px;
+}
+.hero-eyebrow::before {
+  content: '';
+  display: block;
+  width: 28px; height: 2px;
+  background: var(--violet);
+  border-radius: 99px;
+}
+
+.hero-title {
+  font-family: var(--font-d);
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -.03em;
+  margin-bottom: 22px;
+  color: var(--ink);
+}
+.hero-title .v { color: var(--violet); }
+.hero-title .t { color: var(--teal); }
+
+.hero-desc {
+  font-size: 18px;
+  color: var(--ink2);
+  max-width: 580px;
+  line-height: 1.8;
+  margin-bottom: 40px;
+  font-weight: 300;
+}
+
+/* Stat strip */
+.hero-stats {
+  display: flex; gap: 32px; flex-wrap: wrap;
+  padding: 24px 0;
+  border-top: 1px solid var(--cream3);
+  border-bottom: 1px solid var(--cream3);
+  margin-bottom: 48px;
+}
+.hstat { }
+.hstat-num {
+  font-family: var(--font-d);
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1;
+}
+.hstat-num .acc { color: var(--violet); }
+.hstat-lbl {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--ink4);
+  font-family: var(--font-d);
+  margin-top: 3px;
+}
+
+/* ── VENN HERO ── */
+.venn-hero {
+  background: var(--ink);
+  border-radius: 16px;
+  padding: 36px 32px 28px;
+  color: var(--cream);
+  position: relative;
+  overflow: hidden;
+}
+.venn-hero::before {
+  content: 'SETS';
+  position: absolute;
+  right: -20px; top: -30px;
+  font-family: var(--font-d);
+  font-size: 120px;
+  font-weight: 800;
+  color: rgba(255,255,255,.04);
+  letter-spacing: -.05em;
+  pointer-events: none;
+  user-select: none;
+}
+.venn-hero-label {
+  font-family: var(--font-d);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  color: rgba(255,255,255,.4);
+  margin-bottom: 20px;
+}
+.venn-svg-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.venn-item { text-align: center; }
+.venn-item svg { display: block; margin: 0 auto 10px; }
+.venn-item-title {
+  font-family: var(--font-d);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: rgba(255,255,255,.5);
+}
+.venn-result {
+  font-family: var(--font-c);
+  font-size: 13px;
+  color: rgba(255,255,255,.7);
+  margin-top: 6px;
+}
+
+/* Venn SVG circles */
+.vc-a { fill: rgba(124,58,237,.5); }
+.vc-b { fill: rgba(8,145,178,.5); }
+.vc-i { fill: rgba(232,93,58,.7); }
+.vc-outer { fill: none; stroke: rgba(255,255,255,.15); stroke-width: 1.5; }
+
+/* ══════════════════════════════════════════
+   SECTIONS
+══════════════════════════════════════════ */
+.section {
+  margin-bottom: 96px;
+  scroll-margin-top: 68px;
+}
+
+.sec-head {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  margin-bottom: 36px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid var(--ink);
+}
+.sec-label {
+  font-family: var(--font-d);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  padding: 5px 11px;
+  border-radius: var(--r-sm);
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.sl-v { color: var(--violet); background: var(--violet-l); }
+.sl-t { color: var(--teal);   background: var(--teal-l); }
+.sl-c { color: var(--coral);  background: var(--coral-l); }
+.sl-g { color: var(--green);  background: var(--green-l); }
+.sl-a { color: var(--amber);  background: var(--amber-l); }
+
+.sec-title {
+  font-family: var(--font-d);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  line-height: 1.2;
+  color: var(--ink);
+}
+.sec-title small {
+  display: block;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink3);
+  margin-top: 4px;
+  letter-spacing: 0;
+  font-family: var(--font-b);
+}
+
+/* ══════════════════════════════════════════
+   PROSE
+══════════════════════════════════════════ */
+.prose {
+  color: var(--ink2);
+  font-size: 16px;
+  line-height: 1.85;
+  margin-bottom: 22px;
+}
+.prose strong { color: var(--ink); font-weight: 600; font-family: var(--font-d); }
+.prose em { color: var(--violet); font-style: normal; font-weight: 500; }
+.prose code {
+  font-family: var(--font-c);
+  font-size: 13.5px;
+  background: var(--cream2);
+  border: 1px solid var(--cream3);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--teal);
+}
+
+/* ══════════════════════════════════════════
+   CODE BLOCKS
+══════════════════════════════════════════ */
+.cw {
+  background: #1C1917;
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 28px;
+  border: 1px solid #2C2A26;
+}
+.cw-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  background: #141210;
+  border-bottom: 1px solid #2C2A26;
+}
+.cw-dots { display: flex; gap: 6px; }
+.cw-dots span { width: 10px; height: 10px; border-radius: 50%; }
+.cd1 { background: #FF605C; }
+.cd2 { background: #FFBD2E; }
+.cd3 { background: #00CA56; }
+.cw-fname {
+  font-family: var(--font-c);
+  font-size: 11px;
+  color: #6B6862;
+}
+.cw-copy {
+  background: transparent;
+  border: 1px solid #3A3830;
+  border-radius: 5px;
+  color: #6B6862;
+  font-size: 11px;
+  font-family: var(--font-b);
+  padding: 3px 10px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.cw-copy:hover { border-color: var(--violet); color: var(--violet-m); }
+.cw-copy.copied { border-color: #00CA56; color: #00CA56; }
+
+pre {
+  padding: 22px 22px;
+  overflow-x: auto;
+  font-family: var(--font-c);
+  font-size: 13.5px;
+  line-height: 1.9;
+  color: #D4C9B8;
+}
+pre::-webkit-scrollbar { height: 4px; }
+pre::-webkit-scrollbar-thumb { background: #3A3830; border-radius: 99px; }
+
+/* syntax */
+.kw  { color: #C792EA; font-weight: 600; }
+.fn  { color: #82AAFF; }
+.st  { color: #C3E88D; }
+.nm  { color: #F78C6C; }
+.cm  { color: #546E7A; font-style: italic; }
+.va  { color: #EEFFFF; }
+.op  { color: #89DDFF; }
+.bl  { color: #FFD180; font-weight: 600; }
+.me  { color: #82AAFF; }
+
+/* output */
+.cw-out {
+  border-top: 1px solid #2C2A26;
+  background: #131110;
+  padding: 14px 22px;
+}
+.cw-out-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: #546E7A;
+  font-family: var(--font-d);
+  margin-bottom: 8px;
+}
+.ol { font-family: var(--font-c); font-size: 13px; color: #00CA56; line-height: 1.8; }
+.ol.err { color: #FF5370; }
+.ol.dim { color: #546E7A; }
+
+/* ══════════════════════════════════════════
+   CONCEPT BOX
+══════════════════════════════════════════ */
+.cb {
+  border-radius: var(--r);
+  padding: 22px 26px;
+  margin-bottom: 24px;
+  border-left: 3px solid;
+  position: relative;
+}
+.cb-v { background: var(--violet-l); border-color: var(--violet); }
+.cb-t { background: var(--teal-l);   border-color: var(--teal); }
+.cb-c { background: var(--coral-l);  border-color: var(--coral); }
+.cb-g { background: var(--green-l);  border-color: var(--green); }
+.cb-a { background: var(--amber-l);  border-color: var(--amber); }
+
+.cb-tag {
+  font-family: var(--font-d);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  margin-bottom: 8px;
+}
+.cb-v .cb-tag { color: var(--violet); }
+.cb-t .cb-tag { color: var(--teal); }
+.cb-c .cb-tag { color: var(--coral); }
+.cb-g .cb-tag { color: var(--green); }
+.cb-a .cb-tag { color: var(--amber); }
+
+.cb p { color: var(--ink2); font-size: 15px; line-height: 1.75; }
+.cb p + p { margin-top: 9px; }
+.cb strong { color: var(--ink); }
+.cb code {
+  font-family: var(--font-c);
+  font-size: 12.5px;
+  background: rgba(0,0,0,.07);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--ink);
+}
+
+/* callouts */
+.tip, .warn, .trick, .danger {
+  border-radius: var(--r);
+  padding: 16px 20px;
+  margin-bottom: 22px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  font-size: 15px;
+}
+.tip    { background: var(--violet-l); border: 1px solid var(--violet-m); }
+.warn   { background: var(--amber-l); border: 1px solid #FDE68A; }
+.trick  { background: var(--teal-l);  border: 1px solid #BAE6FD; }
+.danger { background: var(--coral-l); border: 1px solid #FECACA; }
+.tip    .ico { color: var(--violet); font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+.warn   .ico { color: var(--amber);  font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+.trick  .ico { color: var(--teal);   font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+.danger .ico { color: var(--coral);  font-size: 17px; flex-shrink: 0; margin-top: 1px; }
+.tc p { color: var(--ink2); line-height: 1.65; }
+.tc strong { display: block; margin-bottom: 3px; color: var(--ink); font-size: 12.5px; text-transform: uppercase; letter-spacing: .06em; font-family: var(--font-d); font-weight: 700; }
+.tc code { font-family: var(--font-c); font-size: 12px; background: rgba(0,0,0,.07); border-radius: 4px; padding: 1px 5px; }
+
+/* ══════════════════════════════════════════
+   VENN DIAGRAMS (inline interactive)
+══════════════════════════════════════════ */
+.venn-inline {
+  background: var(--ink);
+  border-radius: var(--r);
+  padding: 28px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.venn-inline svg { flex-shrink: 0; }
+.venn-desc { color: rgba(255,255,255,.65); font-size: 14px; line-height: 1.7; flex: 1; min-width: 180px; }
+.venn-desc strong { color: #fff; display: block; margin-bottom: 6px; font-family: var(--font-d); font-size: 15px; }
+.venn-desc .vop {
+  font-family: var(--font-c);
+  font-size: 12.5px;
+  color: rgba(255,255,255,.4);
+  margin-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  padding-top: 10px;
+}
+.venn-desc .vres { color: #C3E88D; }
+
+/* ══════════════════════════════════════════
+   COMPARISON TABLE
+══════════════════════════════════════════ */
+.ctbl {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 28px;
+  font-size: 14px;
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.ctbl th {
+  background: var(--ink);
+  color: var(--cream);
+  padding: 13px 18px;
+  text-align: left;
+  font-family: var(--font-d);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.ctbl td {
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--cream3);
+  color: var(--ink2);
+  vertical-align: top;
+  line-height: 1.55;
+}
+.ctbl td:first-child { font-weight: 600; color: var(--ink); font-family: var(--font-d); }
+.ctbl tr:last-child td { border-bottom: none; }
+.ctbl tr:nth-child(even) td { background: var(--cream2); }
+.ctbl code { font-family: var(--font-c); font-size: 12px; color: var(--teal); background: var(--teal-l); padding: 1px 5px; border-radius: 3px; }
+
+/* ══════════════════════════════════════════
+   METHOD CARDS GRID
+══════════════════════════════════════════ */
+.methods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.method-card {
+  background: var(--cream2);
+  border: 1px solid var(--cream3);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  transition: all .2s;
+}
+.method-card:hover { border-color: var(--violet); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(124,58,237,.08); }
+.mc-name {
+  font-family: var(--font-c);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--violet);
+  margin-bottom: 6px;
+}
+.mc-sig {
+  font-family: var(--font-c);
+  font-size: 11px;
+  color: var(--ink4);
+  margin-bottom: 10px;
+}
+.mc-desc { font-size: 13px; color: var(--ink2); line-height: 1.6; }
+.mc-ex {
+  margin-top: 10px;
+  font-family: var(--font-c);
+  font-size: 11.5px;
+  color: var(--teal);
+  background: var(--teal-l);
+  border-radius: var(--r-sm);
+  padding: 6px 10px;
+}
+
+/* ══════════════════════════════════════════
+   CHALLENGES
+══════════════════════════════════════════ */
+.challenges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.ch-card {
+  background: var(--cream);
+  border: 1.5px solid var(--cream3);
+  border-radius: var(--r);
+  padding: 20px;
+  transition: all .2s;
+}
+.ch-card:hover { border-color: var(--ink); transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,.06); }
+.ch-badge {
+  font-family: var(--font-d);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 3px 9px;
+  border-radius: 99px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+.easy   { background: var(--green-l); color: var(--green); }
+.medium { background: var(--amber-l); color: var(--amber); }
+.hard   { background: var(--coral-l); color: var(--coral); }
+.ch-title { font-family: var(--font-d); font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 8px; line-height: 1.35; }
+.ch-desc  { font-size: 13px; color: var(--ink3); line-height: 1.6; }
+.ch-hint  { margin-top: 12px; font-family: var(--font-c); font-size: 11.5px; color: var(--ink4); background: var(--cream2); border-radius: var(--r-sm); padding: 8px 12px; }
+
+/* ══════════════════════════════════════════
+   QUIZ
+══════════════════════════════════════════ */
+.quiz-wrap {
+  background: var(--cream);
+  border: 1.5px solid var(--cream3);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.qz-head {
+  background: var(--ink);
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.qz-num {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  background: var(--violet);
+  color: #fff;
+  font-family: var(--font-d);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.qz-head-txt { font-family: var(--font-d); font-size: 14px; font-weight: 600; color: #fff; }
+.qz-head-txt small { font-size: 11px; color: rgba(255,255,255,.4); font-weight: 400; display: block; }
+
+.qz-body { padding: 20px 22px; }
+.qz-q { font-size: 15px; font-weight: 500; color: var(--ink); margin-bottom: 16px; line-height: 1.6; }
+.qz-q code { font-family: var(--font-c); font-size: 12.5px; background: var(--cream2); border: 1px solid var(--cream3); border-radius: 4px; padding: 1px 6px; color: var(--teal); }
+
+.qz-opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.qz-opt {
+  display: flex; align-items: center; gap: 11px;
+  padding: 11px 16px;
+  border: 1.5px solid var(--cream3);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-size: 14px; color: var(--ink2);
+  transition: all .15s; user-select: none;
+}
+.qz-opt:hover { border-color: var(--violet); color: var(--ink); background: var(--violet-l); }
+.qz-opt.sel   { border-color: var(--violet); background: var(--violet-l); color: var(--violet); }
+.qz-opt.corr  { border-color: var(--green);  background: var(--green-l);  color: var(--green); }
+.qz-opt.wrng  { border-color: var(--coral);  background: var(--coral-l);  color: var(--coral); }
+.qz-key {
+  width: 24px; height: 24px; border-radius: 5px;
+  background: var(--cream2); border: 1px solid var(--cream3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-c); font-size: 11px; font-weight: 600;
+  color: var(--ink3); flex-shrink: 0; transition: all .2s;
+}
+.qz-opt.sel  .qz-key { background: var(--violet); border-color: var(--violet); color: #fff; }
+.qz-opt.corr .qz-key { background: var(--green);  border-color: var(--green);  color: #fff; }
+.qz-opt.wrng .qz-key { background: var(--coral);  border-color: var(--coral);  color: #fff; }
+
+.qz-actions { display: flex; gap: 8px; }
+.qz-sub {
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--font-d);
+  font-size: 13px; font-weight: 700;
+  border: none; border-radius: var(--r-sm);
+  padding: 10px 22px; cursor: pointer; transition: all .2s;
+}
+.qz-sub:hover { background: var(--violet); }
+.qz-sub:disabled { opacity: .3; cursor: not-allowed; }
+.qz-next {
+  background: transparent;
+  border: 1.5px solid var(--cream3);
+  color: var(--ink2);
+  font-family: var(--font-d);
+  font-size: 13px; font-weight: 600;
+  border-radius: var(--r-sm);
+  padding: 10px 20px; cursor: pointer;
+  transition: all .2s; display: none;
+}
+.qz-next:hover { border-color: var(--ink); color: var(--ink); }
+.qz-next.show { display: block; }
+
+.qz-fb {
+  margin-top: 14px; padding: 12px 16px;
+  border-radius: var(--r-sm);
+  font-size: 14px; line-height: 1.65; display: none;
+}
+.qz-fb.show { display: block; }
+.qz-fb.ok   { background: var(--green-l); border: 1px solid #BBF7D0; color: var(--green); }
+.qz-fb.fail { background: var(--coral-l); border: 1px solid #FECACA; color: var(--coral); }
+.qz-fb strong { display: block; margin-bottom: 3px; }
+
+/* ══════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════ */
+#footer {
+  border-top: 2px solid var(--ink);
+  margin-top: 40px;
+  padding: 56px 48px;
+  text-align: center;
+  background: var(--ink);
+  color: var(--cream);
+}
+.footer-icon { font-size: 48px; display: block; margin-bottom: 16px; }
+.footer-h { font-family: var(--font-d); font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+.footer-sub { color: rgba(255,255,255,.4); font-size: 15px; }
+
+/* ══════════════════════════════════════════
+   MOBILE
+══════════════════════════════════════════ */
+#overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 90; }
+
+@media (max-width: 900px) {
+  #sidebar { transform: translateX(-100%); }
+  #sidebar.open { transform: translateX(0); }
+  #main { margin-left: 0; }
+  #overlay { display: block; opacity: 0; pointer-events: none; transition: opacity .3s; }
+  #overlay.open { opacity: 1; pointer-events: all; }
+  #content { padding: 32px 20px 80px; }
+  #topbar { padding: 0 20px; }
+  .menu-btn { display: block; }
+  .hero-stats { gap: 20px; }
+}
+@media (max-width: 540px) {
+  .sec-title { font-size: 22px; }
+  .methods-grid, .challenges-grid { grid-template-columns: 1fr; }
+  .venn-inline { flex-direction: column; }
+  .ctbl { font-size: 13px; }
+  .ctbl th, .ctbl td { padding: 10px 12px; }
+}
+</style>
+</head>
+<body>
+<div id="shell">
+
+<!-- ════════ SIDEBAR ════════ -->
+<nav id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-mark">🐍 Python Sets</div>
+    <div class="sb-logo-sub">From Zero to Hero</div>
+  </div>
+
+  <div class="sb-prog">
+    <div class="sb-prog-label">Your Progress</div>
+    <div class="sb-prog-track"><div class="sb-prog-fill" id="progFill"></div></div>
+    <div class="sb-prog-txt" id="progTxt">0 of 10 sections</div>
+  </div>
+
+  <div class="sb-grp-label">Foundations</div>
+  <a class="sb-link" href="#intro" data-sec="intro"><span class="si">🌱</span>What is a Set?<span class="sb-done-dot" id="nd-intro">✓</span></a>
+  <a class="sb-link" href="#create" data-sec="create"><span class="si">🏗️</span>Creating Sets<span class="sb-done-dot" id="nd-create">✓</span></a>
+  <a class="sb-link" href="#props" data-sec="props"><span class="si">✨</span>Key Properties<span class="sb-done-dot" id="nd-props">✓</span></a>
+  <a class="sb-link" href="#methods" data-sec="methods"><span class="si">🔧</span>Methods<span class="sb-done-dot" id="nd-methods">✓</span></a>
+  <a class="sb-link" href="#operations" data-sec="operations"><span class="si">⚙️</span>Set Operations<span class="sb-done-dot" id="nd-operations">✓</span></a>
+
+  <div class="sb-grp-label">Going Deeper</div>
+  <a class="sb-link" href="#frozenset" data-sec="frozenset"><span class="si">🧊</span>Frozen Sets<span class="sb-done-dot" id="nd-frozenset">✓</span></a>
+  <a class="sb-link" href="#comprehension" data-sec="comprehension"><span class="si">⚡</span>Set Comprehension<span class="sb-done-dot" id="nd-comprehension">✓</span></a>
+  <a class="sb-link" href="#vs" data-sec="vs"><span class="si">⚖️</span>Sets vs Lists vs Dicts<span class="sb-done-dot" id="nd-vs">✓</span></a>
+
+  <div class="sb-grp-label">Practice</div>
+  <a class="sb-link" href="#quiz" data-sec="quiz"><span class="si">🎯</span>Quiz<span class="sb-done-dot" id="nd-quiz">✓</span></a>
+  <a class="sb-link" href="#challenges" data-sec="challenges"><span class="si">🏆</span>Challenges<span class="sb-done-dot" id="nd-challenges">✓</span></a>
+</nav>
+
+<!-- ════════ MAIN ════════ -->
+<div id="main">
+  <header id="topbar">
+    <button class="menu-btn" id="menuBtn">☰</button>
+    <div class="tb-crumb">🐍 Python — <b>Sets</b></div>
+    <div style="font-size:12px;color:var(--ink4);font-family:var(--font-d);">Unique · Unordered · Powerful</div>
+  </header>
+
+  <div id="content">
+
+    <!-- ════════ HERO ════════ -->
+    <div class="hero">
+      <div class="hero-eyebrow">Python for Beginners — Sets Edition</div>
+      <h1 class="hero-title">
+        The Most <span class="v">Underrated</span><br>
+        Data Structure<br>
+        in <span class="t">Python</span>
+      </h1>
+      <p class="hero-desc">
+        Sets are Python's secret weapon. They eliminate duplicates automatically, perform lightning-fast lookups, and let you do mathematical set operations in one line of code.
+      </p>
+
+      <div class="hero-stats">
+        <div class="hstat">
+          <div class="hstat-num"><span class="acc">10</span></div>
+          <div class="hstat-lbl">Sections</div>
+        </div>
+        <div class="hstat">
+          <div class="hstat-num"><span class="acc">30+</span></div>
+          <div class="hstat-lbl">Code Examples</div>
+        </div>
+        <div class="hstat">
+          <div class="hstat-num"><span class="acc">12</span></div>
+          <div class="hstat-lbl">Quiz Questions</div>
+        </div>
+        <div class="hstat">
+          <div class="hstat-num"><span class="acc">O(1)</span></div>
+          <div class="hstat-lbl">Lookup Speed</div>
+        </div>
+      </div>
+
+      <!-- Venn Hero -->
+      <div class="venn-hero">
+        <div class="venn-hero-label">Set Operations — Visual Overview</div>
+        <div class="venn-svg-wrap">
+
+          <!-- Union -->
+          <div class="venn-item">
+            <svg width="110" height="70" viewBox="0 0 110 70">
+              <circle cx="38" cy="35" r="30" class="vc-a"/>
+              <circle cx="72" cy="35" r="30" class="vc-b"/>
+              <circle cx="38" cy="35" r="30" class="vc-outer"/>
+              <circle cx="72" cy="35" r="30" class="vc-outer"/>
+            </svg>
+            <div class="venn-item-title">Union |</div>
+            <div class="venn-result">{1,2,3,4,5}</div>
+          </div>
+
+          <!-- Intersection -->
+          <div class="venn-item">
+            <svg width="110" height="70" viewBox="0 0 110 70">
+              <circle cx="38" cy="35" r="30" fill="rgba(124,58,237,.2)"/>
+              <circle cx="72" cy="35" r="30" fill="rgba(8,145,178,.2)"/>
+              <clipPath id="bClip"><circle cx="72" cy="35" r="30"/></clipPath>
+              <circle cx="38" cy="35" r="30" fill="rgba(232,93,58,.75)" clip-path="url(#bClip)"/>
+              <circle cx="38" cy="35" r="30" class="vc-outer"/>
+              <circle cx="72" cy="35" r="30" class="vc-outer"/>
+            </svg>
+            <div class="venn-item-title">Intersection &amp;</div>
+            <div class="venn-result">{3}</div>
+          </div>
+
+          <!-- Difference -->
+          <div class="venn-item">
+            <svg width="110" height="70" viewBox="0 0 110 70">
+              <circle cx="38" cy="35" r="30" class="vc-a"/>
+              <circle cx="72" cy="35" r="30" fill="rgba(8,145,178,.15)"/>
+              <clipPath id="bClip2"><circle cx="72" cy="35" r="30"/></clipPath>
+              <circle cx="38" cy="35" r="30" fill="rgba(20,18,16,1)" clip-path="url(#bClip2)"/>
+              <circle cx="38" cy="35" r="30" class="vc-outer"/>
+              <circle cx="72" cy="35" r="30" class="vc-outer"/>
+            </svg>
+            <div class="venn-item-title">Difference -</div>
+            <div class="venn-result">{1,2}</div>
+          </div>
+
+          <!-- Symmetric Difference -->
+          <div class="venn-item">
+            <svg width="110" height="70" viewBox="0 0 110 70">
+              <circle cx="38" cy="35" r="30" class="vc-a"/>
+              <circle cx="72" cy="35" r="30" class="vc-b"/>
+              <clipPath id="bClip3"><circle cx="72" cy="35" r="30"/></clipPath>
+              <circle cx="38" cy="35" r="30" fill="rgba(20,18,16,1)" clip-path="url(#bClip3)"/>
+              <circle cx="38" cy="35" r="30" class="vc-outer"/>
+              <circle cx="72" cy="35" r="30" class="vc-outer"/>
+            </svg>
+            <div class="venn-item-title">Symmetric ^</div>
+            <div class="venn-result">{1,2,4,5}</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════
+         S1: WHAT IS A SET
+    ════════════════════════ -->
+    <section class="section" id="intro" data-sec="intro">
+      <div class="sec-head">
+        <div class="sec-label sl-v">Ch 01</div>
+        <div>
+          <h2 class="sec-title">What is a Set?
+            <small>A collection that never repeats itself — like a guest list</small>
+          </h2>
+        </div>
+      </div>
+
+      <div class="cb cb-v">
+        <div class="cb-tag">💡 Core Concept</div>
+        <p>A <strong>set</strong> is a collection of <strong>unique, unordered items</strong>. Think of it like a real-world set in mathematics — a bag where every item appears only once, and the order doesn't matter.</p>
+        <p>If you add the same item twice, Python silently ignores the second one. No duplicates. Ever.</p>
+      </div>
+
+      <p class="prose">Imagine you're counting which cities students come from. Some cities repeat — but you only want to know <em>which unique cities</em> exist:</p>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">intro_set.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="cm"># Without sets — messy manual work</span>
+<span class="va">cities</span> <span class="op">=</span> [<span class="st">"Cairo"</span>, <span class="st">"Alex"</span>, <span class="st">"Cairo"</span>, <span class="st">"Giza"</span>, <span class="st">"Alex"</span>, <span class="st">"Cairo"</span>]
+<span class="va">unique</span> <span class="op">=</span> []
+<span class="kw">for</span> <span class="va">city</span> <span class="kw">in</span> <span class="va">cities</span>:
+    <span class="kw">if</span> <span class="va">city</span> <span class="kw">not in</span> <span class="va">unique</span>:
+        <span class="va">unique</span><span class="me">.append</span>(<span class="va">city</span>)
+<span class="fn">print</span>(<span class="va">unique</span>)   <span class="cm"># ['Cairo', 'Alex', 'Giza']</span>
+
+<span class="cm"># WITH a set — one line, instant ✨</span>
+<span class="va">unique_cities</span> <span class="op">=</span> <span class="fn">set</span>(<span class="va">cities</span>)
+<span class="fn">print</span>(<span class="va">unique_cities</span>)   <span class="cm"># {'Cairo', 'Alex', 'Giza'} — order may vary!</span></pre>
+        <div class="cw-out">
+          <div class="cw-out-label">Output</div>
+          <div class="ol">{'Cairo', 'Alex', 'Giza'}</div>
+          <div class="ol dim">(order is not guaranteed in sets)</div>
+        </div>
+      </div>
+
+      <div class="tip">
+        <div class="ico">💡</div>
+        <div class="tc">
+          <strong>The Three Rules of Sets</strong>
+          <p>1. <strong>No duplicates</strong> — each element appears exactly once. 2. <strong>Unordered</strong> — you can't access elements by index. 3. <strong>Elements must be hashable</strong> — strings, numbers, tuples work. Lists don't (they're mutable).</p>
+        </div>
+      </div>
+
+      <h3 style="font-family:var(--font-d);font-size:18px;font-weight:700;margin:28px 0 14px;color:var(--ink);">Real-World Analogies</h3>
+      <div class="cb cb-t">
+        <div class="cb-tag">🌍 Think Of It This Way</div>
+        <p><strong>A pizza topping list</strong> — you either have pepperoni or you don't. Ordering it twice doesn't give you double pepperoni (on a set, anyway). <strong>A social media follower list</strong> — one person can only follow you once. <strong>Raffle ticket stubs</strong> — each unique number appears once.</p>
+      </div>
+    </section>
+
+    <!-- ════════════════════════
+         S2: CREATING SETS
+    ════════════════════════ -->
+    <section class="section" id="create" data-sec="create">
+      <div class="sec-head">
+        <div class="sec-label sl-v">Ch 02</div>
+        <div>
+          <h2 class="sec-title">Creating Sets
+            <small>Four different ways — know them all</small>
+          </h2>
+        </div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">creating_sets.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="cm"># METHOD 1: Curly braces {} with values</span>
+<span class="va">fruits</span> <span class="op">=</span> {<span class="st">"apple"</span>, <span class="st">"banana"</span>, <span class="st">"cherry"</span>}
+<span class="fn">print</span>(<span class="va">fruits</span>)       <span class="cm"># {'apple', 'banana', 'cherry'}</span>
+
+<span class="cm"># METHOD 2: set() with a list</span>
+<span class="va">numbers</span> <span class="op">=</span> <span class="fn">set</span>([<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">2</span>, <span class="nm">1</span>])
+<span class="fn">print</span>(<span class="va">numbers</span>)      <span class="cm"># {1, 2, 3} — duplicates removed!</span>
+
+<span class="cm"># METHOD 3: set() with a string — each CHAR becomes an element</span>
+<span class="va">letters</span> <span class="op">=</span> <span class="fn">set</span>(<span class="st">"hello"</span>)
+<span class="fn">print</span>(<span class="va">letters</span>)      <span class="cm"># {'h', 'e', 'l', 'o'} — 'l' appeared twice, kept once</span>
+
+<span class="cm"># METHOD 4: Empty set — MUST use set(), not {}</span>
+<span class="va">empty</span> <span class="op">=</span> <span class="fn">set</span>()
+<span class="fn">print</span>(<span class="va">empty</span>)        <span class="cm"># set()</span>
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="va">empty</span>))  <span class="cm"># &lt;class 'set'&gt;</span>
+
+<span class="cm"># Mixed types in a set</span>
+<span class="va">mixed</span> <span class="op">=</span> {<span class="nm">1</span>, <span class="st">"hello"</span>, <span class="nm">3.14</span>, <span class="bl">True</span>}
+<span class="fn">print</span>(<span class="va">mixed</span>)</pre>
+      </div>
+
+      <div class="danger">
+        <div class="ico">☠️</div>
+        <div class="tc">
+          <strong>The Empty Set Trap — Beginner #1 Mistake</strong>
+          <p><code>empty = {}</code> does NOT create an empty set. It creates an empty <strong>dictionary</strong>! Always use <code>set()</code> for an empty set. This is one of Python's most common gotchas.</p>
+        </div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">empty_trap.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="va">wrong</span> <span class="op">=</span> {}            <span class="cm"># This is a DICT not a set!</span>
+<span class="va">right</span> <span class="op">=</span> <span class="fn">set</span>()         <span class="cm"># This is an empty set ✓</span>
+
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="va">wrong</span>))    <span class="cm"># &lt;class 'dict'&gt; ← WRONG!</span>
+<span class="fn">print</span>(<span class="fn">type</span>(<span class="va">right</span>))    <span class="cm"># &lt;class 'set'&gt;  ← CORRECT</span></pre>
+        <div class="cw-out">
+          <div class="cw-out-label">Output</div>
+          <div class="ol err">&lt;class 'dict'&gt;</div>
+          <div class="ol">&lt;class 'set'&gt;</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════
+         S3: KEY PROPERTIES
+    ════════════════════════ -->
+    <section class="section" id="props" data-sec="props">
+      <div class="sec-head">
+        <div class="sec-label sl-t">Ch 03</div>
+        <div>
+          <h2 class="sec-title">Key Properties
+            <small>What makes sets special — and different from lists</small>
+          </h2>
+        </div>
+      </div>
+
+      <table class="ctbl">
+        <thead>
+          <tr><th>Property</th><th>What It Means</th><th>Example</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>No Duplicates</td><td>Each element exists only once — adding the same item is ignored</td><td><code>{1,1,2} → {1,2}</code></td></tr>
+          <tr><td>Unordered</td><td>No first/last. Can't use index [0], [1]. Order can vary on print</td><td><code>s[0]</code> → TypeError</td></tr>
+          <tr><td>Mutable</td><td>You can add/remove items after creation (unlike frozenset)</td><td><code>s.add(5)</code></td></tr>
+          <tr><td>Hashable Elements Only</td><td>Items must be immutable: int, str, float, tuple. No lists or dicts</td><td><code>{[1,2]}</code> → TypeError</td></tr>
+          <tr><td>O(1) Lookup</td><td>"Is X in this set?" is instant, even for a million items</td><td><code>x in big_set</code></td></tr>
+          <tr><td>Supports Math Operations</td><td>Union, intersection, difference — just like math class</td><td><code>A | B</code>, <code>A &amp; B</code></td></tr>
+        </tbody>
+      </table>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">properties.py — Exploring all properties</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="va">s</span> <span class="op">=</span> {<span class="nm">3</span>, <span class="nm">1</span>, <span class="nm">4</span>, <span class="nm">1</span>, <span class="nm">5</span>, <span class="nm">9</span>, <span class="nm">2</span>, <span class="nm">6</span>, <span class="nm">5</span>, <span class="nm">3</span>}
+<span class="fn">print</span>(<span class="va">s</span>)            <span class="cm"># {1, 2, 3, 4, 5, 6, 9} — no order guarantee</span>
+
+<span class="cm"># No index access</span>
+<span class="cm"># print(s[0])     # ← TypeError: 'set' object is not subscriptable</span>
+
+<span class="cm"># But you CAN check membership — very fast!</span>
+<span class="fn">print</span>(<span class="nm">5</span> <span class="kw">in</span> <span class="va">s</span>)      <span class="cm"># True</span>
+<span class="fn">print</span>(<span class="nm">7</span> <span class="kw">in</span> <span class="va">s</span>)      <span class="cm"># False</span>
+
+<span class="cm"># Length</span>
+<span class="fn">print</span>(<span class="fn">len</span>(<span class="va">s</span>))       <span class="cm"># 7 (unique elements only)</span>
+
+<span class="cm"># Iteration (order unpredictable but works)</span>
+<span class="kw">for</span> <span class="va">num</span> <span class="kw">in</span> <span class="va">s</span>:
+    <span class="fn">print</span>(<span class="va">num</span>, <span class="va">end</span><span class="op">=</span><span class="st">" "</span>)
+
+<span class="cm"># What can NOT be in a set:</span>
+<span class="cm"># {[1, 2]}  → TypeError: unhashable type: 'list'</span>
+<span class="cm"># {{1:2}}   → TypeError: unhashable type: 'dict'</span></pre>
+        <div class="cw-out">
+          <div class="cw-out-label">Output</div>
+          <div class="ol">{1, 2, 3, 4, 5, 6, 9}</div>
+          <div class="ol">True</div>
+          <div class="ol">False</div>
+          <div class="ol">7</div>
+        </div>
+      </div>
+
+      <div class="trick">
+        <div class="ico">⚡</div>
+        <div class="tc">
+          <strong>Why O(1) Lookup Matters</strong>
+          <p>With a list, Python checks every item one by one to see if something exists — O(n). With a set, it uses a hash table and jumps directly to where the item would be — O(1). For 1 million items, the difference is seconds vs microseconds.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════
+         S4: METHODS
+    ════════════════════════ -->
+    <section class="section" id="methods" data-sec="methods">
+      <div class="sec-head">
+        <div class="sec-label sl-t">Ch 04</div>
+        <div>
+          <h2 class="sec-title">Set Methods
+            <small>Everything you can do with a set — the complete toolkit</small>
+          </h2>
+        </div>
+      </div>
+
+      <div class="methods-grid">
+        <div class="method-card">
+          <div class="mc-name">.add(elem)</div>
+          <div class="mc-sig">set.add(x)</div>
+          <div class="mc-desc">Adds one element. If it already exists, nothing happens — no error, no duplicate.</div>
+          <div class="mc-ex">s.add(5) → {1,2,3,5}</div>
+        </div>
+        <div class="method-card">
+          <div class="mc-name">.remove(elem)</div>
+          <div class="mc-sig">set.remove(x)</div>
+          <div class="mc-desc">Removes element. Raises KeyError if element doesn't exist. Use when sure it's there.</div>
+          <div class="mc-ex">s.remove(3) → KeyError if missing</div>
+        </div>
+        <div class="method-card">
+          <div class="mc-name">.discard(elem)</div>
+          <div class="mc-sig">set.discard(x)</div>
+          <div class="mc-desc">Removes element safely. If it doesn't exist, does nothing — no error. Usually preferred over remove().</div>
+          <div class="mc-ex">s.discard(99) → no error</div>
+        </div>
+        <div class="method-card">
+          <div class="mc-name">.pop()</div>
+          <div class="mc-sig">set.pop()</div>
+          <div class="mc-desc">Removes and returns a random element. Raises KeyError on empty set. Unpredictable which element!</div>
+          <div class="mc-ex">s.pop() → some element</div>
+        </div>
+        <div class="method-card">
+          <div class="mc-name">.clear()</div>
+          <div class="mc-sig">set.clear()</div>
+          <div class="mc-desc">Removes ALL elements. The set becomes empty (but still exists).</div>
+          <div class="mc-ex">s.clear() → set()</div>
+        </div>
+        <div class="method-card">
+          <div class="mc-name">.copy()</div>
+          <div class="mc-sig">set.copy()</div>
+          <div class="mc-desc">Returns a shallow copy. Changes to the copy don't affect the original.</div>
+          <div class="mc-ex">new = s.copy()</div>
+        </div>
+        <div class="method-card">
+          <div class="mc-name">.update()</div>
+          <div class="mc-sig">set.update(other)</div>
+          <div class="mc-desc">Adds all elements from another iterable (list, set, string) into the set. In-place union.</div>
+          <div class="mc-ex">s.update([4,5,6])</div>
+        </div>
+        <div class="method-card">
+          <div class="mc-name">.issubset()</div>
+          <div class="mc-sig">A.issubset(B)</div>
+          <div class="mc-desc">Returns True if every element of A is also in B. A ⊆ B.</div>
+          <div class="mc-ex">{1,2}.issubset({1,2,3}) → True</div>
+        </div>
+        <div class="method-card">
+          <div class="mc-name">.issuperset()</div>
+          <div class="mc-sig">A.issuperset(B)</div>
+          <div class="mc-desc">Returns True if A contains every element of B. A ⊇ B.</div>
+          <div class="mc-ex">{1,2,3}.issuperset({1,2}) → True</div>
+        </div>
+        <div class="method-card">
+          <div class="mc-name">.isdisjoint()</div>
+          <div class="mc-sig">A.isdisjoint(B)</div>
+          <div class="mc-desc">Returns True if the sets have NO elements in common. Zero overlap.</div>
+          <div class="mc-ex">{1,2}.isdisjoint({3,4}) → True</div>
+        </div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">methods_demo.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="va">s</span> <span class="op">=</span> {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}
+
+<span class="cm"># add — safe duplicate attempt</span>
+<span class="va">s</span><span class="me">.add</span>(<span class="nm">4</span>)
+<span class="va">s</span><span class="me">.add</span>(<span class="nm">2</span>)        <span class="cm"># already there — ignored silently</span>
+<span class="fn">print</span>(<span class="va">s</span>)          <span class="cm"># {1, 2, 3, 4}</span>
+
+<span class="cm"># remove vs discard</span>
+<span class="va">s</span><span class="me">.discard</span>(<span class="nm">99</span>)    <span class="cm"># no error, 99 doesn't exist</span>
+<span class="cm"># s.remove(99)   # would raise KeyError!</span>
+<span class="va">s</span><span class="me">.discard</span>(<span class="nm">3</span>)     <span class="cm"># removes 3</span>
+<span class="fn">print</span>(<span class="va">s</span>)          <span class="cm"># {1, 2, 4}</span>
+
+<span class="cm"># update from a list</span>
+<span class="va">s</span><span class="me">.update</span>([<span class="nm">5</span>, <span class="nm">6</span>, <span class="nm">1</span>])  <span class="cm"># 1 already in s, ignored</span>
+<span class="fn">print</span>(<span class="va">s</span>)          <span class="cm"># {1, 2, 4, 5, 6}</span>
+
+<span class="cm"># Subset/superset checks</span>
+<span class="va">A</span> <span class="op">=</span> {<span class="nm">1</span>, <span class="nm">2</span>}
+<span class="va">B</span> <span class="op">=</span> {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>}
+<span class="fn">print</span>(<span class="va">A</span><span class="me">.issubset</span>(<span class="va">B</span>))    <span class="cm"># True  — A ⊆ B</span>
+<span class="fn">print</span>(<span class="va">B</span><span class="me">.issuperset</span>(<span class="va">A</span>))  <span class="cm"># True  — B ⊇ A</span>
+<span class="fn">print</span>(<span class="va">A</span><span class="me">.isdisjoint</span>({<span class="nm">5</span>,<span class="nm">6</span>}))  <span class="cm"># True — no common elements</span></pre>
+        <div class="cw-out">
+          <div class="cw-out-label">Output</div>
+          <div class="ol">{1, 2, 3, 4}</div>
+          <div class="ol">{1, 2, 4}</div>
+          <div class="ol">{1, 2, 4, 5, 6}</div>
+          <div class="ol">True</div>
+          <div class="ol">True</div>
+          <div class="ol">True</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════
+         S5: SET OPERATIONS
+    ════════════════════════ -->
+    <section class="section" id="operations" data-sec="operations">
+      <div class="sec-head">
+        <div class="sec-label sl-c">Ch 05</div>
+        <div>
+          <h2 class="sec-title">Set Operations
+            <small>The superpower — math built into Python syntax</small>
+          </h2>
+        </div>
+      </div>
+
+      <div class="cb cb-c">
+        <div class="cb-tag">⚙️ The Big Four</div>
+        <p>These four operations come from mathematics and are built directly into Python. You can use either <strong>operators</strong> (<code>|</code>, <code>&</code>, <code>-</code>, <code>^</code>) or <strong>method names</strong> — both produce the same result.</p>
+      </div>
+
+      <!-- Union -->
+      <h3 style="font-family:var(--font-d);font-size:20px;font-weight:700;margin:32px 0 16px;color:var(--ink);">1. Union — Everything from Both</h3>
+      <div class="venn-inline">
+        <svg width="120" height="80" viewBox="0 0 120 80">
+          <circle cx="42" cy="40" r="34" class="vc-a"/>
+          <circle cx="78" cy="40" r="34" class="vc-b"/>
+          <circle cx="42" cy="40" r="34" class="vc-outer"/>
+          <circle cx="78" cy="40" r="34" class="vc-outer"/>
+        </svg>
+        <div class="venn-desc">
+          <strong>A | B — Union</strong>
+          All elements from A <em>plus</em> all elements from B. If something is in either set, it's in the union. Duplicates still removed.
+          <div class="vop">A = {1,2,3} &nbsp; B = {3,4,5}<br><span class="vres">A | B = {1,2,3,4,5}</span></div>
+        </div>
+      </div>
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">union.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="va">A</span> <span class="op">=</span> {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}
+<span class="va">B</span> <span class="op">=</span> {<span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>}
+
+<span class="fn">print</span>(<span class="va">A</span> <span class="op">|</span> <span class="va">B</span>)              <span class="cm"># {1, 2, 3, 4, 5} — operator</span>
+<span class="fn">print</span>(<span class="va">A</span><span class="me">.union</span>(<span class="va">B</span>))         <span class="cm"># {1, 2, 3, 4, 5} — method (same result)</span>
+
+<span class="cm"># Real world: combine two friend lists</span>
+<span class="va">friends_A</span> <span class="op">=</span> {<span class="st">"Sara"</span>, <span class="st">"Ahmed"</span>, <span class="st">"Nour"</span>}
+<span class="va">friends_B</span> <span class="op">=</span> {<span class="st">"Ahmed"</span>, <span class="st">"Mona"</span>, <span class="st">"Khaled"</span>}
+<span class="va">all_friends</span> <span class="op">=</span> <span class="va">friends_A</span> <span class="op">|</span> <span class="va">friends_B</span>
+<span class="fn">print</span>(<span class="va">all_friends</span>)
+<span class="cm"># {'Sara', 'Ahmed', 'Nour', 'Mona', 'Khaled'} — Ahmed appears once</span></pre>
+      </div>
+
+      <!-- Intersection -->
+      <h3 style="font-family:var(--font-d);font-size:20px;font-weight:700;margin:32px 0 16px;color:var(--ink);">2. Intersection — What They Share</h3>
+      <div class="venn-inline">
+        <svg width="120" height="80" viewBox="0 0 120 80">
+          <circle cx="42" cy="40" r="34" fill="rgba(124,58,237,.2)"/>
+          <circle cx="78" cy="40" r="34" fill="rgba(8,145,178,.2)"/>
+          <clipPath id="ic1"><circle cx="78" cy="40" r="34"/></clipPath>
+          <circle cx="42" cy="40" r="34" fill="rgba(232,93,58,.8)" clip-path="url(#ic1)"/>
+          <circle cx="42" cy="40" r="34" class="vc-outer"/>
+          <circle cx="78" cy="40" r="34" class="vc-outer"/>
+        </svg>
+        <div class="venn-desc">
+          <strong>A &amp; B — Intersection</strong>
+          Only elements that exist in <em>both</em> sets simultaneously. The overlap. If it's in only one, it's excluded.
+          <div class="vop">A = {1,2,3} &nbsp; B = {3,4,5}<br><span class="vres">A &amp; B = {3}</span></div>
+        </div>
+      </div>
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">intersection.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="va">A</span> <span class="op">=</span> {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}
+<span class="va">B</span> <span class="op">=</span> {<span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>}
+
+<span class="fn">print</span>(<span class="va">A</span> <span class="op">&</span> <span class="va">B</span>)                 <span class="cm"># {3}</span>
+<span class="fn">print</span>(<span class="va">A</span><span class="me">.intersection</span>(<span class="va">B</span>))    <span class="cm"># {3}</span>
+
+<span class="cm"># Real world: find mutual friends</span>
+<span class="va">ahmed_friends</span> <span class="op">=</span> {<span class="st">"Sara"</span>, <span class="st">"Mona"</span>, <span class="st">"Ali"</span>}
+<span class="va">sara_friends</span>  <span class="op">=</span> {<span class="st">"Mona"</span>, <span class="st">"Khaled"</span>, <span class="st">"Ali"</span>}
+<span class="va">mutual</span> <span class="op">=</span> <span class="va">ahmed_friends</span> <span class="op">&</span> <span class="va">sara_friends</span>
+<span class="fn">print</span>(<span class="st">f"Mutual friends: {mutual}"</span>)  <span class="cm"># {'Mona', 'Ali'}</span></pre>
+      </div>
+
+      <!-- Difference -->
+      <h3 style="font-family:var(--font-d);font-size:20px;font-weight:700;margin:32px 0 16px;color:var(--ink);">3. Difference — In A but Not B</h3>
+      <div class="venn-inline">
+        <svg width="120" height="80" viewBox="0 0 120 80">
+          <circle cx="42" cy="40" r="34" class="vc-a"/>
+          <circle cx="78" cy="40" r="34" fill="rgba(8,145,178,.15)"/>
+          <clipPath id="dc1"><circle cx="78" cy="40" r="34"/></clipPath>
+          <circle cx="42" cy="40" r="34" fill="#1C1917" clip-path="url(#dc1)"/>
+          <circle cx="42" cy="40" r="34" class="vc-outer"/>
+          <circle cx="78" cy="40" r="34" class="vc-outer"/>
+        </svg>
+        <div class="venn-desc">
+          <strong>A - B — Difference</strong>
+          Elements in A that are NOT in B. What's unique to A. Note: order matters — A-B ≠ B-A.
+          <div class="vop">A = {1,2,3} &nbsp; B = {3,4,5}<br><span class="vres">A - B = {1,2} &nbsp; B - A = {4,5}</span></div>
+        </div>
+      </div>
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">difference.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="va">A</span> <span class="op">=</span> {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}
+<span class="va">B</span> <span class="op">=</span> {<span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>}
+
+<span class="fn">print</span>(<span class="va">A</span> <span class="op">-</span> <span class="va">B</span>)              <span class="cm"># {1, 2}  — in A, not in B</span>
+<span class="fn">print</span>(<span class="va">B</span> <span class="op">-</span> <span class="va">A</span>)              <span class="cm"># {4, 5}  — in B, not in A</span>
+<span class="fn">print</span>(<span class="va">A</span><span class="me">.difference</span>(<span class="va">B</span>))    <span class="cm"># {1, 2}  — same as A - B</span>
+
+<span class="cm"># Real world: find students who failed (in registered but not in passed)</span>
+<span class="va">registered</span> <span class="op">=</span> {<span class="st">"Ali"</span>, <span class="st">"Sara"</span>, <span class="st">"Mona"</span>, <span class="st">"Ahmed"</span>}
+<span class="va">passed</span>     <span class="op">=</span> {<span class="st">"Sara"</span>, <span class="st">"Ahmed"</span>}
+<span class="va">failed</span>     <span class="op">=</span> <span class="va">registered</span> <span class="op">-</span> <span class="va">passed</span>
+<span class="fn">print</span>(<span class="st">f"Students who failed: {failed}"</span>)  <span class="cm"># {'Ali', 'Mona'}</span></pre>
+      </div>
+
+      <!-- Symmetric Difference -->
+      <h3 style="font-family:var(--font-d);font-size:20px;font-weight:700;margin:32px 0 16px;color:var(--ink);">4. Symmetric Difference — Everything Unique</h3>
+      <div class="venn-inline">
+        <svg width="120" height="80" viewBox="0 0 120 80">
+          <circle cx="42" cy="40" r="34" class="vc-a"/>
+          <circle cx="78" cy="40" r="34" class="vc-b"/>
+          <clipPath id="sc1"><circle cx="78" cy="40" r="34"/></clipPath>
+          <circle cx="42" cy="40" r="34" fill="#1C1917" clip-path="url(#sc1)"/>
+          <circle cx="42" cy="40" r="34" class="vc-outer"/>
+          <circle cx="78" cy="40" r="34" class="vc-outer"/>
+        </svg>
+        <div class="venn-desc">
+          <strong>A ^ B — Symmetric Difference</strong>
+          Elements in either A or B, but NOT in both. Excludes the overlap. Think "XOR" (exclusive or).
+          <div class="vop">A = {1,2,3} &nbsp; B = {3,4,5}<br><span class="vres">A ^ B = {1,2,4,5}</span></div>
+        </div>
+      </div>
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">symmetric_diff.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="va">A</span> <span class="op">=</span> {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}
+<span class="va">B</span> <span class="op">=</span> {<span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>}
+
+<span class="fn">print</span>(<span class="va">A</span> <span class="op">^</span> <span class="va">B</span>)                         <span class="cm"># {1, 2, 4, 5}</span>
+<span class="fn">print</span>(<span class="va">A</span><span class="me">.symmetric_difference</span>(<span class="va">B</span>))     <span class="cm"># {1, 2, 4, 5}</span>
+
+<span class="cm"># Equivalent to: (A | B) - (A & B)</span>
+<span class="fn">print</span>((<span class="va">A</span> <span class="op">|</span> <span class="va">B</span>) <span class="op">-</span> (<span class="va">A</span> <span class="op">&</span> <span class="va">B</span>))            <span class="cm"># {1, 2, 4, 5} — same result</span>
+
+<span class="cm"># Real world: things changed between two versions</span>
+<span class="va">v1_features</span> <span class="op">=</span> {<span class="st">"login"</span>, <span class="st">"upload"</span>, <span class="st">"profile"</span>}
+<span class="va">v2_features</span> <span class="op">=</span> {<span class="st">"login"</span>, <span class="st">"upload"</span>, <span class="st">"dashboard"</span>, <span class="st">"search"</span>}
+<span class="va">changes</span> <span class="op">=</span> <span class="va">v1_features</span> <span class="op">^</span> <span class="va">v2_features</span>
+<span class="fn">print</span>(<span class="st">f"What changed: {changes}"</span>)
+<span class="cm"># {'profile', 'dashboard', 'search'}</span></pre>
+      </div>
+
+      <!-- In-place operations -->
+      <h3 style="font-family:var(--font-d);font-size:20px;font-weight:700;margin:32px 0 16px;color:var(--ink);">In-Place Operations (modify the set directly)</h3>
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">inplace_ops.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="va">A</span> <span class="op">=</span> {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}
+<span class="va">B</span> <span class="op">=</span> {<span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>}
+
+<span class="cm"># |=  (update in place — union)</span>
+<span class="va">A</span> <span class="op">|=</span> <span class="va">B</span>
+<span class="fn">print</span>(<span class="va">A</span>)     <span class="cm"># {1, 2, 3, 4, 5}</span>
+
+<span class="cm"># &=  (intersection in place)</span>
+<span class="va">A</span> <span class="op">=</span> {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}
+<span class="va">A</span> <span class="op">&=</span> <span class="va">B</span>
+<span class="fn">print</span>(<span class="va">A</span>)     <span class="cm"># {3}</span>
+
+<span class="cm"># -=  (difference in place)</span>
+<span class="va">A</span> <span class="op">=</span> {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}
+<span class="va">A</span> <span class="op">-=</span> <span class="va">B</span>
+<span class="fn">print</span>(<span class="va">A</span>)     <span class="cm"># {1, 2}</span>
+
+<span class="cm"># ^=  (symmetric difference in place)</span>
+<span class="va">A</span> <span class="op">=</span> {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}
+<span class="va">A</span> <span class="op">^=</span> <span class="va">B</span>
+<span class="fn">print</span>(<span class="va">A</span>)     <span class="cm"># {1, 2, 4, 5}</span></pre>
+      </div>
+    </section>
+
+    <!-- ════════════════════════
+         S6: FROZENSET
+    ════════════════════════ -->
+    <section class="section" id="frozenset" data-sec="frozenset">
+      <div class="sec-head">
+        <div class="sec-label sl-a">Ch 06</div>
+        <div>
+          <h2 class="sec-title">Frozen Sets
+            <small>An immutable set — locked forever after creation</small>
+          </h2>
+        </div>
+      </div>
+
+      <div class="cb cb-a">
+        <div class="cb-tag">🧊 Concept</div>
+        <p>A <strong>frozenset</strong> is a set that can never be changed after creation. No adding, no removing. It's the "read-only" version of a set.</p>
+        <p>Because it's immutable, it's <strong>hashable</strong> — meaning you can use a frozenset as a <em>key in a dictionary</em> or as an element inside another set. Regular sets can't do this.</p>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">frozenset_demo.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="cm"># Create a frozenset</span>
+<span class="va">fs</span> <span class="op">=</span> <span class="fn">frozenset</span>([<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">2</span>, <span class="nm">1</span>])
+<span class="fn">print</span>(<span class="va">fs</span>)          <span class="cm"># frozenset({1, 2, 3})</span>
+
+<span class="cm"># Read operations work fine</span>
+<span class="fn">print</span>(<span class="nm">2</span> <span class="kw">in</span> <span class="va">fs</span>)     <span class="cm"># True</span>
+<span class="fn">print</span>(<span class="fn">len</span>(<span class="va">fs</span>))     <span class="cm"># 3</span>
+
+<span class="cm"># Write operations FAIL</span>
+<span class="cm"># fs.add(4)        # AttributeError: 'frozenset' has no .add()</span>
+<span class="cm"># fs.remove(1)     # AttributeError: 'frozenset' has no .remove()</span>
+
+<span class="cm"># All set operations still work (return new frozensets)</span>
+<span class="va">fs2</span> <span class="op">=</span> <span class="fn">frozenset</span>([<span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>])
+<span class="fn">print</span>(<span class="va">fs</span> <span class="op">|</span> <span class="va">fs2</span>)   <span class="cm"># frozenset({1, 2, 3, 4, 5})</span>
+<span class="fn">print</span>(<span class="va">fs</span> <span class="op">&</span> <span class="va">fs2</span>)   <span class="cm"># frozenset({3})</span>
+
+<span class="cm"># Use frozenset as dict KEY (impossible with regular set)</span>
+<span class="va">d</span> <span class="op">=</span> {}
+<span class="va">d</span>[<span class="fn">frozenset</span>([<span class="nm">1</span>,<span class="nm">2</span>])] <span class="op">=</span> <span class="st">"group A"</span>
+<span class="va">d</span>[<span class="fn">frozenset</span>([<span class="nm">3</span>,<span class="nm">4</span>])] <span class="op">=</span> <span class="st">"group B"</span>
+<span class="fn">print</span>(<span class="va">d</span>)
+<span class="cm"># {frozenset({1, 2}): 'group A', frozenset({3, 4}): 'group B'}</span></pre>
+      </div>
+
+      <table class="ctbl">
+        <thead><tr><th>Feature</th><th>set</th><th>frozenset</th></tr></thead>
+        <tbody>
+          <tr><td>Add/remove elements</td><td>✅ Yes</td><td>❌ No</td></tr>
+          <tr><td>Set operations (|, &, -, ^)</td><td>✅ Yes</td><td>✅ Yes</td></tr>
+          <tr><td>Use as dict key</td><td>❌ No (not hashable)</td><td>✅ Yes</td></tr>
+          <tr><td>Use as element inside a set</td><td>❌ No</td><td>✅ Yes</td></tr>
+          <tr><td>Created with</td><td><code>set()</code> or <code>{}</code></td><td><code>frozenset()</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ════════════════════════
+         S7: SET COMPREHENSION
+    ════════════════════════ -->
+    <section class="section" id="comprehension" data-sec="comprehension">
+      <div class="sec-head">
+        <div class="sec-label sl-g">Ch 07</div>
+        <div>
+          <h2 class="sec-title">Set Comprehension
+            <small>Build sets in one elegant line — like a pro</small>
+          </h2>
+        </div>
+      </div>
+
+      <div class="cb cb-g">
+        <div class="cb-tag">⚡ Concept</div>
+        <p>Set comprehension is the <strong>one-liner syntax</strong> for building a set. Same idea as list comprehension, but uses <code>{}</code> and automatically removes duplicates. Formula: <code>{expression for item in iterable if condition}</code></p>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">set_comprehension.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="cm"># Basic: squares of 1–10</span>
+<span class="va">squares</span> <span class="op">=</span> {<span class="va">x</span><span class="op">**</span><span class="nm">2</span> <span class="kw">for</span> <span class="va">x</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">11</span>)}
+<span class="fn">print</span>(<span class="va">squares</span>)
+<span class="cm"># {1, 4, 9, 16, 25, 36, 49, 64, 81, 100}</span>
+
+<span class="cm"># With condition: only even squares</span>
+<span class="va">even_sq</span> <span class="op">=</span> {<span class="va">x</span><span class="op">**</span><span class="nm">2</span> <span class="kw">for</span> <span class="va">x</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">11</span>) <span class="kw">if</span> <span class="va">x</span> <span class="op">%</span> <span class="nm">2</span> <span class="op">==</span> <span class="nm">0</span>}
+<span class="fn">print</span>(<span class="va">even_sq</span>)
+<span class="cm"># {4, 16, 36, 64, 100}</span>
+
+<span class="cm"># Dedup naturally: first letters of words (some letters repeat)</span>
+<span class="va">words</span> <span class="op">=</span> [<span class="st">"apple"</span>, <span class="st">"ant"</span>, <span class="st">"banana"</span>, <span class="st">"ball"</span>, <span class="st">"cherry"</span>]
+<span class="va">first_letters</span> <span class="op">=</span> {<span class="va">w</span>[<span class="nm">0</span>] <span class="kw">for</span> <span class="va">w</span> <span class="kw">in</span> <span class="va">words</span>}
+<span class="fn">print</span>(<span class="va">first_letters</span>)   <span class="cm"># {'a', 'b', 'c'}</span>
+
+<span class="cm"># Uppercase unique characters from a string</span>
+<span class="va">chars</span> <span class="op">=</span> {<span class="va">c</span><span class="me">.upper</span>() <span class="kw">for</span> <span class="va">c</span> <span class="kw">in</span> <span class="st">"mississippi"</span> <span class="kw">if</span> <span class="va">c</span> <span class="op">!=</span> <span class="st">"i"</span>}
+<span class="fn">print</span>(<span class="va">chars</span>)            <span class="cm"># {'M', 'S', 'P'}</span>
+
+<span class="cm"># Find all unique remainders when dividing 1-20 by 3</span>
+<span class="va">remainders</span> <span class="op">=</span> {<span class="va">n</span> <span class="op">%</span> <span class="nm">3</span> <span class="kw">for</span> <span class="va">n</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">21</span>)}
+<span class="fn">print</span>(<span class="va">remainders</span>)       <span class="cm"># {0, 1, 2}</span></pre>
+      </div>
+
+      <div class="trick">
+        <div class="ico">⚡</div>
+        <div class="tc">
+          <strong>List Comprehension vs Set Comprehension</strong>
+          <p>Use <code>[x for x in ...]</code> for a list (ordered, duplicates allowed). Use <code>{x for x in ...}</code> for a set (unordered, no duplicates, faster membership testing). The only visible difference: square brackets vs curly braces.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════
+         S8: SETS VS LISTS VS DICTS
+    ════════════════════════ -->
+    <section class="section" id="vs" data-sec="vs">
+      <div class="sec-head">
+        <div class="sec-label sl-g">Ch 08</div>
+        <div>
+          <h2 class="sec-title">Sets vs Lists vs Dicts
+            <small>When to use which — the decision you'll make every day</small>
+          </h2>
+        </div>
+      </div>
+
+      <table class="ctbl">
+        <thead>
+          <tr><th>Feature</th><th>List []</th><th>Set {}</th><th>Dict {k:v}</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Ordered?</td><td>✅ Yes (insertion order)</td><td>❌ No</td><td>✅ Yes (Python 3.7+)</td></tr>
+          <tr><td>Duplicates?</td><td>✅ Allowed</td><td>❌ Not allowed</td><td>Keys: No. Values: Yes</td></tr>
+          <tr><td>Access by index?</td><td>✅ list[0]</td><td>❌ No</td><td>❌ (use key)</td></tr>
+          <tr><td>Lookup speed</td><td>O(n) — slow</td><td>O(1) — instant</td><td>O(1) — instant</td></tr>
+          <tr><td>Math operations?</td><td>❌ No built-in</td><td>✅ |, &, -, ^</td><td>❌ No</td></tr>
+          <tr><td>Memory</td><td>Compact</td><td>More than list</td><td>Most (stores key+value)</td></tr>
+          <tr><td>Use when…</td><td>Order matters, duplicates ok</td><td>Uniqueness matters, fast lookups</td><td>Key-value pairs needed</td></tr>
+        </tbody>
+      </table>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">when_to_use.py — Real-world decisions</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="cm"># USE A LIST when order and duplicates matter</span>
+<span class="va">exam_scores</span> <span class="op">=</span> [<span class="nm">95</span>, <span class="nm">72</span>, <span class="nm">88</span>, <span class="nm">72</span>, <span class="nm">91</span>]  <span class="cm"># 72 appears twice — that's valid!</span>
+
+<span class="cm"># USE A SET when you need uniqueness or fast lookup</span>
+<span class="va">visited_pages</span> <span class="op">=</span> {<span class="st">"/home"</span>, <span class="st">"/about"</span>, <span class="st">"/contact"</span>}
+<span class="kw">if</span> <span class="st">"/home"</span> <span class="kw">in</span> <span class="va">visited_pages</span>:     <span class="cm"># O(1) — instant even with millions!</span>
+    <span class="fn">print</span>(<span class="st">"Already visited"</span>)
+
+<span class="cm"># USE A DICT when you need to map one thing to another</span>
+<span class="va">student_grades</span> <span class="op">=</span> {<span class="st">"Ali"</span>: <span class="nm">95</span>, <span class="st">"Sara"</span>: <span class="nm">88</span>, <span class="st">"Mona"</span>: <span class="nm">72</span>}
+
+<span class="cm"># SPEED COMPARISON — set vs list membership test</span>
+<span class="kw">import</span> <span class="va">time</span>
+<span class="va">big_list</span> <span class="op">=</span> <span class="fn">list</span>(<span class="fn">range</span>(<span class="nm">1_000_000</span>))
+<span class="va">big_set</span>  <span class="op">=</span> <span class="fn">set</span>(<span class="fn">range</span>(<span class="nm">1_000_000</span>))
+
+<span class="va">t1</span> <span class="op">=</span> <span class="va">time</span><span class="me">.time</span>()
+<span class="nm">999_999</span> <span class="kw">in</span> <span class="va">big_list</span>
+<span class="fn">print</span>(<span class="st">f"List: {time.time()-t1:.4f}s"</span>)   <span class="cm"># ~0.01s — scans all items</span>
+
+<span class="va">t2</span> <span class="op">=</span> <span class="va">time</span><span class="me">.time</span>()
+<span class="nm">999_999</span> <span class="kw">in</span> <span class="va">big_set</span>
+<span class="fn">print</span>(<span class="st">f"Set:  {time.time()-t2:.6f}s"</span>)   <span class="cm"># ~0.000001s — instant hash!</span></pre>
+      </div>
+    </section>
+
+    <!-- ════════════════════════
+         S9: QUIZ
+    ════════════════════════ -->
+    <section class="section" id="quiz" data-sec="quiz">
+      <div class="sec-head">
+        <div class="sec-label sl-v">Ch 09</div>
+        <div>
+          <h2 class="sec-title">Quiz Time 🎯
+            <small>12 questions — test every concept you've learned</small>
+          </h2>
+        </div>
+      </div>
+      <div class="cb cb-v">
+        <div class="cb-tag">📋 Instructions</div>
+        <p>Read carefully. Think before clicking. After each answer, read the explanation — understanding <em>why</em> is more important than getting it right. Questions appear one at a time.</p>
+      </div>
+      <div id="quizContainer"></div>
+    </section>
+
+    <!-- ════════════════════════
+         S10: CHALLENGES
+    ════════════════════════ -->
+    <section class="section" id="challenges" data-sec="challenges">
+      <div class="sec-head">
+        <div class="sec-label sl-g">Ch 10</div>
+        <div>
+          <h2 class="sec-title">Coding Challenges 🏆
+            <small>Write it yourself — this is where understanding becomes skill</small>
+          </h2>
+        </div>
+      </div>
+      <p class="prose">Try each challenge before reading the hint. The struggle is the point — your brain builds stronger connections when you work for the answer.</p>
+
+      <div class="challenges-grid">
+        <div class="ch-card"><div class="ch-badge easy">⭐ Easy</div><div class="ch-title">Remove Duplicates from a List</div><div class="ch-desc">Given a list with duplicates, return a list of unique items using a set. Preserve nothing about order.</div><div class="ch-hint">💡 list(set(your_list))</div></div>
+        <div class="ch-card"><div class="ch-badge easy">⭐ Easy</div><div class="ch-title">Count Unique Characters</div><div class="ch-desc">Write code that counts how many unique characters are in the string "programming".</div><div class="ch-hint">💡 len(set("programming"))</div></div>
+        <div class="ch-card"><div class="ch-badge easy">⭐ Easy</div><div class="ch-title">Check for Duplicate Emails</div><div class="ch-desc">Given a list of emails, print True if there are duplicates, False if all are unique.</div><div class="ch-hint">💡 len(emails) != len(set(emails))</div></div>
+        <div class="ch-card"><div class="ch-badge medium">⚡ Medium</div><div class="ch-title">Common Items in Two Lists</div><div class="ch-desc">Find items that appear in BOTH list_a and list_b without using any loops.</div><div class="ch-hint">💡 set(list_a) & set(list_b)</div></div>
+        <div class="ch-card"><div class="ch-badge medium">⚡ Medium</div><div class="ch-title">Items Only in One List</div><div class="ch-desc">Find items that appear in list_a but NOT in list_b. Then find those only in list_b.</div><div class="ch-hint">💡 set(a)-set(b) and set(b)-set(a)</div></div>
+        <div class="ch-card"><div class="ch-badge medium">⚡ Medium</div><div class="ch-title">Unique Words Counter</div><div class="ch-desc">Given a long sentence, count how many unique words appear. Case-insensitive.</div><div class="ch-hint">💡 set(sentence.lower().split())</div></div>
+        <div class="ch-card"><div class="ch-badge medium">⚡ Medium</div><div class="ch-title">Voting System Deduplication</div><div class="ch-desc">A vote list may have people voting multiple times. Count valid unique voters only.</div><div class="ch-hint">💡 len(set(votes)) gives unique voter count</div></div>
+        <div class="ch-card"><div class="ch-badge hard">🔥 Hard</div><div class="ch-title">Anagram Checker</div><div class="ch-desc">Two words are anagrams if they have the same unique characters. Check if "listen" and "silent" are anagrams using sets.</div><div class="ch-hint">💡 set("listen") == set("silent")</div></div>
+        <div class="ch-card"><div class="ch-badge hard">🔥 Hard</div><div class="ch-title">Find All Missing Numbers</div><div class="ch-desc">Given a list of numbers from 1-100 with some missing, find all missing numbers efficiently.</div><div class="ch-hint">💡 set(range(1,101)) - set(your_list)</div></div>
+        <div class="ch-card"><div class="ch-badge hard">🔥 Hard</div><div class="ch-title">Set Comprehension Filter</div><div class="ch-desc">Create a set of all numbers 1-50 that are divisible by both 3 and 5, using one set comprehension.</div><div class="ch-hint">💡 {n for n in range(1,51) if n%3==0 and n%5==0}</div></div>
+        <div class="ch-card"><div class="ch-badge hard">🔥 Hard</div><div class="ch-title">Access Control System</div><div class="ch-desc">Build a system with admin_permissions and user_permissions sets. Find: shared permissions, admin-only permissions, and all unique permissions combined.</div><div class="ch-hint">💡 &, -, | operations on the two sets</div></div>
+        <div class="ch-card"><div class="ch-badge hard">🔥 Hard</div><div class="ch-title">Frozenset as Dict Key</div><div class="ch-desc">Create a dictionary where each key is a frozenset of student names (a study group) and the value is their average score.</div><div class="ch-hint">💡 {frozenset(["Ali","Sara"]): 88, ...}</div></div>
+      </div>
+    </section>
+
+    <footer id="footer">
+      <span class="footer-icon">🎯</span>
+      <div class="footer-h">You've Mastered Python Sets!</div>
+      <div class="footer-sub">Unique · Unordered · O(1) · Union · Intersection · Difference · Comprehension · Frozenset — all yours.</div>
+    </footer>
+  </div>
+</div>
+</div>
+
+<div id="overlay"></div>
+
+<script>
+// ═══════════ QUIZ DATA ═══════════
+const QUIZ = [
+  {q:"What does <code>set([1,1,2,2,3])</code> return?",opts:["{1,1,2,2,3}","[1,2,3]","{1,2,3}","Error"],ans:2,ex:"Sets automatically remove duplicates. {1,2,3} is the result — each value appears exactly once."},
+  {q:"Which of these creates an empty SET (not dict)?",opts:["{}","set()","{,}","empty_set{}"],ans:1,ex:"<code>{}</code> creates an empty DICTIONARY in Python — one of the most common gotchas. Always use <code>set()</code> for an empty set."},
+  {q:"Can you access set elements with an index like <code>s[0]</code>?",opts:["Yes always","Yes if sorted","No — sets are unordered","Only for frozensets"],ans:2,ex:"Sets are unordered — there is no 'first' or 'second' element. <code>s[0]</code> raises a TypeError. Use loops or membership checks instead."},
+  {q:"What is <code>{1,2,3} | {3,4,5}</code>?",opts:["{3}","{1,2,4,5}","{1,2,3,4,5}","Error"],ans:2,ex:"The | operator is Union — all elements from BOTH sets, duplicates removed. {1,2,3} combined with {3,4,5} = {1,2,3,4,5}."},
+  {q:"What is <code>{1,2,3} & {3,4,5}</code>?",opts:["{1,2,3,4,5}","{3}","{1,2,4,5}","{}"],ans:1,ex:"The & operator is Intersection — only elements present in BOTH sets. Only 3 is in both sets, so the result is {3}."},
+  {q:"What does <code>s.discard(99)</code> do if 99 is NOT in the set?",opts:["Raises KeyError","Raises ValueError","Does nothing silently","Returns False"],ans:2,ex:"discard() is the safe version of remove(). If the element doesn't exist, it does nothing and raises NO error. Use it when you're not sure the element is present."},
+  {q:"Which elements can be inside a set?",opts:["Only integers","Any Python object","Only strings and numbers","Only immutable (hashable) objects"],ans:3,ex:"Sets can only contain hashable (immutable) objects: integers, floats, strings, tuples. Lists and dicts are mutable and unhashable — they CANNOT be set elements."},
+  {q:"What does <code>{x**2 for x in range(4)}</code> produce?",opts:["[0,1,4,9]","{0,1,4,9}","(0,1,4,9)","Error"],ans:1,ex:"This is a set comprehension — curly braces with a for loop inside. It produces a SET of squares: {0, 1, 4, 9}. Note: sets don't guarantee order."},
+  {q:"What is <code>{1,2,3} - {3,4,5}</code>?",opts:["{3}","{1,2,3,4,5}","{1,2}","{4,5}"],ans:2,ex:"The - operator is Difference — elements in the LEFT set that are NOT in the right set. From {1,2,3}, removing what's in {3,4,5} gives {1,2}."},
+  {q:"What is the difference between <code>frozenset</code> and <code>set</code>?",opts:["frozenset is faster","frozenset cannot be modified (immutable)","frozenset allows duplicates","frozenset is ordered"],ans:1,ex:"A frozenset is an immutable set — you cannot add or remove elements after creation. This makes it hashable, so it can be used as a dictionary key or inside another set."},
+  {q:"What is the time complexity of <code>x in my_set</code>?",opts:["O(n) — scans all items","O(log n) — binary search","O(1) — constant time","O(n²)"],ans:2,ex:"Set membership testing is O(1) — constant time — regardless of set size. This uses a hash table internally, jumping directly to where the item would be rather than scanning."},
+  {q:"What does <code>{1,2,3} ^ {3,4,5}</code> give?",opts:["{3}","{1,2,3,4,5}","{1,2}","{1,2,4,5}"],ans:3,ex:"^ is Symmetric Difference — elements in EITHER set but NOT IN BOTH. 3 is in both so it's excluded. Result: {1, 2, 4, 5}."},
+];
+
+// ═══════════ QUIZ RENDER ═══════════
+let quizState = {};
+let qCorrect = 0;
+let qTotal = 0;
+
+function renderQuiz(){
+  const c = document.getElementById('quizContainer');
+  QUIZ.forEach((q,i)=>{
+    const div = document.createElement('div');
+    div.className='quiz-wrap';div.id=`qw${i}`;
+    const keys=['A','B','C','D'];
+    div.innerHTML=`
+      <div class="qz-head">
+        <div class="qz-num">${i+1}</div>
+        <div class="qz-head-txt">Question ${i+1} of ${QUIZ.length}<small>Think before clicking</small></div>
+      </div>
+      <div class="qz-body">
+        <div class="qz-q">${q.q}</div>
+        <div class="qz-opts">
+          ${q.opts.map((o,oi)=>`<div class="qz-opt" data-qi="${i}" data-oi="${oi}"><span class="qz-key">${keys[oi]}</span>${o}</div>`).join('')}
+        </div>
+        <div class="qz-actions">
+          <button class="qz-sub" id="sub${i}" onclick="checkQ(${i})" disabled>Submit</button>
+          ${i<QUIZ.length-1?`<button class="qz-next" id="nx${i}" onclick="nextQ(${i+1})">Next →</button>`:''}
+        </div>
+        <div class="qz-fb" id="fb${i}"></div>
+      </div>`;
+    c.appendChild(div);
+    div.querySelectorAll('.qz-opt').forEach(o=>o.addEventListener('click',()=>selectQ(i,+o.dataset.oi)));
+  });
+}
+
+function selectQ(qi,oi){
+  if(quizState[qi]!==undefined) return;
+  document.querySelectorAll(`[data-qi="${qi}"]`).forEach(o=>o.classList.remove('sel'));
+  document.querySelector(`[data-qi="${qi}"][data-oi="${oi}"]`).classList.add('sel');
+  document.getElementById(`sub${qi}`)._sel=oi;
+  document.getElementById(`sub${qi}`).disabled=false;
+}
+
+function checkQ(qi){
+  const btn=document.getElementById(`sub${qi}`);
+  const sel=btn._sel; if(sel===undefined) return;
+  const ok=sel===QUIZ[qi].ans;
+  quizState[qi]=ok; if(ok) qCorrect++;
+  document.querySelectorAll(`[data-qi="${qi}"]`).forEach((o,i)=>{
+    o.onclick=null;o.classList.remove('sel');
+    if(i===QUIZ[qi].ans) o.classList.add('corr');
+    else if(i===sel&&!ok) o.classList.add('wrng');
+  });
+  const fb=document.getElementById(`fb${qi}`);
+  fb.className=`qz-fb ${ok?'ok':'fail'} show`;
+  fb.innerHTML=`<strong>${ok?'✅ Correct!':'❌ Not quite.'}</strong> ${QUIZ[qi].ex}`;
+  btn.disabled=true;btn.style.display='none';
+  const nx=document.getElementById(`nx${qi}`);
+  if(nx) nx.classList.add('show');
+}
+
+function nextQ(idx){
+  const el=document.getElementById(`qw${idx}`);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ═══════════ PROGRESS TRACKING ═══════════
+const SECS=['intro','create','props','methods','operations','frozenset','comprehension','vs','quiz','challenges'];
+const seen=new Set();
+
+function updateProgress(){
+  const pct=Math.round(seen.size/SECS.length*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progTxt').textContent=`${seen.size} of ${SECS.length} sections`;
+}
+
+function markSeen(sec){
+  if(!SECS.includes(sec)) return;
+  seen.add(sec);
+  const nd=document.getElementById(`nd-${sec}`);
+  const nl=document.querySelector(`.sb-link[data-sec="${sec}"]`);
+  if(nd) nd.parentElement.classList.add('done');
+  updateProgress();
+}
+
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const s=e.target.dataset.sec;
+      markSeen(s);
+      document.querySelectorAll('.sb-link').forEach(l=>l.classList.remove('active'));
+      const l=document.querySelector(`.sb-link[data-sec="${s}"]`);
+      if(l) l.classList.add('active');
+    }
+  });
+},{threshold:.15,rootMargin:'-55px 0px -30% 0px'});
+
+document.querySelectorAll('.section[data-sec]').forEach(el=>obs.observe(el));
+
+// ═══════════ SIDEBAR / MOBILE ═══════════
+const sidebar=document.getElementById('sidebar');
+const overlay=document.getElementById('overlay');
+document.getElementById('menuBtn').addEventListener('click',()=>{sidebar.classList.toggle('open');overlay.classList.toggle('open');});
+overlay.addEventListener('click',()=>{sidebar.classList.remove('open');overlay.classList.remove('open');});
+document.querySelectorAll('.sb-link').forEach(l=>{
+  l.addEventListener('click',()=>{sidebar.classList.remove('open');overlay.classList.remove('open');});
+});
+
+// ═══════════ COPY ═══════════
+function copyCode(btn){
+  const pre=btn.closest('.cw').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(()=>{
+    btn.textContent='✓ Copied!';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='⎘ Copy';btn.classList.remove('copied');},2000);
+  });
+}
+
+// ═══════════ INIT ═══════════
+renderQuiz();
+</script>
+</body>
+</html>
