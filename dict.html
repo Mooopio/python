@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Dictionaries — The Complete Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════
+   TOKENS
+════════════════════════════════════ */
+:root {
+  --bg:       #161B27;
+  --bg2:      #1E2433;
+  --bg3:      #252D40;
+  --card:     #1A2030;
+  --border:   #2A3450;
+  --border2:  #3A4A6A;
+
+  --gold:     #F5A623;
+  --gold2:    #D4891A;
+  --gold-l:   rgba(245,166,35,.12);
+  --gold-bd:  rgba(245,166,35,.3);
+
+  --emerald:  #34D399;
+  --emerald2: #10B981;
+  --em-l:     rgba(52,211,153,.1);
+  --em-bd:    rgba(52,211,153,.3);
+
+  --blue:     #60A5FA;
+  --blue2:    #3B82F6;
+  --blue-l:   rgba(96,165,250,.1);
+  --blue-bd:  rgba(96,165,250,.3);
+
+  --rose:     #FB7185;
+  --rose-l:   rgba(251,113,133,.1);
+  --rose-bd:  rgba(251,113,133,.3);
+
+  --purple:   #A78BFA;
+  --purple-l: rgba(167,139,250,.1);
+  --purple-bd:rgba(167,139,250,.3);
+
+  --text:     #F1F5F9;
+  --text2:    #8899BB;
+  --text3:    #4A5A78;
+
+  --font-d:   'Space Grotesk', sans-serif;
+  --font-b:   'Inter', sans-serif;
+  --font-c:   'Fira Code', monospace;
+
+  --r:        12px;
+  --rsm:      7px;
+  --sidebar:  252px;
+}
+
+/* ════════════════════════════════════
+   RESET
+════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-b);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  font-size: 15px;
+  overflow-x: hidden;
+}
+::selection { background: var(--gold-l); color: var(--gold); }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold2); }
+
+/* ════════════════════════════════════
+   LAYOUT
+════════════════════════════════════ */
+#shell { display: flex; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+#sidebar {
+  width: var(--sidebar);
+  position: fixed; top:0; left:0;
+  height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow-y: auto; z-index: 100;
+  transition: transform .3s ease;
+}
+#sidebar::-webkit-scrollbar { width: 3px; }
+
+.sb-brand {
+  padding: 26px 22px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.sb-logo {
+  display: flex; align-items: center; gap: 9px;
+  font-family: var(--font-d);
+  font-size: 13px; font-weight: 700;
+  color: var(--text);
+  margin-bottom: 5px;
+}
+.sb-logo .key-pill {
+  background: var(--gold);
+  color: var(--bg);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: .04em;
+}
+.sb-logo .val-pill {
+  background: var(--border2);
+  color: var(--text2);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.sb-tagline {
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-family: var(--font-d);
+}
+
+/* Progress */
+.sb-prog {
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border);
+}
+.sb-prog-lbl {
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--text3); font-family: var(--font-d);
+  margin-bottom: 7px;
+}
+.sb-track {
+  height: 4px;
+  background: var(--border);
+  border-radius: 99px; overflow: hidden;
+}
+.sb-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold2), var(--gold));
+  border-radius: 99px; width: 0%;
+  transition: width .5s ease;
+}
+.sb-prog-txt {
+  font-size: 11px; color: var(--text3);
+  margin-top: 6px; font-family: var(--font-d);
+}
+
+/* Nav */
+.sb-section { padding: 14px 0 4px; }
+.sb-section-label {
+  padding: 0 22px 5px;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .12em;
+  color: var(--text3); font-family: var(--font-d);
+}
+.sb-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 22px;
+  font-size: 13px; color: var(--text2);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all .15s;
+  font-family: var(--font-d);
+}
+.sb-item:hover { color: var(--text); background: var(--bg3); }
+.sb-item.active {
+  color: var(--gold);
+  border-left-color: var(--gold);
+  background: var(--gold-l);
+  font-weight: 600;
+}
+.sb-item.done { color: var(--emerald); }
+.sb-icon { font-size: 13px; width: 16px; text-align: center; flex-shrink: 0; }
+.sb-tick {
+  margin-left: auto; width: 15px; height: 15px;
+  border-radius: 50%; border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8px; flex-shrink: 0; transition: all .3s;
+}
+.sb-item.done .sb-tick { background: var(--emerald2); border-color: var(--emerald2); color: #000; }
+
+/* ── MAIN ── */
+#main { margin-left: var(--sidebar); flex: 1; }
+
+/* ── TOPBAR ── */
+#topbar {
+  position: sticky; top: 0; z-index: 50;
+  height: 56px;
+  background: rgba(22,27,39,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+}
+.tb-crumb {
+  font-family: var(--font-d);
+  font-size: 13px; color: var(--text2);
+}
+.tb-crumb b { color: var(--text); }
+.tb-badge {
+  font-family: var(--font-d);
+  font-size: 11px; font-weight: 600;
+  background: var(--gold-l);
+  border: 1px solid var(--gold-bd);
+  color: var(--gold);
+  padding: 4px 12px; border-radius: 99px;
+  letter-spacing: .04em;
+}
+.menu-btn {
+  display: none;
+  background: none; border: 1px solid var(--border);
+  border-radius: var(--rsm); color: var(--text);
+  padding: 6px 10px; font-size: 16px; cursor: pointer;
+}
+
+/* ── CONTENT ── */
+#content { padding: 56px 44px 120px; max-width: 900px; }
+
+/* ════════════════════════════════════
+   HERO
+════════════════════════════════════ */
+.hero { margin-bottom: 80px; }
+
+.hero-eyebrow {
+  font-family: var(--font-d);
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .18em;
+  color: var(--gold);
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 18px;
+}
+.hero-eyebrow::before {
+  content: '';
+  width: 24px; height: 2px;
+  background: var(--gold); border-radius: 99px;
+}
+
+.hero-h {
+  font-family: var(--font-d);
+  font-size: clamp(36px, 5.5vw, 64px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -.03em;
+  margin-bottom: 20px;
+}
+.hero-h .gd { color: var(--gold); }
+.hero-h .em { color: var(--emerald); }
+
+.hero-desc {
+  font-size: 17px; color: var(--text2);
+  max-width: 560px; line-height: 1.8;
+  margin-bottom: 36px;
+}
+
+/* ── INTERACTIVE DICT VISUALIZER (Signature Element) ── */
+.dict-viz {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+.dv-header {
+  padding: 14px 22px;
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.dv-dots { display: flex; gap: 6px; }
+.dv-dots span { width: 10px; height: 10px; border-radius: 50%; }
+.dd1 { background: #FF5F56; }
+.dd2 { background: #FFBD2E; }
+.dd3 { background: #27C93F; }
+.dv-title {
+  font-family: var(--font-c); font-size: 12px;
+  color: var(--text3);
+}
+.dv-body { padding: 24px 22px; }
+.dv-label {
+  font-family: var(--font-d); font-size: 11px;
+  font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--text3);
+  margin-bottom: 14px;
+}
+.dv-pairs { display: flex; flex-direction: column; gap: 8px; margin-bottom: 22px; }
+.dv-pair {
+  display: flex; align-items: center; gap: 0;
+  border-radius: var(--rsm); overflow: hidden;
+  border: 1px solid var(--border);
+  font-family: var(--font-c); font-size: 13.5px;
+  transition: all .2s;
+}
+.dv-pair:hover { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold); }
+.dv-key {
+  background: var(--gold-l);
+  border-right: 1px solid var(--gold-bd);
+  padding: 10px 16px;
+  color: var(--gold);
+  font-weight: 600;
+  min-width: 120px;
+  text-align: right;
+}
+.dv-arrow {
+  padding: 10px 12px;
+  color: var(--text3); font-size: 16px;
+  background: var(--bg3);
+}
+.dv-val {
+  padding: 10px 16px;
+  color: var(--text);
+  flex: 1;
+}
+.dv-lookup {
+  border-top: 1px solid var(--border);
+  padding: 16px 22px 20px;
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap;
+}
+.dv-lookup-label {
+  font-family: var(--font-c); font-size: 12px;
+  color: var(--text3);
+}
+.dv-input-wrap {
+  display: flex; align-items: center; gap: 0;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--rsm); overflow: hidden;
+  flex: 1; min-width: 160px;
+}
+.dv-input-pre {
+  font-family: var(--font-c); font-size: 12px;
+  color: var(--text3); padding: 8px 10px;
+  white-space: nowrap;
+}
+.dv-input {
+  background: none; border: none; outline: none;
+  font-family: var(--font-c); font-size: 13px;
+  color: var(--gold); padding: 8px 6px;
+  width: 100%; min-width: 0;
+}
+.dv-input::placeholder { color: var(--text3); }
+.dv-result {
+  font-family: var(--font-c); font-size: 13px;
+  padding: 8px 14px;
+  border-radius: var(--rsm);
+  min-width: 80px;
+}
+.dv-result.found { background: var(--em-l); color: var(--emerald); border: 1px solid var(--em-bd); }
+.dv-result.notfound { background: var(--rose-l); color: var(--rose); border: 1px solid var(--rose-bd); }
+.dv-result.idle { background: var(--bg3); color: var(--text3); border: 1px solid var(--border); }
+
+/* Stats */
+.hero-stats {
+  display: flex; gap: 28px; flex-wrap: wrap;
+  margin-top: 24px;
+}
+.hst { }
+.hst-n {
+  font-family: var(--font-d);
+  font-size: 30px; font-weight: 700;
+  color: var(--text); line-height: 1;
+}
+.hst-n .a { color: var(--gold); }
+.hst-l {
+  font-size: 11px; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--text3);
+  font-family: var(--font-d); margin-top: 3px;
+}
+
+/* ════════════════════════════════════
+   SECTIONS
+════════════════════════════════════ */
+.section {
+  margin-bottom: 92px;
+  scroll-margin-top: 68px;
+}
+.sec-head {
+  display: flex; gap: 18px; align-items: flex-start;
+  margin-bottom: 34px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--border);
+}
+.sec-badge {
+  font-family: var(--font-d);
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  padding: 4px 10px; border-radius: var(--rsm);
+  flex-shrink: 0; margin-top: 4px;
+}
+.bg-g { background: var(--gold-l); color: var(--gold); border: 1px solid var(--gold-bd); }
+.bg-e { background: var(--em-l); color: var(--emerald); border: 1px solid var(--em-bd); }
+.bg-b { background: var(--blue-l); color: var(--blue); border: 1px solid var(--blue-bd); }
+.bg-r { background: var(--rose-l); color: var(--rose); border: 1px solid var(--rose-bd); }
+.bg-p { background: var(--purple-l); color: var(--purple); border: 1px solid var(--purple-bd); }
+
+.sec-title {
+  font-family: var(--font-d);
+  font-size: 26px; font-weight: 700;
+  letter-spacing: -.02em; line-height: 1.2;
+  color: var(--text);
+}
+.sec-title small {
+  display: block; font-size: 13px;
+  font-weight: 400; color: var(--text2);
+  margin-top: 4px; letter-spacing: 0;
+  font-family: var(--font-b);
+}
+
+/* ════════════════════════════════════
+   CODE BLOCKS
+════════════════════════════════════ */
+.cw {
+  background: #0D1117;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden; margin-bottom: 26px;
+}
+.cw-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 16px; background: #090D12;
+  border-bottom: 1px solid var(--border);
+}
+.cw-dots { display: flex; gap: 5px; }
+.cw-dots span { width: 9px; height: 9px; border-radius: 50%; }
+.cd1 { background: #FF5F5644; } .cd2 { background: #FFBD2E44; } .cd3 { background: #27C93F44; }
+.cw-fname { font-family: var(--font-c); font-size: 11px; color: var(--text3); }
+.cw-copy {
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 5px; color: var(--text3);
+  font-size: 11px; font-family: var(--font-b);
+  padding: 3px 10px; cursor: pointer; transition: all .2s;
+}
+.cw-copy:hover { border-color: var(--gold); color: var(--gold); }
+.cw-copy.copied { border-color: var(--emerald); color: var(--emerald); }
+
+pre {
+  padding: 20px 22px; overflow-x: auto;
+  font-family: var(--font-c); font-size: 13.5px;
+  line-height: 1.9; color: #B0C4DE;
+}
+pre::-webkit-scrollbar { height: 4px; }
+pre::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+/* Syntax */
+.kw { color: #FF79C6; font-weight: 600; }
+.fn { color: #8BE9FD; }
+.st { color: #F1FA8C; }
+.nm { color: #BD93F9; }
+.cm { color: #4A5568; font-style: italic; }
+.va { color: #E2E8F0; }
+.op { color: #FF6E6E; }
+.bl { color: #50FA7B; font-weight: 600; }
+.me { color: #8BE9FD; }
+.ky { color: var(--gold); font-weight: 600; }
+.vl { color: var(--emerald); }
+
+/* output */
+.cw-out { border-top: 1px solid var(--border); background: #07090E; padding: 13px 22px; }
+.cw-out-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--text3); font-family: var(--font-d); margin-bottom: 8px; }
+.ol { font-family: var(--font-c); font-size: 13px; color: var(--emerald); line-height: 1.8; }
+.ol.err { color: var(--rose); }
+.ol.dim { color: var(--text3); }
+
+/* ════════════════════════════════════
+   CONCEPT BOX
+════════════════════════════════════ */
+.cb {
+  border-radius: var(--r); padding: 20px 24px;
+  margin-bottom: 22px; position: relative;
+  overflow: hidden;
+}
+.cb::before {
+  content: ''; position: absolute;
+  left: 0; top: 0; bottom: 0; width: 3px;
+}
+.cb-g { background: var(--gold-l); border: 1px solid var(--gold-bd); }
+.cb-g::before { background: var(--gold); }
+.cb-e { background: var(--em-l); border: 1px solid var(--em-bd); }
+.cb-e::before { background: var(--emerald); }
+.cb-b { background: var(--blue-l); border: 1px solid var(--blue-bd); }
+.cb-b::before { background: var(--blue); }
+.cb-r { background: var(--rose-l); border: 1px solid var(--rose-bd); }
+.cb-r::before { background: var(--rose); }
+.cb-p { background: var(--purple-l); border: 1px solid var(--purple-bd); }
+.cb-p::before { background: var(--purple); }
+
+.cb-tag { font-family: var(--font-d); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 8px; }
+.cb-g .cb-tag { color: var(--gold); }
+.cb-e .cb-tag { color: var(--emerald); }
+.cb-b .cb-tag { color: var(--blue); }
+.cb-r .cb-tag { color: var(--rose); }
+.cb-p .cb-tag { color: var(--purple); }
+.cb p { color: var(--text2); font-size: 14.5px; line-height: 1.75; }
+.cb p + p { margin-top: 8px; }
+.cb strong { color: var(--text); }
+.cb code { font-family: var(--font-c); font-size: 12.5px; background: rgba(255,255,255,.07); border-radius: 4px; padding: 1px 6px; color: var(--text); }
+
+/* Callouts */
+.tip, .warn, .trick, .danger {
+  border-radius: var(--r); padding: 15px 19px;
+  margin-bottom: 20px; display: flex;
+  gap: 12px; align-items: flex-start; font-size: 14.5px;
+}
+.tip    { background: var(--gold-l);   border: 1px solid var(--gold-bd); }
+.warn   { background: var(--rose-l);   border: 1px solid var(--rose-bd); }
+.trick  { background: var(--em-l);     border: 1px solid var(--em-bd); }
+.danger { background: var(--purple-l); border: 1px solid var(--purple-bd); }
+.tip    .ico { color: var(--gold);    font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.warn   .ico { color: var(--rose);    font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.trick  .ico { color: var(--emerald); font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.danger .ico { color: var(--purple);  font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.tc p { color: var(--text2); line-height: 1.65; font-size: 14px; }
+.tc strong { display: block; margin-bottom: 3px; color: var(--text); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; font-family: var(--font-d); font-weight: 700; }
+.tc code { font-family: var(--font-c); font-size: 12px; background: rgba(255,255,255,.07); border-radius: 4px; padding: 1px 5px; color: var(--gold); }
+
+/* Prose */
+.prose { color: var(--text2); font-size: 15px; line-height: 1.85; margin-bottom: 20px; }
+.prose strong { color: var(--text); font-weight: 600; }
+.prose em { color: var(--gold); font-style: normal; font-weight: 500; }
+.prose code { font-family: var(--font-c); font-size: 13px; background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; color: var(--emerald); }
+
+/* ════════════════════════════════════
+   TABLE
+════════════════════════════════════ */
+.ctbl { width: 100%; border-collapse: collapse; margin-bottom: 26px; font-size: 14px; border-radius: var(--r); overflow: hidden; }
+.ctbl th { background: var(--bg3); padding: 12px 18px; text-align: left; font-family: var(--font-d); font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .08em; border-bottom: 1px solid var(--border); }
+.ctbl th:first-child { color: var(--gold); }
+.ctbl td { padding: 12px 18px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: top; line-height: 1.55; }
+.ctbl td:first-child { color: var(--text); font-weight: 600; font-family: var(--font-d); }
+.ctbl tr:last-child td { border-bottom: none; }
+.ctbl tr:hover td { background: rgba(255,255,255,.02); }
+.ctbl code { font-family: var(--font-c); font-size: 12px; color: var(--gold); background: var(--gold-l); padding: 1px 5px; border-radius: 3px; }
+
+/* ════════════════════════════════════
+   METHOD CARDS
+════════════════════════════════════ */
+.methods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px; margin-bottom: 26px;
+}
+.mc {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r); padding: 18px;
+  transition: all .2s;
+}
+.mc:hover { border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,166,35,.08); }
+.mc-name { font-family: var(--font-c); font-size: 14px; font-weight: 600; color: var(--gold); margin-bottom: 4px; }
+.mc-sig  { font-family: var(--font-c); font-size: 10.5px; color: var(--text3); margin-bottom: 10px; }
+.mc-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.mc-ex   { margin-top: 10px; font-family: var(--font-c); font-size: 11.5px; color: var(--emerald); background: var(--em-l); border-radius: var(--rsm); padding: 6px 10px; border: 1px solid var(--em-bd); }
+
+/* ════════════════════════════════════
+   CHALLENGE CARDS
+════════════════════════════════════ */
+.ch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+  gap: 13px; margin-bottom: 26px;
+}
+.ch {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r); padding: 20px;
+  transition: all .2s;
+}
+.ch:hover { border-color: var(--gold2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.2); }
+.ch-badge {
+  font-family: var(--font-d); font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .08em;
+  padding: 3px 9px; border-radius: 99px;
+  display: inline-block; margin-bottom: 12px;
+}
+.lv1 { background: var(--em-l); color: var(--emerald); border: 1px solid var(--em-bd); }
+.lv2 { background: var(--gold-l); color: var(--gold); border: 1px solid var(--gold-bd); }
+.lv3 { background: var(--rose-l); color: var(--rose); border: 1px solid var(--rose-bd); }
+.ch-title { font-family: var(--font-d); font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1.35; }
+.ch-desc  { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.ch-hint  { margin-top: 12px; font-family: var(--font-c); font-size: 11.5px; color: var(--text3); background: var(--bg3); border-radius: var(--rsm); padding: 7px 11px; }
+
+/* ════════════════════════════════════
+   QUIZ
+════════════════════════════════════ */
+.qw {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden; margin-bottom: 16px;
+}
+.qw-head {
+  background: var(--bg3); padding: 13px 20px;
+  display: flex; align-items: center; gap: 11px;
+  border-bottom: 1px solid var(--border);
+}
+.qw-num {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: var(--gold); color: var(--bg);
+  font-family: var(--font-d); font-size: 12px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.qw-head-t { font-family: var(--font-d); font-size: 14px; font-weight: 600; color: var(--text); }
+.qw-head-t small { font-size: 11px; color: var(--text3); font-weight: 400; display: block; }
+.qw-body { padding: 18px 20px; }
+.qw-q { font-size: 15px; font-weight: 500; color: var(--text); margin-bottom: 14px; line-height: 1.6; }
+.qw-q code { font-family: var(--font-c); font-size: 13px; color: var(--gold); background: var(--gold-l); padding: 1px 6px; border-radius: 4px; }
+.qw-opts { display: flex; flex-direction: column; gap: 7px; margin-bottom: 13px; }
+.qw-opt {
+  display: flex; align-items: center; gap: 11px;
+  padding: 11px 15px; border: 1.5px solid var(--border);
+  border-radius: var(--rsm); cursor: pointer;
+  font-size: 14px; color: var(--text2);
+  transition: all .15s; user-select: none;
+}
+.qw-opt:hover { border-color: var(--gold); color: var(--text); background: var(--gold-l); }
+.qw-opt.sel  { border-color: var(--gold);    background: var(--gold-l);  color: var(--gold); }
+.qw-opt.ok   { border-color: var(--emerald); background: var(--em-l);    color: var(--emerald); }
+.qw-opt.bad  { border-color: var(--rose);    background: var(--rose-l);  color: var(--rose); }
+.qw-key {
+  width: 24px; height: 24px; border-radius: 5px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-c); font-size: 11px; font-weight: 600;
+  color: var(--text3); flex-shrink: 0; transition: all .2s;
+}
+.qw-opt.sel .qw-key { background: var(--gold);    border-color: var(--gold);    color: var(--bg); }
+.qw-opt.ok  .qw-key { background: var(--emerald); border-color: var(--emerald); color: #000; }
+.qw-opt.bad .qw-key { background: var(--rose);    border-color: var(--rose);    color: #fff; }
+.qw-actions { display: flex; gap: 8px; }
+.qw-sub {
+  background: var(--gold); color: var(--bg);
+  font-family: var(--font-d); font-size: 13px; font-weight: 700;
+  border: none; border-radius: var(--rsm);
+  padding: 10px 22px; cursor: pointer; transition: all .2s;
+}
+.qw-sub:hover { background: var(--gold2); }
+.qw-sub:disabled { opacity: .3; cursor: not-allowed; }
+.qw-next {
+  background: transparent; border: 1px solid var(--border2);
+  color: var(--text2); font-family: var(--font-d);
+  font-size: 13px; font-weight: 600; border-radius: var(--rsm);
+  padding: 10px 20px; cursor: pointer; transition: all .2s; display: none;
+}
+.qw-next:hover { border-color: var(--emerald); color: var(--emerald); }
+.qw-next.show { display: block; }
+.qw-fb {
+  margin-top: 13px; padding: 12px 15px;
+  border-radius: var(--rsm); font-size: 14px;
+  line-height: 1.65; display: none;
+}
+.qw-fb.show { display: block; }
+.qw-fb.ok  { background: var(--em-l);   border: 1px solid var(--em-bd);   color: #86EFAC; }
+.qw-fb.bad { background: var(--rose-l); border: 1px solid var(--rose-bd); color: #FCA5A5; }
+.qw-fb strong { display: block; margin-bottom: 3px; }
+
+/* ════════════════════════════════════
+   FOOTER
+════════════════════════════════════ */
+#footer {
+  border-top: 1px solid var(--border);
+  margin-top: 40px; padding: 52px 44px;
+  text-align: center;
+  background: var(--bg2);
+}
+.foot-icon { font-size: 46px; display: block; margin-bottom: 14px; }
+.foot-h { font-family: var(--font-d); font-size: 22px; font-weight: 700; margin-bottom: 7px; }
+.foot-s { color: var(--text3); font-size: 14px; }
+
+/* ════════════════════════════════════
+   MOBILE
+════════════════════════════════════ */
+#overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 90; }
+@media (max-width: 900px) {
+  :root { --sidebar: 0px; }
+  #sidebar { width: 252px; transform: translateX(-100%); }
+  #sidebar.open { transform: translateX(0); }
+  #main { margin-left: 0; }
+  #overlay { display: block; opacity: 0; pointer-events: none; transition: opacity .3s; }
+  #overlay.open { opacity: 1; pointer-events: all; }
+  #content { padding: 28px 18px 80px; }
+  #topbar { padding: 0 18px; }
+  .menu-btn { display: block; }
+  .hero-stats { gap: 18px; }
+}
+@media (max-width: 540px) {
+  .sec-title { font-size: 21px; }
+  .methods-grid, .ch-grid { grid-template-columns: 1fr; }
+  .ctbl { font-size: 13px; }
+  .ctbl th, .ctbl td { padding: 9px 12px; }
+  .dv-key { min-width: 80px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+<div id="shell">
+
+<!-- ═══════ SIDEBAR ═══════ -->
+<nav id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">
+      🗝️
+      <span class="key-pill">key</span>
+      <span style="color:var(--text3);font-size:14px">→</span>
+      <span class="val-pill">value</span>
+    </div>
+    <div class="sb-tagline">Python Dictionaries</div>
+  </div>
+
+  <div class="sb-prog">
+    <div class="sb-prog-lbl">Progress</div>
+    <div class="sb-track"><div class="sb-fill" id="sbFill"></div></div>
+    <div class="sb-prog-txt" id="sbTxt">0 of 10 sections</div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-label">Foundations</div>
+    <a class="sb-item" href="#intro" data-sec="intro"><span class="sb-icon">🌱</span>What is a Dict?<span class="sb-tick" id="nd-intro">✓</span></a>
+    <a class="sb-item" href="#create" data-sec="create"><span class="sb-icon">🏗️</span>Creating Dicts<span class="sb-tick" id="nd-create">✓</span></a>
+    <a class="sb-item" href="#access" data-sec="access"><span class="sb-icon">🔑</span>Accessing Values<span class="sb-tick" id="nd-access">✓</span></a>
+    <a class="sb-item" href="#modify" data-sec="modify"><span class="sb-icon">✏️</span>Adding & Modifying<span class="sb-tick" id="nd-modify">✓</span></a>
+    <a class="sb-item" href="#methods" data-sec="methods"><span class="sb-icon">🔧</span>Methods<span class="sb-tick" id="nd-methods">✓</span></a>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-label">Going Deeper</div>
+    <a class="sb-item" href="#loops" data-sec="loops"><span class="sb-icon">🔁</span>Looping Dicts<span class="sb-tick" id="nd-loops">✓</span></a>
+    <a class="sb-item" href="#comprehension" data-sec="comprehension"><span class="sb-icon">⚡</span>Dict Comprehension<span class="sb-tick" id="nd-comprehension">✓</span></a>
+    <a class="sb-item" href="#nested" data-sec="nested"><span class="sb-icon">🪆</span>Nested Dicts<span class="sb-tick" id="nd-nested">✓</span></a>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-label">Practice</div>
+    <a class="sb-item" href="#quiz" data-sec="quiz"><span class="sb-icon">🎯</span>Quiz (12 Q)<span class="sb-tick" id="nd-quiz">✓</span></a>
+    <a class="sb-item" href="#challenges" data-sec="challenges"><span class="sb-icon">🏆</span>Challenges<span class="sb-tick" id="nd-challenges">✓</span></a>
+  </div>
+</nav>
+
+<!-- ═══════ MAIN ═══════ -->
+<div id="main">
+  <header id="topbar">
+    <button class="menu-btn" id="menuBtn">☰</button>
+    <div class="tb-crumb">🐍 Python — <b>Dictionaries</b></div>
+    <div class="tb-badge">key → value</div>
+  </header>
+
+  <div id="content">
+
+    <!-- ═══════ HERO ═══════ -->
+    <div class="hero">
+      <div class="hero-eyebrow">Python for Beginners — Dictionaries</div>
+      <h1 class="hero-h">
+        Every Key Has<br>
+        a <span class="gd">Value</span> —<br>
+        Learn to Map <span class="em">Anything</span>
+      </h1>
+      <p class="hero-desc">
+        Dictionaries are Python's most powerful data structure. Real apps use them constantly — from storing user profiles, to counting words, to building APIs. Master them and everything else gets easier.
+      </p>
+
+      <!-- Interactive Dict Visualizer -->
+      <div class="dict-viz">
+        <div class="dv-header">
+          <div class="dv-dots"><span class="dd1"></span><span class="dd2"></span><span class="dd3"></span></div>
+          <span class="dv-title">student.py — Live dict lookup demo</span>
+        </div>
+        <div class="dv-body">
+          <div class="dv-label">student = { ... }</div>
+          <div class="dv-pairs">
+            <div class="dv-pair"><div class="dv-key">"name"</div><div class="dv-arrow">→</div><div class="dv-val">"Ahmed Hassan"</div></div>
+            <div class="dv-pair"><div class="dv-key">"age"</div><div class="dv-arrow">→</div><div class="dv-val">20</div></div>
+            <div class="dv-pair"><div class="dv-key">"grade"</div><div class="dv-arrow">→</div><div class="dv-val">"A"</div></div>
+            <div class="dv-pair"><div class="dv-key">"city"</div><div class="dv-arrow">→</div><div class="dv-val">"Cairo"</div></div>
+            <div class="dv-pair"><div class="dv-key">"gpa"</div><div class="dv-arrow">→</div><div class="dv-val">3.9</div></div>
+          </div>
+        </div>
+        <div class="dv-lookup">
+          <span class="dv-lookup-label">Try it:</span>
+          <div class="dv-input-wrap">
+            <span class="dv-input-pre">student[</span>
+            <input class="dv-input" id="dvInput" type="text" placeholder='"name"' />
+            <span class="dv-input-pre">]</span>
+          </div>
+          <div class="dv-result idle" id="dvResult">→ ?</div>
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hst"><div class="hst-n"><span class="a">10</span></div><div class="hst-l">Sections</div></div>
+        <div class="hst"><div class="hst-n"><span class="a">30+</span></div><div class="hst-l">Code Examples</div></div>
+        <div class="hst"><div class="hst-n"><span class="a">12</span></div><div class="hst-l">Quiz Questions</div></div>
+        <div class="hst"><div class="hst-n"><span class="a">O(1)</span></div><div class="hst-l">Lookup Speed</div></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════
+         S1: WHAT IS A DICT
+    ═══════════════════════════════ -->
+    <section class="section" id="intro" data-sec="intro">
+      <div class="sec-head">
+        <div class="sec-badge bg-g">Ch 01</div>
+        <div>
+          <h2 class="sec-title">What is a Dictionary?
+            <small>The most powerful way to store related data in Python</small>
+          </h2>
+        </div>
+      </div>
+
+      <div class="cb cb-g">
+        <div class="cb-tag">💡 Core Concept</div>
+        <p>A <strong>dictionary</strong> is a collection of <strong>key-value pairs</strong>. Instead of accessing items by position (like a list), you access them by a meaningful <em>key</em>. Think of a real dictionary: you look up a word (key) and get its definition (value).</p>
+        <p>Keys must be <strong>unique</strong> and <strong>immutable</strong> (strings, numbers, tuples). Values can be anything — strings, numbers, lists, even other dicts.</p>
+      </div>
+
+      <p class="prose">Without dicts, storing a student's info is clunky:</p>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">before_dict.py — The painful way</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="cm"># Without dict — parallel lists (terrible idea)</span>
+<span class="va">names</span>  <span class="op">=</span> [<span class="st">"Ahmed"</span>]
+<span class="va">ages</span>   <span class="op">=</span> [<span class="nm">20</span>]
+<span class="va">grades</span> <span class="op">=</span> [<span class="st">"A"</span>]
+<span class="cm"># To get Ahmed's grade: grades[names.index("Ahmed")] 😱</span>
+
+<span class="cm"># With dict — clean, readable, powerful ✨</span>
+<span class="va">student</span> <span class="op">=</span> {
+    <span class="ky">"name"</span>:  <span class="st">"Ahmed"</span>,
+    <span class="ky">"age"</span>:   <span class="nm">20</span>,
+    <span class="ky">"grade"</span>: <span class="st">"A"</span>
+}
+<span class="fn">print</span>(<span class="va">student</span>[<span class="st">"grade"</span>])   <span class="cm"># "A" — instant!</span></pre>
+        <div class="cw-out">
+          <div class="cw-out-lbl">Output</div>
+          <div class="ol">A</div>
+        </div>
+      </div>
+
+      <h3 style="font-family:var(--font-d);font-size:18px;font-weight:700;margin:28px 0 14px;color:var(--text);">Real-world analogies</h3>
+      <div class="cb cb-e">
+        <div class="cb-tag">🌍 Analogies</div>
+        <p><strong>A real dictionary:</strong> word → definition. <strong>A phone contact:</strong> name → phone number. <strong>A restaurant menu:</strong> dish name → price. <strong>A country-code map:</strong> "EG" → "Egypt". <strong>A student record:</strong> student ID → all their data.</p>
+        <p>Everywhere you have a "label that points to a value," a <strong>dict</strong> is the right tool.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════
+         S2: CREATING DICTS
+    ═══════════════════════════════ -->
+    <section class="section" id="create" data-sec="create">
+      <div class="sec-head">
+        <div class="sec-badge bg-g">Ch 02</div>
+        <div>
+          <h2 class="sec-title">Creating Dictionaries
+            <small>Five different ways — know them all</small>
+          </h2>
+        </div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">creating_dicts.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="cm"># METHOD 1: Curly braces — most common</span>
+<span class="va">person</span> <span class="op">=</span> {<span class="ky">"name"</span>: <span class="st">"Sara"</span>, <span class="ky">"age"</span>: <span class="nm">25</span>, <span class="ky">"city"</span>: <span class="st">"Alex"</span>}
+
+<span class="cm"># METHOD 2: dict() constructor</span>
+<span class="va">car</span> <span class="op">=</span> <span class="fn">dict</span>(<span class="va">brand</span><span class="op">=</span><span class="st">"Toyota"</span>, <span class="va">year</span><span class="op">=</span><span class="nm">2022</span>, <span class="va">color</span><span class="op">=</span><span class="st">"white"</span>)
+<span class="cm"># Note: keys are written WITHOUT quotes here!</span>
+
+<span class="cm"># METHOD 3: dict() from a list of pairs</span>
+<span class="va">pairs</span> <span class="op">=</span> [(<span class="st">"x"</span>, <span class="nm">10</span>), (<span class="st">"y"</span>, <span class="nm">20</span>), (<span class="st">"z"</span>, <span class="nm">30</span>)]
+<span class="va">coords</span> <span class="op">=</span> <span class="fn">dict</span>(<span class="va">pairs</span>)
+
+<span class="cm"># METHOD 4: fromkeys() — same value for all keys</span>
+<span class="va">scores</span> <span class="op">=</span> <span class="fn">dict</span>.<span class="me">fromkeys</span>([<span class="st">"Ali"</span>, <span class="st">"Sara"</span>, <span class="st">"Mona"</span>], <span class="nm">0</span>)
+<span class="fn">print</span>(<span class="va">scores</span>)   <span class="cm"># {'Ali': 0, 'Sara': 0, 'Mona': 0}</span>
+
+<span class="cm"># METHOD 5: Empty dict then fill</span>
+<span class="va">inventory</span> <span class="op">=</span> {}
+<span class="va">inventory</span>[<span class="st">"apples"</span>]  <span class="op">=</span> <span class="nm">50</span>
+<span class="va">inventory</span>[<span class="st">"bananas"</span>] <span class="op">=</span> <span class="nm">30</span>
+<span class="va">inventory</span>[<span class="st">"oranges"</span>] <span class="op">=</span> <span class="nm">45</span>
+<span class="fn">print</span>(<span class="va">inventory</span>)</pre>
+        <div class="cw-out">
+          <div class="cw-out-lbl">Output</div>
+          <div class="ol">{'Ali': 0, 'Sara': 0, 'Mona': 0}</div>
+          <div class="ol">{'apples': 50, 'bananas': 30, 'oranges': 45}</div>
+        </div>
+      </div>
+
+      <div class="tip">
+        <div class="ico">💡</div>
+        <div class="tc">
+          <strong>What Can Be a Key?</strong>
+          <p>Keys must be <code>hashable</code> (immutable): strings ✅, integers ✅, floats ✅, tuples ✅. Lists ❌ and dicts ❌ cannot be keys — they're mutable. Values can be <em>anything</em>: lists, dicts, functions, None, whatever you need.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════
+         S3: ACCESSING VALUES
+    ═══════════════════════════════ -->
+    <section class="section" id="access" data-sec="access">
+      <div class="sec-head">
+        <div class="sec-badge bg-g">Ch 03</div>
+        <div>
+          <h2 class="sec-title">Accessing Values
+            <small>Two ways — one safe, one not</small>
+          </h2>
+        </div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">accessing.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="va">student</span> <span class="op">=</span> {
+    <span class="ky">"name"</span>:  <span class="st">"Nour"</span>,
+    <span class="ky">"age"</span>:   <span class="nm">22</span>,
+    <span class="ky">"grade"</span>: <span class="st">"B+"</span>
+}
+
+<span class="cm"># WAY 1: Square brackets [] — fast, but crashes if key missing</span>
+<span class="fn">print</span>(<span class="va">student</span>[<span class="st">"name"</span>])    <span class="cm"># "Nour"</span>
+<span class="fn">print</span>(<span class="va">student</span>[<span class="st">"age"</span>])     <span class="cm"># 22</span>
+<span class="cm"># print(student["email"]) # ← KeyError: 'email' — key doesn't exist!</span>
+
+<span class="cm"># WAY 2: .get() — safe, returns None (or a default) if missing</span>
+<span class="fn">print</span>(<span class="va">student</span><span class="me">.get</span>(<span class="st">"grade"</span>))          <span class="cm"># "B+"</span>
+<span class="fn">print</span>(<span class="va">student</span><span class="me">.get</span>(<span class="st">"email"</span>))          <span class="cm"># None — no crash!</span>
+<span class="fn">print</span>(<span class="va">student</span><span class="me">.get</span>(<span class="st">"email"</span>, <span class="st">"N/A"</span>))  <span class="cm"># "N/A" — custom default</span>
+
+<span class="cm"># Checking if key exists before access</span>
+<span class="kw">if</span> <span class="st">"name"</span> <span class="kw">in</span> <span class="va">student</span>:
+    <span class="fn">print</span>(<span class="st">f"Name found: {student['name']}"</span>)
+
+<span class="cm"># Access nested value (dict inside dict)</span>
+<span class="va">data</span> <span class="op">=</span> {<span class="ky">"scores"</span>: {<span class="ky">"math"</span>: <span class="nm">95</span>, <span class="ky">"science"</span>: <span class="nm">88</span>}}
+<span class="fn">print</span>(<span class="va">data</span>[<span class="st">"scores"</span>][<span class="st">"math"</span>])   <span class="cm"># 95</span></pre>
+        <div class="cw-out">
+          <div class="cw-out-lbl">Output</div>
+          <div class="ol">Nour</div>
+          <div class="ol">22</div>
+          <div class="ol">B+</div>
+          <div class="ol dim">None</div>
+          <div class="ol">N/A</div>
+          <div class="ol">Name found: Nour</div>
+          <div class="ol">95</div>
+        </div>
+      </div>
+
+      <div class="warn">
+        <div class="ico">⚠️</div>
+        <div class="tc">
+          <strong>Use .get() When You're Not Sure the Key Exists</strong>
+          <p>Accessing a missing key with <code>[]</code> raises a <code>KeyError</code> and crashes your program. Use <code>.get(key, default)</code> when the key might not be there — it returns <code>None</code> or your custom default instead of crashing.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════
+         S4: ADDING & MODIFYING
+    ═══════════════════════════════ -->
+    <section class="section" id="modify" data-sec="modify">
+      <div class="sec-head">
+        <div class="sec-badge bg-e">Ch 04</div>
+        <div>
+          <h2 class="sec-title">Adding, Modifying & Removing
+            <small>Dicts are mutable — change them freely</small>
+          </h2>
+        </div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">modify.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="va">profile</span> <span class="op">=</span> {<span class="ky">"name"</span>: <span class="st">"Ali"</span>, <span class="ky">"age"</span>: <span class="nm">19</span>}
+
+<span class="cm"># ADD a new key-value pair</span>
+<span class="va">profile</span>[<span class="st">"email"</span>] <span class="op">=</span> <span class="st">"ali@example.com"</span>
+<span class="fn">print</span>(<span class="va">profile</span>)
+<span class="cm"># {'name': 'Ali', 'age': 19, 'email': 'ali@example.com'}</span>
+
+<span class="cm"># MODIFY an existing value</span>
+<span class="va">profile</span>[<span class="st">"age"</span>] <span class="op">=</span> <span class="nm">20</span>   <span class="cm"># same key, new value → overwrites</span>
+<span class="fn">print</span>(<span class="va">profile</span>[<span class="st">"age"</span>])  <span class="cm"># 20</span>
+
+<span class="cm"># DELETE a key — 3 ways</span>
+<span class="kw">del</span> <span class="va">profile</span>[<span class="st">"email"</span>]              <span class="cm"># del keyword</span>
+<span class="va">removed</span> <span class="op">=</span> <span class="va">profile</span><span class="me">.pop</span>(<span class="st">"age"</span>)      <span class="cm"># .pop() returns the value</span>
+<span class="fn">print</span>(<span class="st">f"Removed: {removed}"</span>)       <span class="cm"># Removed: 20</span>
+<span class="va">last</span> <span class="op">=</span> <span class="va">profile</span><span class="me">.popitem</span>()           <span class="cm"># .popitem() removes last added</span>
+
+<span class="cm"># UPDATE — merge another dict in</span>
+<span class="va">user</span> <span class="op">=</span> {<span class="ky">"name"</span>: <span class="st">"Mona"</span>, <span class="ky">"age"</span>: <span class="nm">21</span>}
+<span class="va">extra</span> <span class="op">=</span> {<span class="ky">"city"</span>: <span class="st">"Giza"</span>, <span class="ky">"age"</span>: <span class="nm">22</span>}  <span class="cm"># age will be overwritten</span>
+<span class="va">user</span><span class="me">.update</span>(<span class="va">extra</span>)
+<span class="fn">print</span>(<span class="va">user</span>)
+<span class="cm"># {'name': 'Mona', 'age': 22, 'city': 'Giza'}</span>
+
+<span class="cm"># Python 3.9+ merge operator |</span>
+<span class="va">merged</span> <span class="op">=</span> <span class="va">user</span> <span class="op">|</span> {<span class="ky">"country"</span>: <span class="st">"Egypt"</span>}
+<span class="fn">print</span>(<span class="va">merged</span>)</pre>
+        <div class="cw-out">
+          <div class="cw-out-lbl">Output</div>
+          <div class="ol">{'name': 'Mona', 'age': 22, 'city': 'Giza'}</div>
+          <div class="ol">{'name': 'Mona', 'age': 22, 'city': 'Giza', 'country': 'Egypt'}</div>
+        </div>
+      </div>
+
+      <div class="trick">
+        <div class="ico">⚡</div>
+        <div class="tc">
+          <strong>setdefault() — Add Only If Missing</strong>
+          <p><code>d.setdefault(key, value)</code> adds the key only if it doesn't exist, then returns its value. Perfect for "initialize if not set" patterns — like building a word-count dict without checking first.</p>
+        </div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">setdefault.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="va">counts</span> <span class="op">=</span> {}
+<span class="va">words</span>  <span class="op">=</span> [<span class="st">"cat"</span>, <span class="st">"dog"</span>, <span class="st">"cat"</span>, <span class="st">"bird"</span>, <span class="st">"dog"</span>, <span class="st">"cat"</span>]
+
+<span class="kw">for</span> <span class="va">word</span> <span class="kw">in</span> <span class="va">words</span>:
+    <span class="va">counts</span><span class="me">.setdefault</span>(<span class="va">word</span>, <span class="nm">0</span>)  <span class="cm"># init to 0 if not there yet</span>
+    <span class="va">counts</span>[<span class="va">word</span>] <span class="op">+=</span> <span class="nm">1</span>
+
+<span class="fn">print</span>(<span class="va">counts</span>)
+<span class="cm"># {'cat': 3, 'dog': 2, 'bird': 1}</span>
+
+<span class="cm"># Even cleaner with .get():</span>
+<span class="va">counts2</span> <span class="op">=</span> {}
+<span class="kw">for</span> <span class="va">word</span> <span class="kw">in</span> <span class="va">words</span>:
+    <span class="va">counts2</span>[<span class="va">word</span>] <span class="op">=</span> <span class="va">counts2</span><span class="me">.get</span>(<span class="va">word</span>, <span class="nm">0</span>) <span class="op">+</span> <span class="nm">1</span>
+
+<span class="fn">print</span>(<span class="va">counts2</span>)  <span class="cm"># {'cat': 3, 'dog': 2, 'bird': 1}</span></pre>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════
+         S5: METHODS
+    ═══════════════════════════════ -->
+    <section class="section" id="methods" data-sec="methods">
+      <div class="sec-head">
+        <div class="sec-badge bg-e">Ch 05</div>
+        <div>
+          <h2 class="sec-title">Dictionary Methods
+            <small>The complete toolkit — every method explained</small>
+          </h2>
+        </div>
+      </div>
+
+      <div class="methods-grid">
+        <div class="mc"><div class="mc-name">.keys()</div><div class="mc-sig">dict.keys()</div><div class="mc-desc">Returns a view of all keys in the dict. Updates automatically if dict changes.</div><div class="mc-ex">d.keys() → dict_keys(['a','b'])</div></div>
+        <div class="mc"><div class="mc-name">.values()</div><div class="mc-sig">dict.values()</div><div class="mc-desc">Returns a view of all values. Duplicates are allowed in values (unlike keys).</div><div class="mc-ex">d.values() → dict_values([1, 2])</div></div>
+        <div class="mc"><div class="mc-name">.items()</div><div class="mc-sig">dict.items()</div><div class="mc-desc">Returns a view of (key, value) pairs as tuples. Essential for looping.</div><div class="mc-ex">d.items() → dict_items([('a',1)])</div></div>
+        <div class="mc"><div class="mc-name">.get()</div><div class="mc-sig">dict.get(key, default)</div><div class="mc-desc">Returns value for key, or default if key missing. Never raises KeyError.</div><div class="mc-ex">d.get('x', 0) → 0 if 'x' missing</div></div>
+        <div class="mc"><div class="mc-name">.pop()</div><div class="mc-sig">dict.pop(key, default)</div><div class="mc-desc">Removes and returns the value for key. Pass default to avoid KeyError on missing key.</div><div class="mc-ex">d.pop('a') → 1, removes 'a'</div></div>
+        <div class="mc"><div class="mc-name">.popitem()</div><div class="mc-sig">dict.popitem()</div><div class="mc-desc">Removes and returns the last inserted (key, value) pair. Useful for LIFO processing.</div><div class="mc-ex">d.popitem() → ('last_key', val)</div></div>
+        <div class="mc"><div class="mc-name">.update()</div><div class="mc-sig">dict.update(other)</div><div class="mc-desc">Merges another dict into this one. Existing keys are overwritten.</div><div class="mc-ex">d.update({'c': 3}) adds/overwrites</div></div>
+        <div class="mc"><div class="mc-name">.setdefault()</div><div class="mc-sig">dict.setdefault(key, val)</div><div class="mc-desc">If key exists: return its value. If missing: insert key with val, return val.</div><div class="mc-ex">d.setdefault('x', 0)</div></div>
+        <div class="mc"><div class="mc-name">.copy()</div><div class="mc-sig">dict.copy()</div><div class="mc-desc">Returns a shallow copy. Changes to copy don't affect original (for top-level keys).</div><div class="mc-ex">new = d.copy()</div></div>
+        <div class="mc"><div class="mc-name">.clear()</div><div class="mc-sig">dict.clear()</div><div class="mc-desc">Removes all items. Dict becomes empty {} but the variable still exists.</div><div class="mc-ex">d.clear() → {}</div></div>
+        <div class="mc"><div class="mc-name">len()</div><div class="mc-sig">len(dict)</div><div class="mc-desc">Returns the number of key-value pairs. One of Python's built-in functions, works on dicts.</div><div class="mc-ex">len({'a':1, 'b':2}) → 2</div></div>
+        <div class="mc"><div class="mc-name">in / not in</div><div class="mc-sig">key in dict</div><div class="mc-desc">Checks if a KEY exists in the dict. Does NOT check values. O(1) speed.</div><div class="mc-ex">'name' in d → True or False</div></div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">methods_demo.py — All key methods in action</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="va">d</span> <span class="op">=</span> {<span class="ky">"a"</span>: <span class="nm">1</span>, <span class="ky">"b"</span>: <span class="nm">2</span>, <span class="ky">"c"</span>: <span class="nm">3</span>}
+
+<span class="fn">print</span>(<span class="fn">list</span>(<span class="va">d</span><span class="me">.keys</span>()))    <span class="cm"># ['a', 'b', 'c']</span>
+<span class="fn">print</span>(<span class="fn">list</span>(<span class="va">d</span><span class="me">.values</span>()))  <span class="cm"># [1, 2, 3]</span>
+<span class="fn">print</span>(<span class="fn">list</span>(<span class="va">d</span><span class="me">.items</span>()))   <span class="cm"># [('a', 1), ('b', 2), ('c', 3)]</span>
+
+<span class="cm"># Safe get with default</span>
+<span class="fn">print</span>(<span class="va">d</span><span class="me">.get</span>(<span class="st">"z"</span>, <span class="nm">99</span>))    <span class="cm"># 99  — "z" doesn't exist</span>
+
+<span class="cm"># Pop removes and returns</span>
+<span class="va">val</span> <span class="op">=</span> <span class="va">d</span><span class="me">.pop</span>(<span class="st">"b"</span>)
+<span class="fn">print</span>(<span class="va">val</span>, <span class="va">d</span>)            <span class="cm"># 2  {'a': 1, 'c': 3}</span>
+
+<span class="cm"># in checks KEYS only</span>
+<span class="fn">print</span>(<span class="st">"a"</span> <span class="kw">in</span> <span class="va">d</span>)          <span class="cm"># True</span>
+<span class="fn">print</span>(<span class="nm">1</span> <span class="kw">in</span> <span class="va">d</span>)            <span class="cm"># False — 1 is a VALUE, not a key</span>
+<span class="fn">print</span>(<span class="nm">1</span> <span class="kw">in</span> <span class="va">d</span><span class="me">.values</span>())   <span class="cm"># True — check values explicitly</span>
+
+<span class="cm"># Length</span>
+<span class="fn">print</span>(<span class="fn">len</span>(<span class="va">d</span>))             <span class="cm"># 2 (after pop)</span></pre>
+        <div class="cw-out">
+          <div class="cw-out-lbl">Output</div>
+          <div class="ol">['a', 'b', 'c']</div>
+          <div class="ol">[1, 2, 3]</div>
+          <div class="ol">[('a', 1), ('b', 2), ('c', 3)]</div>
+          <div class="ol">99</div>
+          <div class="ol">2  {'a': 1, 'c': 3}</div>
+          <div class="ol">True</div>
+          <div class="ol">False</div>
+          <div class="ol">True</div>
+          <div class="ol">2</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════
+         S6: LOOPING DICTS
+    ═══════════════════════════════ -->
+    <section class="section" id="loops" data-sec="loops">
+      <div class="sec-head">
+        <div class="sec-badge bg-b">Ch 06</div>
+        <div>
+          <h2 class="sec-title">Looping Through Dicts
+            <small>Four essential patterns — use .items() the most</small>
+          </h2>
+        </div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">looping.py — All four patterns</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="va">menu</span> <span class="op">=</span> {
+    <span class="ky">"Burger"</span>:  <span class="nm">45</span>,
+    <span class="ky">"Pizza"</span>:   <span class="nm">80</span>,
+    <span class="ky">"Pasta"</span>:   <span class="nm">60</span>,
+    <span class="ky">"Salad"</span>:   <span class="nm">30</span>
+}
+
+<span class="cm"># PATTERN 1: Loop over keys (default behavior)</span>
+<span class="kw">for</span> <span class="va">item</span> <span class="kw">in</span> <span class="va">menu</span>:
+    <span class="fn">print</span>(<span class="va">item</span>)           <span class="cm"># Burger, Pizza, Pasta, Salad</span>
+
+<span class="cm"># PATTERN 2: Loop over values</span>
+<span class="kw">for</span> <span class="va">price</span> <span class="kw">in</span> <span class="va">menu</span><span class="me">.values</span>():
+    <span class="fn">print</span>(<span class="va">price</span>)          <span class="cm"># 45, 80, 60, 30</span>
+
+<span class="cm"># PATTERN 3: Loop over BOTH — most useful ⭐</span>
+<span class="kw">for</span> <span class="va">item</span>, <span class="va">price</span> <span class="kw">in</span> <span class="va">menu</span><span class="me">.items</span>():
+    <span class="fn">print</span>(<span class="st">f"{item:10} → {price} EGP"</span>)
+
+<span class="cm"># PATTERN 4: Loop with condition</span>
+<span class="fn">print</span>(<span class="st">"\nAffordable items (under 50 EGP):"</span>)
+<span class="kw">for</span> <span class="va">item</span>, <span class="va">price</span> <span class="kw">in</span> <span class="va">menu</span><span class="me">.items</span>():
+    <span class="kw">if</span> <span class="va">price</span> <span class="op"><</span> <span class="nm">50</span>:
+        <span class="fn">print</span>(<span class="st">f"  ✅ {item} — {price} EGP"</span>)
+
+<span class="cm"># Sorted loop</span>
+<span class="kw">for</span> <span class="va">item</span> <span class="kw">in</span> <span class="fn">sorted</span>(<span class="va">menu</span>):         <span class="cm"># alphabetical by key</span>
+    <span class="fn">print</span>(<span class="va">item</span>)
+
+<span class="kw">for</span> <span class="va">k</span>, <span class="va">v</span> <span class="kw">in</span> <span class="fn">sorted</span>(<span class="va">menu</span><span class="me">.items</span>(), <span class="va">key</span><span class="op">=</span><span class="kw">lambda</span> <span class="va">x</span>: <span class="va">x</span>[<span class="nm">1</span>]):
+    <span class="fn">print</span>(<span class="st">f"{k}: {v}"</span>)               <span class="cm"># sorted by price</span></pre>
+        <div class="cw-out">
+          <div class="cw-out-lbl">Output (items loop)</div>
+          <div class="ol">Burger     → 45 EGP</div>
+          <div class="ol">Pizza      → 80 EGP</div>
+          <div class="ol">Pasta      → 60 EGP</div>
+          <div class="ol">Salad      → 30 EGP</div>
+          <div class="ol dim">Affordable items (under 50 EGP):</div>
+          <div class="ol">  ✅ Burger — 45 EGP</div>
+          <div class="ol">  ✅ Salad — 30 EGP</div>
+        </div>
+      </div>
+
+      <div class="trick">
+        <div class="ico">⚡</div>
+        <div class="tc">
+          <strong>Always Use .items() When You Need Both Key and Value</strong>
+          <p>The most common dict loop pattern in real Python code is <code>for k, v in d.items():</code>. This unpacks each (key, value) tuple automatically. Don't do <code>for k in d: v = d[k]</code> — that's two lookups instead of one.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════
+         S7: DICT COMPREHENSION
+    ═══════════════════════════════ -->
+    <section class="section" id="comprehension" data-sec="comprehension">
+      <div class="sec-head">
+        <div class="sec-badge bg-b">Ch 07</div>
+        <div>
+          <h2 class="sec-title">Dict Comprehension
+            <small>Build entire dictionaries in one elegant line</small>
+          </h2>
+        </div>
+      </div>
+
+      <div class="cb cb-b">
+        <div class="cb-tag">⚡ Concept</div>
+        <p>Dict comprehension is the one-liner syntax for building a dictionary. Formula: <code>{key_expr: val_expr for item in iterable if condition}</code>. It's faster, more readable, and very Pythonic.</p>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">dict_comprehension.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="cm"># Basic: squares dict {num: num²}</span>
+<span class="va">squares</span> <span class="op">=</span> {<span class="va">x</span>: <span class="va">x</span><span class="op">**</span><span class="nm">2</span> <span class="kw">for</span> <span class="va">x</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">6</span>)}
+<span class="fn">print</span>(<span class="va">squares</span>)
+<span class="cm"># {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}</span>
+
+<span class="cm"># With condition: only even numbers</span>
+<span class="va">even_sq</span> <span class="op">=</span> {<span class="va">x</span>: <span class="va">x</span><span class="op">**</span><span class="nm">2</span> <span class="kw">for</span> <span class="va">x</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1</span>, <span class="nm">11</span>) <span class="kw">if</span> <span class="va">x</span> <span class="op">%</span> <span class="nm">2</span> <span class="op">==</span> <span class="nm">0</span>}
+<span class="fn">print</span>(<span class="va">even_sq</span>)
+<span class="cm"># {2: 4, 4: 16, 6: 36, 8: 64, 10: 100}</span>
+
+<span class="cm"># Swap keys and values</span>
+<span class="va">original</span> <span class="op">=</span> {<span class="ky">"a"</span>: <span class="nm">1</span>, <span class="ky">"b"</span>: <span class="nm">2</span>, <span class="ky">"c"</span>: <span class="nm">3</span>}
+<span class="va">swapped</span>  <span class="op">=</span> {<span class="va">v</span>: <span class="va">k</span> <span class="kw">for</span> <span class="va">k</span>, <span class="va">v</span> <span class="kw">in</span> <span class="va">original</span><span class="me">.items</span>()}
+<span class="fn">print</span>(<span class="va">swapped</span>)    <span class="cm"># {1: 'a', 2: 'b', 3: 'c'}</span>
+
+<span class="cm"># Build from two lists with zip()</span>
+<span class="va">students</span> <span class="op">=</span> [<span class="st">"Ali"</span>, <span class="st">"Sara"</span>, <span class="st">"Mona"</span>]
+<span class="va">grades</span>   <span class="op">=</span> [<span class="nm">95</span>, <span class="nm">88</span>, <span class="nm">72</span>]
+<span class="va">report</span> <span class="op">=</span> {<span class="va">name</span>: <span class="va">grade</span> <span class="kw">for</span> <span class="va">name</span>, <span class="va">grade</span> <span class="kw">in</span> <span class="fn">zip</span>(<span class="va">students</span>, <span class="va">grades</span>)}
+<span class="fn">print</span>(<span class="va">report</span>)     <span class="cm"># {'Ali': 95, 'Sara': 88, 'Mona': 72}</span>
+
+<span class="cm"># Transform existing dict: convert Celsius to Fahrenheit</span>
+<span class="va">celsius</span> <span class="op">=</span> {<span class="ky">"Cairo"</span>: <span class="nm">35</span>, <span class="ky">"Alex"</span>: <span class="nm">28</span>, <span class="ky">"Aswan"</span>: <span class="nm">41</span>}
+<span class="va">fahrenheit</span> <span class="op">=</span> {<span class="va">city</span>: (<span class="va">temp</span> <span class="op">*</span> <span class="nm">9</span><span class="op">/</span><span class="nm">5</span>) <span class="op">+</span> <span class="nm">32</span> <span class="kw">for</span> <span class="va">city</span>, <span class="va">temp</span> <span class="kw">in</span> <span class="va">celsius</span><span class="me">.items</span>()}
+<span class="fn">print</span>(<span class="va">fahrenheit</span>)
+<span class="cm"># {'Cairo': 95.0, 'Alex': 82.4, 'Aswan': 105.8}</span>
+
+<span class="cm"># Filter: only passing students (grade >= 60)</span>
+<span class="va">all_grades</span> <span class="op">=</span> {<span class="ky">"Ali"</span>: <span class="nm">95</span>, <span class="ky">"Sara"</span>: <span class="nm">45</span>, <span class="ky">"Mona"</span>: <span class="nm">72</span>, <span class="ky">"Omar"</span>: <span class="nm">30</span>}
+<span class="va">passing</span> <span class="op">=</span> {<span class="va">k</span>: <span class="va">v</span> <span class="kw">for</span> <span class="va">k</span>, <span class="va">v</span> <span class="kw">in</span> <span class="va">all_grades</span><span class="me">.items</span>() <span class="kw">if</span> <span class="va">v</span> <span class="op">>=</span> <span class="nm">60</span>}
+<span class="fn">print</span>(<span class="va">passing</span>)    <span class="cm"># {'Ali': 95, 'Mona': 72}</span></pre>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════
+         S8: NESTED DICTS
+    ═══════════════════════════════ -->
+    <section class="section" id="nested" data-sec="nested">
+      <div class="sec-head">
+        <div class="sec-badge bg-r">Ch 08</div>
+        <div>
+          <h2 class="sec-title">Nested Dictionaries
+            <small>Dicts inside dicts — modeling real-world complex data</small>
+          </h2>
+        </div>
+      </div>
+
+      <div class="cb cb-r">
+        <div class="cb-tag">🪆 Concept</div>
+        <p>A dict's value can itself be a dict. This creates <strong>nested dictionaries</strong> — the most natural way to represent hierarchical data like student records, JSON APIs, configuration files, or a school database.</p>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">nested_dicts.py — School database</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="va">school</span> <span class="op">=</span> {
+    <span class="ky">"Ahmed"</span>: {
+        <span class="ky">"age"</span>:    <span class="nm">20</span>,
+        <span class="ky">"grades"</span>: {<span class="ky">"math"</span>: <span class="nm">95</span>, <span class="ky">"science"</span>: <span class="nm">88</span>, <span class="ky">"english"</span>: <span class="nm">79</span>},
+        <span class="ky">"passed"</span>: <span class="bl">True</span>
+    },
+    <span class="ky">"Sara"</span>: {
+        <span class="ky">"age"</span>:    <span class="nm">21</span>,
+        <span class="ky">"grades"</span>: {<span class="ky">"math"</span>: <span class="nm">72</span>, <span class="ky">"science"</span>: <span class="nm">91</span>, <span class="ky">"english"</span>: <span class="nm">85</span>},
+        <span class="ky">"passed"</span>: <span class="bl">True</span>
+    },
+    <span class="ky">"Omar"</span>: {
+        <span class="ky">"age"</span>:    <span class="nm">19</span>,
+        <span class="ky">"grades"</span>: {<span class="ky">"math"</span>: <span class="nm">45</span>, <span class="ky">"science"</span>: <span class="nm">52</span>, <span class="ky">"english"</span>: <span class="nm">40</span>},
+        <span class="ky">"passed"</span>: <span class="bl">False</span>
+    }
+}
+
+<span class="cm"># Access nested value — chain the keys</span>
+<span class="fn">print</span>(<span class="va">school</span>[<span class="st">"Ahmed"</span>][<span class="st">"grades"</span>][<span class="st">"math"</span>])  <span class="cm"># 95</span>
+
+<span class="cm"># Modify nested value</span>
+<span class="va">school</span>[<span class="st">"Omar"</span>][<span class="st">"grades"</span>][<span class="st">"math"</span>] <span class="op">=</span> <span class="nm">65</span>    <span class="cm"># Omar retook the exam</span>
+
+<span class="cm"># Loop through nested dict</span>
+<span class="kw">for</span> <span class="va">name</span>, <span class="va">info</span> <span class="kw">in</span> <span class="va">school</span><span class="me">.items</span>():
+    <span class="va">avg</span> <span class="op">=</span> <span class="fn">sum</span>(<span class="va">info</span>[<span class="st">"grades"</span>]<span class="me">.values</span>()) <span class="op">/</span> <span class="fn">len</span>(<span class="va">info</span>[<span class="st">"grades"</span>])
+    <span class="va">status</span> <span class="op">=</span> <span class="st">"✅"</span> <span class="kw">if</span> <span class="va">info</span>[<span class="st">"passed"</span>] <span class="kw">else</span> <span class="st">"❌"</span>
+    <span class="fn">print</span>(<span class="st">f"{status} {name:8} | Avg: {avg:.1f}"</span>)
+
+<span class="cm"># Safe access on deeply nested key</span>
+<span class="va">ahmed_eng</span> <span class="op">=</span> <span class="va">school</span><span class="me">.get</span>(<span class="st">"Ahmed"</span>, {})<span class="me">.get</span>(<span class="st">"grades"</span>, {})<span class="me">.get</span>(<span class="st">"english"</span>, <span class="nm">0</span>)
+<span class="fn">print</span>(<span class="st">f"Ahmed's English: {ahmed_eng}"</span>)   <span class="cm"># 79</span></pre>
+        <div class="cw-out">
+          <div class="cw-out-lbl">Output</div>
+          <div class="ol">95</div>
+          <div class="ol">✅ Ahmed    | Avg: 87.3</div>
+          <div class="ol">✅ Sara     | Avg: 82.7</div>
+          <div class="ol">❌ Omar     | Avg: 52.3</div>
+          <div class="ol">Ahmed's English: 79</div>
+        </div>
+      </div>
+
+      <div class="tip">
+        <div class="ico">💡</div>
+        <div class="tc">
+          <strong>Chaining .get() for Safe Deep Access</strong>
+          <p><code>d.get("a", {}).get("b", {}).get("c", default)</code> safely accesses nested keys without crashing. Each <code>.get()</code> returns an empty dict if the key is missing, allowing the next <code>.get()</code> to safely continue.</p>
+        </div>
+      </div>
+
+      <div class="cw">
+        <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">real_world_nested.py — Config and JSON-like data</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+        <pre><span class="cm"># Real-world: API response / config file structure</span>
+<span class="va">app_config</span> <span class="op">=</span> {
+    <span class="ky">"database"</span>: {
+        <span class="ky">"host"</span>:     <span class="st">"localhost"</span>,
+        <span class="ky">"port"</span>:     <span class="nm">5432</span>,
+        <span class="ky">"name"</span>:     <span class="st">"myapp_db"</span>
+    },
+    <span class="ky">"server"</span>: {
+        <span class="ky">"host"</span>:     <span class="st">"0.0.0.0"</span>,
+        <span class="ky">"port"</span>:     <span class="nm">8000</span>,
+        <span class="ky">"debug"</span>:    <span class="bl">False</span>
+    },
+    <span class="ky">"features"</span>: [<span class="st">"auth"</span>, <span class="st">"payments"</span>, <span class="st">"notifications"</span>]
+}
+
+<span class="cm"># Access values</span>
+<span class="va">db_port</span> <span class="op">=</span> <span class="va">app_config</span>[<span class="st">"database"</span>][<span class="st">"port"</span>]
+<span class="fn">print</span>(<span class="st">f"DB running on port: {db_port}"</span>)   <span class="cm"># 5432</span>
+
+<span class="cm"># Update nested value</span>
+<span class="va">app_config</span>[<span class="st">"server"</span>][<span class="st">"debug"</span>] <span class="op">=</span> <span class="bl">True</span>
+
+<span class="cm"># Add a new nested key</span>
+<span class="va">app_config</span>[<span class="st">"cache"</span>] <span class="op">=</span> {<span class="ky">"backend"</span>: <span class="st">"redis"</span>, <span class="ky">"timeout"</span>: <span class="nm">300</span>}</span></pre>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════
+         S9: QUIZ
+    ═══════════════════════════════ -->
+    <section class="section" id="quiz" data-sec="quiz">
+      <div class="sec-head">
+        <div class="sec-badge bg-g">Ch 09</div>
+        <div>
+          <h2 class="sec-title">Quiz Time 🎯
+            <small>12 questions — every concept tested</small>
+          </h2>
+        </div>
+      </div>
+      <div class="cb cb-g">
+        <div class="cb-tag">📋 Instructions</div>
+        <p>Think before clicking. After each answer, read the explanation — understanding <strong>why</strong> matters more than getting it right on the first try. Questions appear one at a time.</p>
+      </div>
+      <div id="quizContainer"></div>
+    </section>
+
+    <!-- ═══════════════════════════════
+         S10: CHALLENGES
+    ═══════════════════════════════ -->
+    <section class="section" id="challenges" data-sec="challenges">
+      <div class="sec-head">
+        <div class="sec-badge bg-e">Ch 10</div>
+        <div>
+          <h2 class="sec-title">Coding Challenges 🏆
+            <small>Write the code — this is where mastery is built</small>
+          </h2>
+        </div>
+      </div>
+
+      <p class="prose">Try each challenge <em>before</em> reading the hint. The goal is to think, not to copy. Each one is a pattern you'll use constantly in real Python code.</p>
+
+      <div class="ch-grid">
+        <div class="ch"><div class="ch-badge lv1">⭐ Easy</div><div class="ch-title">Student Grade Lookup</div><div class="ch-desc">Create a dict of 5 students and their grades. Write code to print each student's name and whether they passed (grade ≥ 60).</div><div class="ch-hint">💡 for name, grade in students.items(): if grade >= 60</div></div>
+        <div class="ch"><div class="ch-badge lv1">⭐ Easy</div><div class="ch-title">Phone Book</div><div class="ch-desc">Build a phone book dict. Add 3 contacts. Write code to look up a name and print their number, or "Not found" if missing.</div><div class="ch-hint">💡 phonebook.get(name, "Not found")</div></div>
+        <div class="ch"><div class="ch-badge lv1">⭐ Easy</div><div class="ch-title">Count Word Frequency</div><div class="ch-desc">Given a sentence, count how many times each word appears and store it in a dict.</div><div class="ch-hint">💡 counts.get(word, 0) + 1 in a for loop</div></div>
+        <div class="ch"><div class="ch-badge lv1">⭐ Easy</div><div class="ch-title">Invert a Dictionary</div><div class="ch-desc">Swap the keys and values of a given dict. {"a": 1} becomes {1: "a"}.</div><div class="ch-hint">💡 {v: k for k, v in d.items()}</div></div>
+        <div class="ch"><div class="ch-badge lv2">⚡ Medium</div><div class="ch-title">Most Frequent Character</div><div class="ch-desc">Given a string, find which character appears most often using a dict to count.</div><div class="ch-hint">💡 max(counts, key=counts.get)</div></div>
+        <div class="ch"><div class="ch-badge lv2">⚡ Medium</div><div class="ch-title">Grade Statistics</div><div class="ch-desc">Given a dict of student grades, print: highest grade, lowest grade, and class average.</div><div class="ch-hint">💡 max(d.values()), min(d.values()), sum/len</div></div>
+        <div class="ch"><div class="ch-badge lv2">⚡ Medium</div><div class="ch-title">Merge Two Configs</div><div class="ch-desc">Given two config dicts, merge them. Values from the second should overwrite the first on conflict.</div><div class="ch-hint">💡 merged = {**config1, **config2} or config1.update()</div></div>
+        <div class="ch"><div class="ch-badge lv2">⚡ Medium</div><div class="ch-title">Filter by Value</div><div class="ch-desc">Given a product price dict, create a new dict with only items costing less than 100 EGP.</div><div class="ch-hint">💡 {k: v for k, v in prices.items() if v < 100}</div></div>
+        <div class="ch"><div class="ch-badge lv2">⚡ Medium</div><div class="ch-title">Group by First Letter</div><div class="ch-desc">Given a list of names, create a dict where keys are letters and values are lists of names starting with that letter.</div><div class="ch-hint">💡 result.setdefault(name[0], []).append(name)</div></div>
+        <div class="ch"><div class="ch-badge lv3">🔥 Hard</div><div class="ch-title">Nested Student Report</div><div class="ch-desc">Build a nested dict for 3 students, each with math/science/english grades. Print each student's average and whether they pass all subjects (all ≥ 60).</div><div class="ch-hint">💡 sum(info["grades"].values()) / len(...) and all(v >= 60 for v in ...)</div></div>
+        <div class="ch"><div class="ch-badge lv3">🔥 Hard</div><div class="ch-title">Anagram Groups</div><div class="ch-desc">Given a list of words, group anagrams together using a dict. ("cat","act","dog","god") → {sorted_key: [group]}.</div><div class="ch-hint">💡 key = tuple(sorted(word)); groups.setdefault(key, []).append(word)</div></div>
+        <div class="ch"><div class="ch-badge lv3">🔥 Hard</div><div class="ch-title">Inventory Management</div><div class="ch-desc">Build an inventory system. Support: add_item, restock(+qty), sell(-qty with understock check), and print a full report sorted by quantity.</div><div class="ch-hint">💡 sorted(inventory.items(), key=lambda x: x[1]) for the report</div></div>
+      </div>
+    </section>
+
+    <footer id="footer">
+      <span class="foot-icon">🗝️</span>
+      <div class="foot-h">You've Mastered Python Dictionaries!</div>
+      <div class="foot-s">key → value · .get() · .items() · comprehension · nested dicts · all yours now.</div>
+    </footer>
+
+  </div>
+</div>
+</div>
+<div id="overlay"></div>
+
+<script>
+// ═══════════ INTERACTIVE DICT VISUALIZER ═══════════
+const DEMO_DICT = {
+  '"name"':  '"Ahmed Hassan"',
+  '"age"':   '20',
+  '"grade"': '"A"',
+  '"city"':  '"Cairo"',
+  '"gpa"':   '3.9',
+};
+
+document.getElementById('dvInput').addEventListener('input', function() {
+  const raw = this.value.trim();
+  const result = document.getElementById('dvResult');
+  if (!raw) { result.className='dv-result idle'; result.textContent='→ ?'; return; }
+
+  // Check with and without quotes
+  const key = raw.startsWith('"') ? raw : `"${raw}"`;
+  if (DEMO_DICT[key] !== undefined) {
+    result.className='dv-result found';
+    result.textContent='→ ' + DEMO_DICT[key];
+    // highlight the pair
+    document.querySelectorAll('.dv-pair').forEach(p => {
+      p.style.borderColor = p.querySelector('.dv-key').textContent.trim() === key ? 'var(--gold)' : 'var(--border)';
+    });
+  } else {
+    result.className='dv-result notfound';
+    result.textContent='KeyError!';
+    document.querySelectorAll('.dv-pair').forEach(p => p.style.borderColor = 'var(--border)');
+  }
+});
+
+// ═══════════ QUIZ DATA ═══════════
+const QUIZ = [
+  { q: "What does <code>d = {}</code> create?", opts: ["An empty set","An empty dictionary","A syntax error","An empty list"], ans: 1, ex: "Curly braces {} with no content create an empty DICTIONARY. For an empty set, you must use set(). This is Python's most famous gotcha." },
+  { q: "What happens when you access a missing key with <code>d['x']</code>?", opts: ["Returns None","Returns False","Raises KeyError","Returns 0"], ans: 2, ex: "Accessing a key that doesn't exist with [] raises a KeyError and crashes the program. Use .get() instead for safe access — it returns None (or your default) if the key is missing." },
+  { q: "What does <code>d.get('name', 'Unknown')</code> return if 'name' is NOT in d?", opts: ["None","Raises KeyError","'Unknown'","False"], ans: 2, ex: ".get(key, default) returns the default value when the key is missing. Here it returns 'Unknown' instead of crashing. This is the safe way to access dict keys." },
+  { q: "What is the output of: <code>print('age' in {'name': 'Ali', 'age': 20})</code>?", opts: ["True","False","20","Ali"], ans: 0, ex: "The 'in' operator checks KEYS only. 'age' is a key in this dict, so it returns True. To check values, use: 'value' in d.values()." },
+  { q: "What does <code>list({'a':1,'b':2,'c':3}.values())</code> return?", opts: ["['a','b','c']","[('a',1),('b',2)]","[1,2,3]","{'a','b','c'}"], ans: 2, ex: ".values() returns a view of all values in the dictionary. Converting to list gives [1, 2, 3]. Note: .keys() gives the keys, .items() gives (key,value) tuples." },
+  { q: "What is the output? <code>d={'x':1}; d['x']+=9; print(d)</code>", opts: ["{'x':1}","{'x':9}","{'x':10}","KeyError"], ans: 2, ex: "d['x'] += 9 is shorthand for d['x'] = d['x'] + 9. Since d['x'] starts as 1, the result is 10. Dict values are mutable — you can overwrite them anytime." },
+  { q: "Which loop pattern gives you BOTH keys and values?", opts: ["for k in d:","for v in d.values():","for k, v in d.items():","for k, v in d:"], ans: 2, ex: "d.items() yields (key, value) tuples which you can unpack as k, v. The pattern 'for k in d:' gives only keys. 'for k, v in d:' is a TypeError — can't unpack directly from dict." },
+  { q: "What does <code>{k: v*2 for k, v in {'a':1,'b':2}.items()}</code> produce?", opts: ["{'a':1,'b':2}","{'a':2,'b':4}","[2,4]","{'a':'aa','b':'bb'}"], ans: 1, ex: "This is dict comprehension — it builds a new dict by transforming the original. For each (k, v) pair, the new value is v*2. 'a':1*2=2, 'b':2*2=4. Result: {'a':2,'b':4}." },
+  { q: "What does <code>d.pop('z', 'default')</code> do if 'z' is NOT in d?", opts: ["Raises KeyError","Returns 'default' and removes nothing","Returns None","Removes 'z' anyway"], ans: 1, ex: ".pop(key, default) safely removes and returns the value. If the key doesn't exist, it returns the default ('default' here) without raising an error. Without the default, it would raise KeyError." },
+  { q: "How do you safely access a deeply nested key: <code>d['a']['b']['c']</code>?", opts: ["d.get('a').get('b').get('c')","d.get('a',{}).get('b',{}).get('c',None)","d['a','b','c']","d.nested('a','b','c')"], ans: 1, ex: "Chain .get() with empty dict {} as defaults: if 'a' is missing, .get('a', {}) returns {} instead of crashing. Then {}.get('b', {}) returns {} again. This safely navigates nested dicts." },
+  { q: "What does <code>dict.fromkeys(['a','b','c'], 0)</code> create?", opts: ["{'a','b','c'}","[0,0,0]","{'a':0,'b':0,'c':0}","{'0':'a','0':'b'}"], ans: 2, ex: "fromkeys(keys, value) creates a new dict with all the given keys set to the same value. Here all three keys get 0. Useful for initializing score/count dicts." },
+  { q: "What is the output? <code>d={'a':1}; d.update({'b':2,'a':99}); print(d)</code>", opts: ["{'a':1,'b':2}","{'a':99,'b':2}","{'b':2}","Error"], ans: 1, ex: ".update() merges the given dict into d. If a key already exists ('a'), its value is OVERWRITTEN by the new value (99). New keys ('b') are simply added. Result: {'a':99,'b':2}." },
+];
+
+// ═══════════ QUIZ RENDER ═══════════
+let qState = {};
+
+function renderQuiz() {
+  const c = document.getElementById('quizContainer');
+  QUIZ.forEach((q, i) => {
+    const div = document.createElement('div');
+    div.className = 'qw'; div.id = `qw${i}`;
+    const keys = ['A','B','C','D'];
+    div.innerHTML = `
+      <div class="qw-head">
+        <div class="qw-num">${i+1}</div>
+        <div class="qw-head-t">Question ${i+1} of ${QUIZ.length}<small>Think before clicking</small></div>
+      </div>
+      <div class="qw-body">
+        <div class="qw-q">${q.q}</div>
+        <div class="qw-opts">
+          ${q.opts.map((o,oi)=>`<div class="qw-opt" data-qi="${i}" data-oi="${oi}"><span class="qw-key">${keys[oi]}</span>${o}</div>`).join('')}
+        </div>
+        <div class="qw-actions">
+          <button class="qw-sub" id="sub${i}" onclick="checkQ(${i})" disabled>Submit</button>
+          ${i < QUIZ.length-1 ? `<button class="qw-next" id="nx${i}" onclick="nextQ(${i+1})">Next →</button>` : ''}
+        </div>
+        <div class="qw-fb" id="fb${i}"></div>
+      </div>`;
+    c.appendChild(div);
+    div.querySelectorAll('.qw-opt').forEach(o => o.addEventListener('click', () => pickQ(i, +o.dataset.oi)));
+  });
+}
+
+function pickQ(qi, oi) {
+  if (qState[qi] !== undefined) return;
+  document.querySelectorAll(`[data-qi="${qi}"]`).forEach(o => o.classList.remove('sel'));
+  document.querySelector(`[data-qi="${qi}"][data-oi="${oi}"]`).classList.add('sel');
+  document.getElementById(`sub${qi}`)._sel = oi;
+  document.getElementById(`sub${qi}`).disabled = false;
+}
+
+function checkQ(qi) {
+  const btn = document.getElementById(`sub${qi}`);
+  const sel = btn._sel; if (sel === undefined) return;
+  const ok = sel === QUIZ[qi].ans;
+  qState[qi] = ok;
+  document.querySelectorAll(`[data-qi="${qi}"]`).forEach((o, i) => {
+    o.onclick = null; o.classList.remove('sel');
+    if (i === QUIZ[qi].ans) o.classList.add('ok');
+    else if (i === sel && !ok) o.classList.add('bad');
+  });
+  const fb = document.getElementById(`fb${qi}`);
+  fb.className = `qw-fb ${ok ? 'ok' : 'bad'} show`;
+  fb.innerHTML = `<strong>${ok ? '✅ Correct!' : '❌ Not quite.'}</strong> ${QUIZ[qi].ex}`;
+  btn.disabled = true; btn.style.display = 'none';
+  const nx = document.getElementById(`nx${qi}`);
+  if (nx) nx.classList.add('show');
+}
+
+function nextQ(idx) {
+  const el = document.getElementById(`qw${idx}`);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ═══════════ PROGRESS ═══════════
+const SECS = ['intro','create','access','modify','methods','loops','comprehension','nested','quiz','challenges'];
+const seen = new Set();
+
+function updateProg() {
+  const pct = Math.round(seen.size / SECS.length * 100);
+  document.getElementById('sbFill').style.width = pct + '%';
+  document.getElementById('sbTxt').textContent = `${seen.size} of ${SECS.length} sections`;
+}
+
+function markSeen(sec) {
+  if (!SECS.includes(sec)) return;
+  seen.add(sec);
+  const el = document.getElementById(`nd-${sec}`);
+  const lnk = document.querySelector(`.sb-item[data-sec="${sec}"]`);
+  if (el) el.parentElement.classList.add('done');
+  updateProg();
+}
+
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const s = e.target.dataset.sec;
+      markSeen(s);
+      document.querySelectorAll('.sb-item').forEach(l => l.classList.remove('active'));
+      const l = document.querySelector(`.sb-item[data-sec="${s}"]`);
+      if (l) l.classList.add('active');
+    }
+  });
+}, { threshold: .15, rootMargin: '-55px 0px -30% 0px' });
+
+document.querySelectorAll('.section[data-sec]').forEach(el => obs.observe(el));
+
+// ═══════════ SIDEBAR ═══════════
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+document.getElementById('menuBtn').addEventListener('click', () => {
+  sidebar.classList.toggle('open'); overlay.classList.toggle('open');
+});
+overlay.addEventListener('click', () => {
+  sidebar.classList.remove('open'); overlay.classList.remove('open');
+});
+document.querySelectorAll('.sb-item').forEach(l => {
+  l.addEventListener('click', () => {
+    sidebar.classList.remove('open'); overlay.classList.remove('open');
+  });
+});
+
+// ═══════════ COPY ═══════════
+function copyCode(btn) {
+  const pre = btn.closest('.cw').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '⎘ Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ═══════════ INIT ═══════════
+renderQuiz();
+updateProg();
+</script>
+</body>
+</html>
