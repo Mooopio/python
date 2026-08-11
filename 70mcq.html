@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Mega Quiz — Variables to Loops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0F1117;
+  --bg2:      #16191F;
+  --bg3:      #1E222B;
+  --card:     #1A1D26;
+  --border:   #2A2F3E;
+  --border2:  #363C50;
+  --blue:     #5865F2;
+  --blue2:    #4752C4;
+  --blue-l:   rgba(88,101,242,.12);
+  --blue-bd:  rgba(88,101,242,.3);
+  --green:    #57F287;
+  --green-l:  rgba(87,242,135,.1);
+  --green-bd: rgba(87,242,135,.3);
+  --red:      #ED4245;
+  --red-l:    rgba(237,66,69,.1);
+  --red-bd:   rgba(237,66,69,.3);
+  --yellow:   #FEE75C;
+  --yel-l:    rgba(254,231,92,.1);
+  --yel-bd:   rgba(254,231,92,.3);
+  --purple:   #9B59B6;
+  --cyan:     #00B0FF;
+  --orange:   #F48C06;
+  --text:     #DCDDDE;
+  --text2:    #72767D;
+  --text3:    #40444B;
+  --font-d:   'IBM Plex Sans', sans-serif;
+  --font-b:   'Inter', sans-serif;
+  --font-c:   'IBM Plex Mono', monospace;
+  --r:        10px;
+  --rsm:      6px;
+  --sidebar:  240px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; scroll-behavior: smooth; }
+body { font-family: var(--font-b); background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+::selection { background: var(--blue-l); color: var(--blue); }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+/* ── LAYOUT ── */
+#shell { display: flex; min-height: 100vh; }
+
+/* SIDEBAR */
+#sidebar {
+  width: var(--sidebar); flex-shrink: 0;
+  position: fixed; top: 0; left: 0; height: 100vh;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow-y: auto; z-index: 100;
+  transition: transform .3s ease;
+}
+#sidebar::-webkit-scrollbar { width: 3px; }
+
+.sb-header {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sb-logo {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-d); font-size: 14px; font-weight: 700;
+  color: var(--text); margin-bottom: 4px;
+}
+.sb-logo .badge {
+  background: var(--blue); color: #fff;
+  font-size: 10px; font-weight: 700; padding: 2px 7px;
+  border-radius: 4px; letter-spacing: .04em;
+}
+.sb-sub { font-size: 11px; color: var(--text2); }
+
+/* Live score in sidebar */
+.sb-score-box {
+  margin: 14px 18px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 14px;
+}
+.sb-score-row {
+  display: flex; justify-content: space-between;
+  align-items: center; margin-bottom: 10px;
+}
+.sb-score-lbl { font-size: 11px; color: var(--text2); font-family: var(--font-d); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+.sb-score-num { font-family: var(--font-d); font-size: 20px; font-weight: 700; }
+.sc-green { color: var(--green); }
+.sc-red   { color: var(--red); }
+.sc-blue  { color: var(--blue); }
+.sb-mini-bar { height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.sb-mini-fill { height: 100%; background: linear-gradient(90deg, var(--blue2), var(--blue)); border-radius: 99px; width: 0%; transition: width .4s ease; }
+.sb-mini-pct { font-size: 10px; color: var(--text2); margin-top: 5px; }
+
+/* Topic filters */
+.sb-topics { padding: 0 12px 12px; }
+.sb-topics-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--text3);
+  font-family: var(--font-d); padding: 12px 6px 8px;
+}
+.topic-btn {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; padding: 7px 10px;
+  background: transparent; border: 1px solid transparent;
+  border-radius: var(--rsm); cursor: pointer;
+  font-family: var(--font-b); font-size: 13px;
+  color: var(--text2); margin-bottom: 3px;
+  transition: all .15s; text-align: left;
+}
+.topic-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border); }
+.topic-btn.active { background: var(--blue-l); border-color: var(--blue-bd); color: var(--blue); }
+.topic-btn .tb-count {
+  font-family: var(--font-c); font-size: 10px;
+  background: var(--border); color: var(--text2);
+  padding: 1px 6px; border-radius: 99px;
+}
+.topic-btn.active .tb-count { background: var(--blue-l); color: var(--blue); }
+
+/* Show results btn */
+.sb-results-btn {
+  margin: 12px; padding: 11px;
+  background: linear-gradient(135deg, var(--blue2), var(--blue));
+  color: #fff; border: none; border-radius: var(--r);
+  font-family: var(--font-d); font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all .2s; width: calc(100% - 24px);
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.sb-results-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+/* MAIN */
+#main { margin-left: var(--sidebar); flex: 1; }
+
+/* TOPBAR */
+#topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(15,17,23,.95); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  height: 54px; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 32px;
+}
+.tb-left { display: flex; align-items: center; gap: 16px; }
+.tb-title { font-family: var(--font-d); font-size: 14px; font-weight: 600; color: var(--text); }
+.tb-pills { display: flex; gap: 6px; }
+.tb-pill {
+  font-size: 11px; padding: 3px 10px; border-radius: 99px;
+  font-family: var(--font-d); font-weight: 600;
+}
+.pill-total  { background: var(--blue-l); color: var(--blue); border: 1px solid var(--blue-bd); }
+.pill-done   { background: var(--yel-l);  color: var(--yellow); border: 1px solid var(--yel-bd); }
+.pill-correct{ background: var(--green-l);color: var(--green);  border: 1px solid var(--green-bd); }
+.tb-right { display: flex; align-items: center; gap: 10px; }
+.tb-timer { font-family: var(--font-c); font-size: 13px; color: var(--text2); background: var(--bg3); border: 1px solid var(--border); padding: 4px 12px; border-radius: var(--rsm); }
+.menu-btn { display: none; background: none; border: 1px solid var(--border); border-radius: var(--rsm); color: var(--text); padding: 5px 9px; font-size: 15px; cursor: pointer; }
+
+/* CONTENT */
+#content { padding: 28px 32px 80px; }
+
+/* Filter bar */
+#filter-bar {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 22px; flex-wrap: wrap;
+}
+.filter-label { font-size: 12px; color: var(--text2); font-family: var(--font-d); font-weight: 600; }
+.filter-search {
+  flex: 1; min-width: 160px; max-width: 300px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--rsm); padding: 7px 12px;
+  font-family: var(--font-b); font-size: 13px;
+  color: var(--text); outline: none; transition: border-color .2s;
+}
+.filter-search:focus { border-color: var(--blue); }
+.filter-search::placeholder { color: var(--text3); }
+.show-only { display: flex; gap: 5px; }
+.so-btn {
+  font-size: 11px; padding: 5px 11px; border-radius: 99px;
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text2); cursor: pointer; font-family: var(--font-d);
+  font-weight: 600; transition: all .15s;
+}
+.so-btn:hover { border-color: var(--text2); color: var(--text); }
+.so-btn.active { background: var(--border2); border-color: var(--border2); color: var(--text); }
+
+/* Questions grid / list */
+#questions-wrap { display: flex; flex-direction: column; gap: 14px; }
+
+/* QUESTION CARD */
+.q-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.q-card:hover { border-color: var(--border2); }
+.q-card.answered-correct { border-color: var(--green-bd); }
+.q-card.answered-wrong   { border-color: var(--red-bd); }
+
+.q-card-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 18px; border-bottom: 1px solid var(--border);
+  background: var(--bg3);
+}
+.q-num {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: var(--bg2); border: 1px solid var(--border2);
+  font-family: var(--font-c); font-size: 11px; font-weight: 600;
+  color: var(--text2); display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+}
+.q-card.answered-correct .q-num { background: var(--green-l); border-color: var(--green-bd); color: var(--green); }
+.q-card.answered-wrong   .q-num { background: var(--red-l);   border-color: var(--red-bd);   color: var(--red); }
+
+.q-topic-tag {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; padding: 2px 8px; border-radius: 99px;
+  font-family: var(--font-d);
+}
+.tag-vars    { background: rgba(155,89,182,.15); color: #C39BD3; border: 1px solid rgba(155,89,182,.3); }
+.tag-strings { background: rgba(0,176,255,.12);  color: #64B5F6; border: 1px solid rgba(0,176,255,.3); }
+.tag-conds   { background: rgba(254,231,92,.1);  color: #FEE75C; border: 1px solid rgba(254,231,92,.3); }
+.tag-while   { background: rgba(87,242,135,.1);  color: #57F287; border: 1px solid rgba(87,242,135,.3); }
+.tag-for     { background: rgba(248,140,6,.12);  color: #FFA726; border: 1px solid rgba(248,140,6,.3); }
+.tag-lists   { background: rgba(88,101,242,.12); color: #7986CB; border: 1px solid rgba(88,101,242,.3); }
+
+.q-diff-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+.diff-e { background: var(--green); }
+.diff-m { background: var(--yellow); }
+.diff-h { background: var(--red); }
+
+.q-status { margin-left: auto; font-size: 14px; }
+
+.q-body { padding: 16px 18px 12px; }
+.q-text {
+  font-size: 15px; font-weight: 500; color: var(--text);
+  margin-bottom: 14px; line-height: 1.6;
+}
+.q-text .ic {
+  font-family: var(--font-c); font-size: 13px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 4px; padding: 1px 6px; color: var(--yellow);
+}
+
+/* Code block inside question */
+.q-code {
+  font-family: var(--font-c); font-size: 13px;
+  background: #090B10; border: 1px solid var(--border);
+  border-radius: var(--rsm); padding: 14px 16px;
+  margin-bottom: 14px; overflow-x: auto;
+  white-space: pre; line-height: 1.85;
+  color: #B0BEC5;
+}
+.kw { color: #CE93D8; font-weight: 600; }
+.fn { color: #80CBC4; }
+.st { color: #A5D6A7; }
+.nm { color: #FFCC80; }
+.cm { color: #455A64; font-style: italic; }
+.bl { color: #80DEEA; font-weight: 600; }
+.op { color: #EF9A9A; }
+
+/* Options */
+.q-opts { display: flex; flex-direction: column; gap: 7px; margin-bottom: 12px; }
+.q-opt {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 14px; border: 1.5px solid var(--border);
+  border-radius: var(--rsm); cursor: pointer;
+  font-size: 14px; color: var(--text2);
+  transition: all .13s; user-select: none;
+}
+.q-opt:hover:not(.locked) { border-color: var(--blue); color: var(--text); background: var(--blue-l); }
+.q-opt.sel     { border-color: var(--blue);  background: var(--blue-l);  color: var(--blue); }
+.q-opt.correct { border-color: var(--green); background: var(--green-l); color: var(--green); }
+.q-opt.wrong   { border-color: var(--red);   background: var(--red-l);   color: var(--red); }
+.q-opt.locked  { cursor: not-allowed; }
+.opt-k {
+  width: 22px; height: 22px; border-radius: 5px;
+  background: var(--bg3); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-c); font-size: 10px; font-weight: 600;
+  color: var(--text3); flex-shrink: 0;
+  transition: all .13s; margin-top: 1px;
+}
+.q-opt.sel     .opt-k { background: var(--blue);  border-color: var(--blue);  color: #fff; }
+.q-opt.correct .opt-k { background: var(--green); border-color: var(--green); color: #000; }
+.q-opt.wrong   .opt-k { background: var(--red);   border-color: var(--red);   color: #fff; }
+
+/* Feedback */
+.q-fb {
+  padding: 10px 14px; border-radius: var(--rsm);
+  font-size: 13.5px; line-height: 1.65;
+  margin-bottom: 12px; display: none;
+}
+.q-fb.show { display: block; }
+.q-fb.ok   { background: var(--green-l); border: 1px solid var(--green-bd); color: #A9DFBF; }
+.q-fb.bad  { background: var(--red-l);   border: 1px solid var(--red-bd);   color: #F1948A; }
+.q-fb strong { display: block; margin-bottom: 3px; color: inherit; }
+
+/* Submit btn */
+.q-footer { padding: 0 18px 16px; display: flex; gap: 8px; align-items: center; }
+.q-submit {
+  background: var(--blue); color: #fff;
+  font-family: var(--font-d); font-size: 12px; font-weight: 700;
+  border: none; border-radius: var(--rsm);
+  padding: 8px 18px; cursor: pointer; transition: all .15s;
+}
+.q-submit:hover { background: var(--blue2); }
+.q-submit:disabled { opacity: .3; cursor: not-allowed; }
+.q-hint { font-size: 11px; color: var(--text3); font-family: var(--font-c); }
+
+/* RESULTS SCREEN */
+#results {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.85); z-index: 200;
+  overflow-y: auto; padding: 40px 20px;
+}
+#results.show { display: block; }
+.res-inner {
+  max-width: 680px; margin: 0 auto;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden;
+}
+.res-banner {
+  padding: 40px 36px 32px; text-align: center;
+  background: linear-gradient(135deg, var(--bg3), var(--bg2));
+}
+.res-emoji { font-size: 52px; display: block; margin-bottom: 16px; }
+.res-title { font-family: var(--font-d); font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+.res-sub   { font-size: 15px; color: var(--text2); }
+
+/* Score ring */
+.res-ring-wrap { width: 140px; height: 140px; position: relative; margin: 0 auto 24px; }
+.res-ring-wrap svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.ring-bg  { fill: none; stroke: var(--border2); stroke-width: 11; }
+.ring-arc { fill: none; stroke-width: 11; stroke-linecap: round; stroke-dasharray: 345; stroke-dashoffset: 345; transition: stroke-dashoffset 1.4s cubic-bezier(.25,1,.5,1) .3s; }
+.ring-mid { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring-big { font-family: var(--font-d); font-size: 36px; font-weight: 700; line-height: 1; }
+.ring-of  { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+/* Stats cards */
+.res-stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--border); }
+.res-stat { padding: 18px; text-align: center; border-right: 1px solid var(--border); }
+.res-stat:last-child { border-right: none; }
+.rs-val { font-family: var(--font-d); font-size: 24px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+.rs-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--text2); font-family: var(--font-d); }
+.rs-correct { color: var(--green); }
+.rs-wrong   { color: var(--red); }
+.rs-pct     { color: var(--blue); }
+.rs-time    { color: var(--yellow); }
+
+/* Topic breakdown */
+.res-topics { padding: 24px 28px; border-top: 1px solid var(--border); }
+.res-topics-h { font-family: var(--font-d); font-size: 13px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px; }
+.topic-row { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; }
+.topic-row-name { font-family: var(--font-d); font-size: 13px; color: var(--text); min-width: 100px; }
+.topic-bar-wrap { flex: 1; height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.topic-bar-fill { height: 100%; border-radius: 99px; transition: width 1s ease .5s; }
+.topic-pct { font-family: var(--font-c); font-size: 12px; color: var(--text2); min-width: 36px; text-align: right; }
+
+/* Actions */
+.res-actions { padding: 20px 28px 28px; display: flex; gap: 10px; }
+.btn-retry { background: var(--blue); color: #fff; font-family: var(--font-d); font-size: 14px; font-weight: 700; border: none; border-radius: var(--r); padding: 12px 24px; cursor: pointer; transition: all .2s; }
+.btn-retry:hover { background: var(--blue2); transform: translateY(-1px); }
+.btn-close { background: transparent; border: 1px solid var(--border2); color: var(--text2); font-family: var(--font-d); font-size: 14px; font-weight: 600; border-radius: var(--r); padding: 12px 24px; cursor: pointer; transition: all .2s; }
+.btn-close:hover { border-color: var(--text2); color: var(--text); }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 64px 32px; color: var(--text2); }
+.empty-state .e-icon { font-size: 40px; display: block; margin-bottom: 14px; }
+.empty-state p { font-size: 14px; }
+
+/* Answered count line */
+.answered-line {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 18px 0; font-size: 12px; color: var(--text3);
+}
+
+/* Responsive */
+#overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 90; }
+@media (max-width: 900px) {
+  :root { --sidebar: 0px; }
+  #sidebar { width: 240px; transform: translateX(-100%); }
+  #sidebar.open { transform: translateX(0); }
+  #main { margin-left: 0; }
+  #overlay { display: block; opacity: 0; pointer-events: none; transition: opacity .3s; }
+  #overlay.open { opacity: 1; pointer-events: all; }
+  #content { padding: 20px 16px 80px; }
+  #topbar { padding: 0 16px; }
+  .menu-btn { display: block; }
+  .res-stats { grid-template-columns: repeat(2, 1fr); }
+  .res-stat:nth-child(2) { border-right: none; }
+  .res-stat:nth-child(3) { border-top: 1px solid var(--border); }
+  .res-stat:nth-child(4) { border-top: 1px solid var(--border); border-right: none; }
+}
+@media (max-width: 540px) {
+  .tb-pills { display: none; }
+  .res-banner { padding: 28px 20px 24px; }
+  .res-topics { padding: 18px 20px; }
+  .res-actions { padding: 16px 20px 24px; flex-direction: column; }
+  .q-code { font-size: 12px; }
+}
+</style>
+</head>
+<body>
+<div id="shell">
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">🐍 Python Quiz <span class="badge">70+ Q</span></div>
+    <div class="sb-sub">Variables → Lists → Loops</div>
+  </div>
+
+  <div class="sb-score-box">
+    <div class="sb-score-row">
+      <span class="sb-score-lbl">Score</span>
+      <span class="sb-score-num sc-blue" id="sbPct">0%</span>
+    </div>
+    <div class="sb-score-row" style="margin-bottom:8px">
+      <span style="font-size:12px;color:var(--text2)">✓ <span id="sbCorrect" class="sc-green">0</span> correct</span>
+      <span style="font-size:12px;color:var(--text2)">✗ <span id="sbWrong" class="sc-red">0</span> wrong</span>
+    </div>
+    <div class="sb-mini-bar"><div class="sb-mini-fill" id="sbFill"></div></div>
+    <div class="sb-mini-pct" id="sbDone">0 of 75 answered</div>
+  </div>
+
+  <div class="sb-topics">
+    <div class="sb-topics-label">Filter by Topic</div>
+    <button class="topic-btn active" onclick="filterTopic('all',this)">📋 All Topics <span class="tb-count" id="tc-all">75</span></button>
+    <button class="topic-btn" onclick="filterTopic('vars',this)">🔢 Variables & Types <span class="tb-count" id="tc-vars">0</span></button>
+    <button class="topic-btn" onclick="filterTopic('strings',this)">📝 Strings <span class="tb-count" id="tc-strings">0</span></button>
+    <button class="topic-btn" onclick="filterTopic('conds',this)">🔀 Conditionals <span class="tb-count" id="tc-conds">0</span></button>
+    <button class="topic-btn" onclick="filterTopic('while',this)">🔄 While Loops <span class="tb-count" id="tc-while">0</span></button>
+    <button class="topic-btn" onclick="filterTopic('for',this)">🔁 For Loops <span class="tb-count" id="tc-for">0</span></button>
+    <button class="topic-btn" onclick="filterTopic('lists',this)">📦 Lists <span class="tb-count" id="tc-lists">0</span></button>
+  </div>
+
+  <button class="sb-results-btn" onclick="showResults()">📊 View Full Results</button>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<div id="main">
+  <header id="topbar">
+    <div class="tb-left">
+      <button class="menu-btn" id="menuBtn">☰</button>
+      <div class="tb-title">🐍 Python Mega Quiz</div>
+      <div class="tb-pills">
+        <span class="tb-pill pill-total">75 Questions</span>
+        <span class="tb-pill pill-done" id="topDone">0 Done</span>
+        <span class="tb-pill pill-correct" id="topCorrect">0 Correct</span>
+      </div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-timer" id="timer">00:00</div>
+    </div>
+  </header>
+
+  <div id="content">
+    <div id="filter-bar">
+      <span class="filter-label">Filter:</span>
+      <input class="filter-search" id="searchBox" type="text" placeholder="Search questions..." oninput="applySearch()">
+      <div class="show-only">
+        <button class="so-btn active" onclick="setShowFilter('all',this)">All</button>
+        <button class="so-btn" onclick="setShowFilter('unanswered',this)">Unanswered</button>
+        <button class="so-btn" onclick="setShowFilter('wrong',this)">Wrong only</button>
+      </div>
+    </div>
+    <div id="questions-wrap"></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ RESULTS ═══ -->
+<div id="results">
+  <div class="res-inner">
+    <div class="res-banner">
+      <div class="res-ring-wrap">
+        <svg viewBox="0 0 120 120" width="140" height="140">
+          <circle class="ring-bg" cx="60" cy="60" r="55"/>
+          <circle class="ring-arc" id="resArc" cx="60" cy="60" r="55"/>
+        </svg>
+        <div class="ring-mid">
+          <div class="ring-big" id="resBig">0</div>
+          <div class="ring-of">/ <span id="resTot">75</span></div>
+        </div>
+      </div>
+      <div class="res-title" id="resTitle">—</div>
+      <div class="res-sub" id="resSub">—</div>
+    </div>
+
+    <div class="res-stats">
+      <div class="res-stat"><div class="rs-val rs-correct" id="rs-c">0</div><div class="rs-lbl">Correct</div></div>
+      <div class="res-stat"><div class="rs-val rs-wrong" id="rs-w">0</div><div class="rs-lbl">Wrong</div></div>
+      <div class="res-stat"><div class="rs-val rs-pct" id="rs-p">0%</div><div class="rs-lbl">Score</div></div>
+      <div class="res-stat"><div class="rs-val rs-time" id="rs-t">—</div><div class="rs-lbl">Time</div></div>
+    </div>
+
+    <div class="res-topics">
+      <div class="res-topics-h">Performance by Topic</div>
+      <div id="topicBreakdown"></div>
+    </div>
+
+    <div class="res-actions">
+      <button class="btn-retry" onclick="retryAll()">🔄 Retry All</button>
+      <button class="btn-close" onclick="document.getElementById('results').classList.remove('show')">✕ Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="overlay"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  QUESTION BANK — 75 questions
+// ══════════════════════════════════════════════════════════
+const QB = [
+  // ── VARIABLES & TYPES (14) ──
+  {id:1, topic:'vars', diff:'e', q:'What is the output?', code:`x = 5\nprint(type(x))`, opts:['int','str','float','number'], ans:0, ex:'x is assigned the integer 5. type() returns the class of the object. The output is <class \'int\'>.'},
+  {id:2, topic:'vars', diff:'e', q:'What value does <span class="ic">y</span> hold?', code:`x = 10\ny = x\nx = 20\nprint(y)`, opts:['20','10','0','Error'], ans:1, ex:'y = x copies the VALUE of x (10) at that moment. Changing x later does NOT change y. y stays 10.'},
+  {id:3, topic:'vars', diff:'e', q:'What is the output?', code:`print(10 // 3)`, opts:['3.33','3','4','1'], ans:1, ex:'// is floor (integer) division. 10 // 3 = 3 (remainder discarded). The result is always an integer.'},
+  {id:4, topic:'vars', diff:'e', q:'What does this print?', code:`print(10 % 3)`, opts:['3','3.33','0','1'], ans:3, ex:'% is the modulo (remainder) operator. 10 divided by 3 = 3 remainder 1. Output: 1.'},
+  {id:5, topic:'vars', diff:'e', q:'What is the output?', code:`x = 2\nprint(x ** 3)`, opts:['6','8','5','23'], ans:1, ex:'** is the power operator. 2 ** 3 = 2³ = 8.'},
+  {id:6, topic:'vars', diff:'m', q:'What is printed?', code:`a = 5\nb = 2\nprint(a / b)`, opts:['2','2.5','2.0','Error'], ans:1, ex:'/ always performs float division in Python 3. 5 / 2 = 2.5, not 2. Use // for integer division.'},
+  {id:7, topic:'vars', diff:'m', q:'Which line causes an error?', code:`x = 10\ny = "hello"\nz = x + y`, opts:['Line 1','Line 2','Line 3','No error'], ans:2, ex:'Line 3 tries to add an int and a string. Python raises TypeError: unsupported operand type(s) for +: \'int\' and \'str\'.'},
+  {id:8, topic:'vars', diff:'m', q:'What is the output?', code:`x = "5"\nprint(int(x) + 3)`, opts:['53','8','Error','53.0'], ans:1, ex:'int("5") converts the string "5" to the integer 5. Then 5 + 3 = 8.'},
+  {id:9, topic:'vars', diff:'m', q:'What does this print?', code:`x = 10\nx += 5\nx *= 2\nprint(x)`, opts:['30','25','20','15'], ans:0, ex:'x starts at 10. x += 5 → 15. x *= 2 → 30. Each operator modifies x in place.'},
+  {id:10, topic:'vars', diff:'m', q:'What is printed?', code:`print(bool(0), bool(""), bool([]))`, opts:['True True True','False False False','True False False','False True True'], ans:1, ex:'0, empty string "", and empty list [] are all Falsy in Python. bool() of any of them returns False.'},
+  {id:11, topic:'vars', diff:'h', q:'What is the output?', code:`x = 1_000_000\nprint(x)`, opts:['1_000_000','Error','1000000','1.0'], ans:2, ex:'Python allows underscores in numeric literals for readability. 1_000_000 is just 1000000. Underscores are ignored by Python.'},
+  {id:12, topic:'vars', diff:'h', q:'What does this print?', code:`a = b = c = 5\nb = 10\nprint(a, b, c)`, opts:['5 10 5','5 5 5','10 10 10','Error'], ans:0, ex:'a = b = c = 5 sets all three to 5. Then b = 10 only changes b. a and c remain 5. Output: 5 10 5.'},
+  {id:13, topic:'vars', diff:'h', q:'What is the output?', code:`x = 5\ny = 2.0\nz = x + y\nprint(type(z))`, opts:["<class 'int'>","<class 'float'>","<class 'str'>","Error"], ans:1, ex:'When you add an int and a float, Python automatically converts the result to float. 5 + 2.0 = 7.0, which is a float.'},
+  {id:14, topic:'vars', diff:'h', q:'What is printed?', code:`x = 10\nif x:\n    print("truthy")\nelse:\n    print("falsy")`, opts:['truthy','falsy','10','Error'], ans:0, ex:'10 is a non-zero number, so it is Truthy. The if block runs and prints "truthy".'},
+
+  // ── STRINGS (12) ──
+  {id:15, topic:'strings', diff:'e', q:'What is the output?', code:`s = "hello"\nprint(len(s))`, opts:['4','5','6','Error'], ans:1, ex:'len() counts the number of characters. "hello" has 5 characters: h, e, l, l, o.'},
+  {id:16, topic:'strings', diff:'e', q:'What does this print?', code:`s = "Python"\nprint(s[0])`, opts:['P','p','Python','Error'], ans:0, ex:'String indexing starts at 0. s[0] is the first character, which is "P".'},
+  {id:17, topic:'strings', diff:'e', q:'What is the output?', code:`s = "hello world"\nprint(s.upper())`, opts:['HELLO WORLD','Hello World','hello world','Error'], ans:0, ex:'.upper() converts every character to uppercase. "hello world" becomes "HELLO WORLD".'},
+  {id:18, topic:'strings', diff:'e', q:'What does this print?', code:`s = "Python"\nprint(s[-1])`, opts:['P','n','o','Error'], ans:1, ex:'Negative indexing counts from the end. s[-1] is the last character, "n".'},
+  {id:19, topic:'strings', diff:'m', q:'What is the output?', code:`s = "hello"\nprint(s[1:4])`, opts:['hel','ell','hello','ello'], ans:1, ex:'Slicing s[1:4] takes characters at index 1, 2, 3 (stops BEFORE 4). Characters: e(1), l(2), l(3). Result: "ell".'},
+  {id:20, topic:'strings', diff:'m', q:'What does this print?', code:`name = "Ahmed"\nage = 20\nprint(f"My name is {name}, I am {age}")`, opts:['My name is {name}, I am {age}','My name is Ahmed, I am 20','Error','f"My name is Ahmed"'], ans:1, ex:'f-strings evaluate expressions inside {}. {name} becomes "Ahmed" and {age} becomes 20.'},
+  {id:21, topic:'strings', diff:'m', q:'What is the output?', code:`s = "hello world"\nprint(s.split())`, opts:["['hello world']","['hello', 'world']","('hello', 'world')","hello world"], ans:1, ex:'.split() with no argument splits on whitespace. "hello world" becomes the list [\'hello\', \'world\'].'},
+  {id:22, topic:'strings', diff:'m', q:'What does this print?', code:`s = "  hello  "\nprint(s.strip())`, opts:['"  hello  "','hello','  hello  ','Error'], ans:1, ex:'.strip() removes leading and trailing whitespace. "  hello  " becomes "hello".'},
+  {id:23, topic:'strings', diff:'m', q:'What is printed?', code:`s = "Python"\nprint(s[::2])`, opts:['Pho','Pto','yhn','Pyt'], ans:1, ex:'s[::2] slices with step 2 — takes every other character. P(0), t(2), o(4). Result: "Pto".'},
+  {id:24, topic:'strings', diff:'m', q:'What is the output?', code:`s = "hello"\nprint(s.replace("l", "r"))`, opts:['herlo','herro','hello','hrrlo'], ans:1, ex:'.replace("l", "r") replaces ALL occurrences of "l" with "r". Both l\'s in "hello" become r\'s → "herro".'},
+  {id:25, topic:'strings', diff:'h', q:'What does this print?', code:`s = "Python"\nprint(s[::-1])`, opts:['nohtyP','Python','nohtyp','Error'], ans:0, ex:'s[::-1] reverses the string using a step of -1, going from end to start. "Python" reversed is "nohtyP".'},
+  {id:26, topic:'strings', diff:'h', q:'What is the output?', code:`words = ["a", "b", "c"]\nprint("-".join(words))`, opts:['a-b-c','[a-b-c]','a b c','Error'], ans:0, ex:'.join(iterable) joins list elements with the separator string. "-".join(["a","b","c"]) produces "a-b-c".'},
+
+  // ── CONDITIONALS (12) ──
+  {id:27, topic:'conds', diff:'e', q:'What is the output?', code:`x = 10\nif x > 5:\n    print("big")\nelse:\n    print("small")`, opts:['big','small','Error','Nothing'], ans:0, ex:'10 > 5 is True, so the if block runs and prints "big".'},
+  {id:28, topic:'conds', diff:'e', q:'What is printed?', code:`x = 5\nif x == 5:\n    print("A")\nelif x > 3:\n    print("B")\nelse:\n    print("C")`, opts:['A','B','C','A B'], ans:0, ex:'x == 5 is True, so "A" is printed. Python stops at the FIRST matching condition — elif is never checked.'},
+  {id:29, topic:'conds', diff:'e', q:'What is the output?', code:`a = True\nb = False\nprint(a and b)`, opts:['True','False','None','Error'], ans:1, ex:'and returns True only if BOTH operands are True. True and False = False.'},
+  {id:30, topic:'conds', diff:'e', q:'What does this print?', code:`x = 7\nprint("even" if x % 2 == 0 else "odd")`, opts:['even','odd','Error','7'], ans:1, ex:'7 % 2 = 1, not 0. So x % 2 == 0 is False. The ternary returns "odd".'},
+  {id:31, topic:'conds', diff:'m', q:'How many lines are printed?', code:`x = 5\nif x > 3:\n    print("A")\nif x > 4:\n    print("B")\nif x > 6:\n    print("C")`, opts:['1','2','3','0'], ans:1, ex:'Three SEPARATE if statements. 5>3 ✓ prints A. 5>4 ✓ prints B. 5>6 ✗ skips C. Total: 2 lines.'},
+  {id:32, topic:'conds', diff:'m', q:'What is the output?', code:`x = 0\nif x:\n    print("yes")\nelse:\n    print("no")`, opts:['yes','no','0','Error'], ans:1, ex:'0 is Falsy. The if condition evaluates to False. The else block runs and prints "no".'},
+  {id:33, topic:'conds', diff:'m', q:'What does this print?', code:`a = True\nb = False\nprint(a or b)`, opts:['True','False','None','Error'], ans:0, ex:'or returns True if AT LEAST ONE operand is True. True or False = True.'},
+  {id:34, topic:'conds', diff:'m', q:'What is printed?', code:`x = 15\nif x % 3 == 0 and x % 5 == 0:\n    print("Both")\nelif x % 3 == 0:\n    print("3 only")\nelse:\n    print("Neither")`, opts:['Both','3 only','Neither','Error'], ans:0, ex:'15 % 3 = 0 AND 15 % 5 = 0. Both conditions are True, so "Both" is printed.'},
+  {id:35, topic:'conds', diff:'m', q:'What does this print?', code:`x = 5\nresult = "high" if x > 3 else "low"\nprint(result)`, opts:['high','low','True','Error'], ans:0, ex:'x > 3 is True (5 > 3). The ternary returns "high". result = "high".'},
+  {id:36, topic:'conds', diff:'h', q:'What is the output?', code:`a = 5\nb = 10\nif a > 3 and b < 5:\n    print("X")\nelif a == 5 or b == 10:\n    print("Y")\nelse:\n    print("Z")`, opts:['X','Y','Z','X Y'], ans:1, ex:'First: a>3 (True) AND b<5 (False) = False. Skip. Second: a==5 (True) OR b==10 (True) = True. Print "Y".'},
+  {id:37, topic:'conds', diff:'h', q:'What is printed?', code:`x = 7\nif 5 < x < 10:\n    print("in range")\nelse:\n    print("out of range")`, opts:['in range','out of range','Error','True'], ans:0, ex:'Python supports chained comparisons. 5 < 7 < 10 is True (both parts must be True). "in range" is printed.'},
+  {id:38, topic:'conds', diff:'h', q:'What is the output?', code:`name = ""\nif not name:\n    print("empty")\nelse:\n    print(name)`, opts:['empty','','Error','False'], ans:0, ex:'Empty string "" is Falsy. "not name" is "not False" = True. The if block runs and prints "empty".'},
+
+  // ── WHILE LOOPS (13) ──
+  {id:39, topic:'while', diff:'e', q:'How many times does the loop run?', code:`i = 0\nwhile i < 3:\n    print(i)\n    i += 1`, opts:['2','3','4','Infinite'], ans:1, ex:'i starts at 0. Runs for i=0,1,2 (3 times). When i=3, the condition 3<3 is False, loop ends.'},
+  {id:40, topic:'while', diff:'e', q:'What is the output?', code:`n = 1\nwhile n < 100:\n    n *= 2\nprint(n)`, opts:['64','128','100','32'], ans:1, ex:'n doubles: 1→2→4→8→16→32→64→128. At 128, condition 128<100 is False. Prints 128.'},
+  {id:41, topic:'while', diff:'e', q:'What does print output?', code:`i = 10\nwhile i > 0:\n    i -= 3\nprint(i)`, opts:['0','1','-2','3'], ans:2, ex:'i: 10→7→4→1→-2. When i=-2, condition -2>0 is False. print(i) prints -2.'},
+  {id:42, topic:'while', diff:'m', q:'What is the output?', code:`total = 0\nn = 1\nwhile n <= 5:\n    total += n\n    n += 1\nprint(total)`, opts:['5','10','15','25'], ans:2, ex:'total = 1+2+3+4+5 = 15. Classic accumulator pattern.'},
+  {id:43, topic:'while', diff:'m', q:'What is printed?', code:`i = 5\nwhile i > 0:\n    if i == 3:\n        break\n    print(i)\n    i -= 1`, opts:['5 4 3 2 1','5 4','5 4 3','5'], ans:1, ex:'i=5: print 5, i→4. i=4: print 4, i→3. i=3: break fires BEFORE print. Loop exits. Output: 5 4.'},
+  {id:44, topic:'while', diff:'m', q:'What does this print?', code:`i = 0\nwhile i < 5:\n    i += 1\n    if i % 2 == 0:\n        continue\n    print(i)`, opts:['1 3 5','2 4','0 2 4','1 2 3 4 5'], ans:0, ex:'continue skips print for even i. When i=1 (odd): print 1. i=2 (even): continue. i=3: print 3. i=4: continue. i=5: print 5. Output: 1 3 5.'},
+  {id:45, topic:'while', diff:'m', q:'What is the output?', code:`i = 1\nresult = 1\nwhile i <= 4:\n    result *= i\n    i += 1\nprint(result)`, opts:['10','24','4','16'], ans:1, ex:'result = 1*1*2*3*4 = 24. This computes 4! (factorial).'},
+  {id:46, topic:'while', diff:'m', q:'What is printed?', code:`count = 0\nwhile True:\n    count += 1\n    if count == 4:\n        break\nprint(count)`, opts:['3','4','5','Infinite loop'], ans:1, ex:'The loop runs forever UNTIL break. When count reaches 4, break exits. print(count) → 4.'},
+  {id:47, topic:'while', diff:'h', q:'What does this print?', code:`n = 2\nwhile n < 50:\n    n **= 2\nprint(n)`, opts:['16','64','256','50'], ans:2, ex:'n squares each iteration: 2→4→16→256. At 256, condition 256<50 is False. Prints 256.'},
+  {id:48, topic:'while', diff:'h', q:'What is the output?', code:`i = 1\nwhile i <= 3:\n    j = 1\n    while j <= i:\n        print("*", end="")\n        j += 1\n    print()\n    i += 1`, opts:['* ** ***','***','* * *','*\\n**\\n***'], ans:3, ex:'For i=1: print 1 star + newline. i=2: print 2 stars + newline. i=3: print 3 stars + newline. Triangle pattern.'},
+  {id:49, topic:'while', diff:'h', q:'What does print output after the loop?', code:`n = 100\nwhile n > 1:\n    if n % 2 == 0:\n        n //= 2\n    else:\n        n = n * 3 + 1\nprint(n)`, opts:['0','1','2','Error'], ans:1, ex:'This is the Collatz sequence. It always reaches 1 eventually. When n=1, the condition 1>1 is False and loop ends. print(n) → 1.'},
+  {id:50, topic:'while', diff:'h', q:'What is the output?', code:`a, b = 0, 1\ncount = 0\nwhile b < 20:\n    a, b = b, a + b\n    count += 1\nprint(count)`, opts:['5','6','7','8'], ans:2, ex:'Fibonacci sequence: 0,1,1,2,3,5,8,13,21. Loop runs while b < 20. Count how many times: 1,2,3,5,8,13 → 7 iterations before b=21.'},
+  {id:51, topic:'while', diff:'h', q:'What is the final value?', code:`i = 0\nwhile i < 10:\n    i += 1\n    if i % 3 == 0:\n        continue\n    if i == 7:\n        break\nprint(i)`, opts:['6','7','9','10'], ans:1, ex:'Loop runs: 1(print),2,3(skip),4,5,6(skip),7 → break. When i=7, break fires. print(i) → 7.'},
+
+  // ── FOR LOOPS (13) ──
+  {id:52, topic:'for', diff:'e', q:'What is the output?', code:`for i in range(5):\n    print(i, end=" ")`, opts:['1 2 3 4 5','0 1 2 3 4','0 1 2 3 4 5','1 2 3 4'], ans:1, ex:'range(5) produces 0,1,2,3,4. end=" " prints on one line with spaces. Output: 0 1 2 3 4.'},
+  {id:53, topic:'for', diff:'e', q:'What does this print?', code:`for i in range(1, 6):\n    print(i, end=" ")`, opts:['0 1 2 3 4 5','1 2 3 4 5 6','1 2 3 4 5','1 2 3 4'], ans:2, ex:'range(1, 6) starts at 1 and stops BEFORE 6. Values: 1,2,3,4,5. Output: 1 2 3 4 5.'},
+  {id:54, topic:'for', diff:'e', q:'What is the output?', code:`for i in range(0, 10, 3):\n    print(i, end=" ")`, opts:['0 3 6 9','3 6 9','0 3 6 9 12','1 4 7'], ans:0, ex:'range(0, 10, 3): start=0, stop=10, step=3. Values: 0, 3, 6, 9 (12 would exceed 10). Output: 0 3 6 9.'},
+  {id:55, topic:'for', diff:'e', q:'What does this print?', code:`fruits = ["apple","banana","cherry"]\nfor f in fruits:\n    print(f)`, opts:['apple banana cherry','["apple","banana","cherry"]','apple\\nbanana\\ncherry','Error'], ans:2, ex:'For loops iterate over list items. Each item is printed on its own line. Output: apple (newline) banana (newline) cherry.'},
+  {id:56, topic:'for', diff:'m', q:'What is the output?', code:`total = 0\nfor i in range(1, 11):\n    total += i\nprint(total)`, opts:['45','55','50','100'], ans:1, ex:'Sum of 1 to 10 = 1+2+...+10 = 55. Classic formula: n*(n+1)/2 = 10*11/2 = 55.'},
+  {id:57, topic:'for', diff:'m', q:'What does this print?', code:`for i in range(5):\n    if i % 2 == 0:\n        continue\n    print(i)`, opts:['0 2 4','1 3','0 1 2 3 4','1 2 3 4'], ans:1, ex:'continue skips even numbers (0,2,4). Only odd numbers (1,3) reach print(). Output: 1 then 3.'},
+  {id:58, topic:'for', diff:'m', q:'What is the output?', code:`result = 1\nfor i in range(1, 6):\n    result *= i\nprint(result)`, opts:['15','120','25','24'], ans:1, ex:'result = 1*1*2*3*4*5 = 120. This computes 5! (5 factorial). range(1,6) = 1,2,3,4,5.'},
+  {id:59, topic:'for', diff:'m', q:'What does this print?', code:`for i in range(3):\n    for j in range(2):\n        print(i, j)`, opts:['6 pairs total','3 pairs total','Error','0 0 only'], ans:0, ex:'Outer loop runs 3 times (i=0,1,2). Inner loop runs 2 times each. Total: 3×2=6 pairs printed: (0,0),(0,1),(1,0),(1,1),(2,0),(2,1).'},
+  {id:60, topic:'for', diff:'m', q:'What is the output?', code:`count = 0\nfor i in range(1, 20):\n    if i % 3 == 0:\n        count += 1\nprint(count)`, opts:['5','6','7','3'], ans:1, ex:'Numbers 1-19 divisible by 3: 3,6,9,12,15,18 → 6 numbers. count = 6.'},
+  {id:61, topic:'for', diff:'h', q:'What is printed?', code:`for i in range(10):\n    if i == 5:\n        break\nelse:\n    print("done")\nprint(i)`, opts:['done\\n5','5','done','Error'], ans:1, ex:'The for/else: else runs ONLY if no break occurred. Here break fires at i=5, so else is SKIPPED. Only print(i) → 5 runs.'},
+  {id:62, topic:'for', diff:'h', q:'What is the output?', code:`nums = [1, 2, 3, 4, 5]\nresult = [x**2 for x in nums if x % 2 != 0]\nprint(result)`, opts:['[1, 4, 9, 16, 25]','[1, 9, 25]','[4, 16]','[1, 3, 5]'], ans:1, ex:'List comprehension filters odd numbers (x%2!=0): 1,3,5. Then squares them: 1,9,25. Result: [1, 9, 25].'},
+  {id:63, topic:'for', diff:'h', q:'What does this print?', code:`for i in range(1, 6):\n    if i == 3:\n        continue\n    if i == 5:\n        break\n    print(i)`, opts:['1 2 4','1 2','1 2 3 4','1 2 4 5'], ans:0, ex:'i=1: print 1. i=2: print 2. i=3: continue (skip print). i=4: print 4. i=5: break exits. Output: 1 2 4.'},
+  {id:64, topic:'for', diff:'h', q:'What is the output?', code:`pairs = [(1,"a"),(2,"b"),(3,"c")]\nfor num, letter in pairs:\n    print(f"{num}:{letter}", end=" ")`, opts:['1:a 2:b 3:c','(1,a) (2,b)','Error','1 2 3'], ans:0, ex:'Tuple unpacking in a for loop: each (num, letter) is unpacked automatically. Output: 1:a 2:b 3:c.'},
+
+  // ── LISTS (11) ──
+  {id:65, topic:'lists', diff:'e', q:'What is the output?', code:`nums = [10, 20, 30, 40]\nprint(nums[2])`, opts:['10','20','30','40'], ans:2, ex:'List indexing starts at 0. nums[0]=10, nums[1]=20, nums[2]=30. Output: 30.'},
+  {id:66, topic:'lists', diff:'e', q:'What does this print?', code:`nums = [1, 2, 3]\nnums.append(4)\nprint(nums)`, opts:['[1, 2, 3]','[1, 2, 3, 4]','[4, 1, 2, 3]','Error'], ans:1, ex:'.append() adds the element to the END of the list. [1,2,3] becomes [1,2,3,4].'},
+  {id:67, topic:'lists', diff:'e', q:'What is the output?', code:`nums = [5, 3, 8, 1, 9]\nprint(len(nums))`, opts:['4','5','9','Error'], ans:1, ex:'len() returns the number of elements. The list has 5 elements: 5,3,8,1,9. Output: 5.'},
+  {id:68, topic:'lists', diff:'m', q:'What does this print?', code:`nums = [1, 2, 3, 4, 5]\nprint(nums[1:4])`, opts:['[1, 2, 3]','[2, 3, 4]','[2, 3, 4, 5]','[1, 2, 3, 4]'], ans:1, ex:'Slicing nums[1:4] takes indices 1,2,3 (stops BEFORE 4). nums[1]=2, nums[2]=3, nums[3]=4. Result: [2,3,4].'},
+  {id:69, topic:'lists', diff:'m', q:'What is the output?', code:`a = [1, 2, 3]\nb = [4, 5, 6]\nprint(a + b)`, opts:['[5, 7, 9]','[1, 2, 3, 4, 5, 6]','Error','[1,2,3],[4,5,6]'], ans:1, ex:'+ on lists concatenates them (joins them). a + b creates a new list [1,2,3,4,5,6].'},
+  {id:70, topic:'lists', diff:'m', q:'What does this print?', code:`nums = [3, 1, 4, 1, 5, 9]\nprint(sorted(nums))`, opts:['[3,1,4,1,5,9]','[1,1,3,4,5,9]','[9,5,4,3,1,1]','Error'], ans:1, ex:'sorted() returns a NEW sorted list (ascending by default). The original nums is unchanged. Result: [1,1,3,4,5,9].'},
+  {id:71, topic:'lists', diff:'m', q:'What is the output?', code:`nums = [10, 20, 30, 40]\nnums.pop(1)\nprint(nums)`, opts:['[10, 20, 40]','[10, 30, 40]','[20, 30, 40]','[10, 20, 30]'], ans:1, ex:'.pop(1) removes the element at index 1 (which is 20). The list becomes [10,30,40].'},
+  {id:72, topic:'lists', diff:'m', q:'What does this print?', code:`nums = [1, 2, 3, 4, 5]\nprint(nums[::-1])`, opts:['[5, 4, 3, 2, 1]','[1, 2, 3, 4, 5]','[5, 3, 1]','Error'], ans:0, ex:'[::-1] reverses the list using a step of -1. The result is [5,4,3,2,1].'},
+  {id:73, topic:'lists', diff:'h', q:'What is the output?', code:`a = [1, 2, 3]\nb = a\nb.append(4)\nprint(a)`, opts:['[1, 2, 3]','[1, 2, 3, 4]','[4]','Error'], ans:1, ex:'b = a does NOT copy the list — both a and b point to the SAME list object. Appending to b also modifies a. To copy, use b = a.copy() or b = a[:].'},
+  {id:74, topic:'lists', diff:'h', q:'What does this print?', code:`matrix = [[1,2],[3,4],[5,6]]\nprint(matrix[1][0])`, opts:['1','2','3','4'], ans:2, ex:'matrix[1] is the second row: [3,4]. Then [0] is the first element of that row: 3. Output: 3.'},
+  {id:75, topic:'lists', diff:'h', q:'What is the output?', code:`nums = [1, 2, 3, 4, 5]\nresult = [x*2 for x in nums if x > 2]\nprint(result)`, opts:['[6, 8, 10]','[2, 4, 6, 8, 10]','[3, 4, 5]','[6, 10]'], ans:0, ex:'List comprehension: filter x > 2 gives 3,4,5. Then multiply by 2: 6,8,10. Result: [6,8,10].'},
+];
+
+// ══════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════
+let answers   = {};  // id → {correct, selected}
+let currentTopic    = 'all';
+let showFilter      = 'all';
+let timerSec        = 0;
+let timerInt        = null;
+
+// Count topics
+const TOPICS = {vars:'Variables',strings:'Strings',conds:'Conditionals',while:'While',for:'For',lists:'Lists'};
+
+function countTopics() {
+  Object.keys(TOPICS).forEach(t => {
+    const cnt = QB.filter(q => q.topic === t).length;
+    const el = document.getElementById('tc-' + t);
+    if (el) el.textContent = cnt;
+  });
+  document.getElementById('tc-all').textContent = QB.length;
+}
+
+// ══════════════════════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════════════════════
+const KEYS = ['A','B','C','D'];
+
+function hl(code) {
+  let s = code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  s = s.replace(/"([^"]*)"/g, '<span class="st">"$1"</span>');
+  s = s.replace(/\b(while|for|if|elif|else|break|continue|in|and|or|not|return|import|pass|def|lambda)\b/g, '<span class="kw">$1</span>');
+  s = s.replace(/\b(True|False|None)\b/g, '<span class="bl">$1</span>');
+  s = s.replace(/\b(print|range|len|int|str|float|bool|list|sorted|type|set|sum|max|min|abs|input|append|pop|join|split|upper|lower|strip|replace)\b/g, '<span class="fn">$1</span>');
+  s = s.replace(/(?<![a-zA-Z_])(-?\d+\.?\d*)/g, '<span class="nm">$1</span>');
+  s = s.replace(/(#[^\n]*)/g, '<span class="cm">$1</span>');
+  return s;
+}
+
+function buildCard(q) {
+  const div = document.createElement('div');
+  div.className = 'q-card';
+  div.id = `qc${q.id}`;
+  div.dataset.topic = q.topic;
+
+  const tagClass = 'tag-' + q.topic;
+  const tagLabel = {vars:'Variables',strings:'Strings',conds:'Conditionals',while:'While Loop',for:'For Loop',lists:'Lists'}[q.topic];
+  const diffClass = {e:'diff-e',m:'diff-m',h:'diff-h'}[q.diff];
+  const diffLabel = {e:'Easy',m:'Medium',h:'Hard'}[q.diff];
+
+  const optsHTML = q.opts.map((o,i) =>
+    `<div class="q-opt" data-id="${q.id}" data-i="${i}"><span class="opt-k">${KEYS[i]}</span>${o}</div>`
+  ).join('');
+
+  div.innerHTML = `
+    <div class="q-card-head">
+      <div class="q-num">${q.id}</div>
+      <span class="q-topic-tag ${tagClass}">${tagLabel}</span>
+      <div class="q-diff-dot ${diffClass}" title="${diffLabel}"></div>
+      <div class="q-status" id="qs${q.id}"></div>
+    </div>
+    <div class="q-body">
+      <div class="q-text">${q.q}</div>
+      ${q.code ? `<div class="q-code">${hl(q.code)}</div>` : ''}
+      <div class="q-opts" id="qo${q.id}">${optsHTML}</div>
+      <div class="q-fb" id="qf${q.id}"></div>
+    </div>
+    <div class="q-footer">
+      <button class="q-submit" id="qb${q.id}" onclick="checkQ(${q.id})" disabled>Check</button>
+      <span class="q-hint">A/B/C/D to select</span>
+    </div>
+  `;
+
+  div.querySelectorAll('.q-opt').forEach(o =>
+    o.addEventListener('click', () => selectOpt(+o.dataset.id, +o.dataset.i))
+  );
+
+  return div;
+}
+
+function renderAll() {
+  const wrap = document.getElementById('questions-wrap');
+  wrap.innerHTML = '';
+  QB.forEach(q => wrap.appendChild(buildCard(q)));
+}
+
+// ══════════════════════════════════════════════════════════
+//  INTERACTION
+// ══════════════════════════════════════════════════════════
+let pending = {};  // id → selected index (before submit)
+
+function selectOpt(id, idx) {
+  if (answers[id]) return;
+  pending[id] = idx;
+  const opts = document.querySelectorAll(`[data-id="${id}"]`);
+  opts.forEach((o, i) => o.classList.toggle('sel', i === idx));
+  const btn = document.getElementById(`qb${id}`);
+  if (btn) btn.disabled = false;
+}
+
+function checkQ(id) {
+  if (answers[id]) return;
+  const sel = pending[id];
+  if (sel === undefined) return;
+
+  const q = QB.find(x => x.id === id);
+  const ok = sel === q.ans;
+  answers[id] = { correct: ok, selected: sel };
+
+  // Style options
+  const opts = document.querySelectorAll(`[data-id="${id}"]`);
+  opts.forEach((o, i) => {
+    o.onclick = null; o.classList.remove('sel');
+    o.classList.add('locked');
+    if (i === q.ans) o.classList.add('correct');
+    else if (i === sel && !ok) o.classList.add('wrong');
+  });
+
+  // Feedback
+  const fb = document.getElementById(`qf${id}`);
+  fb.className = `q-fb ${ok ? 'ok' : 'bad'} show`;
+  fb.innerHTML = `<strong>${ok ? '✅ Correct!' : '❌ Not quite.'}</strong> ${q.ex}`;
+
+  // Status icon
+  const st = document.getElementById(`qs${id}`);
+  if (st) st.textContent = ok ? '✅' : '❌';
+
+  // Card border
+  const card = document.getElementById(`qc${id}`);
+  if (card) card.classList.add(ok ? 'answered-correct' : 'answered-wrong');
+
+  // Disable submit button
+  const btn = document.getElementById(`qb${id}`);
+  if (btn) btn.disabled = true;
+
+  updateStats();
+  applyVisibility();
+}
+
+// ══════════════════════════════════════════════════════════
+//  STATS
+// ══════════════════════════════════════════════════════════
+function updateStats() {
+  const total = QB.length;
+  const done = Object.keys(answers).length;
+  const correct = Object.values(answers).filter(a => a.correct).length;
+  const wrong = done - correct;
+  const pct = done ? Math.round(correct / done * 100) : 0;
+
+  document.getElementById('sbCorrect').textContent = correct;
+  document.getElementById('sbWrong').textContent = wrong;
+  document.getElementById('sbPct').textContent = pct + '%';
+  document.getElementById('sbFill').style.width = (done / total * 100) + '%';
+  document.getElementById('sbDone').textContent = `${done} of ${total} answered`;
+
+  document.getElementById('topDone').textContent = `${done} Done`;
+  document.getElementById('topCorrect').textContent = `${correct} Correct`;
+}
+
+// ══════════════════════════════════════════════════════════
+//  FILTERS
+// ══════════════════════════════════════════════════════════
+function filterTopic(topic, btn) {
+  currentTopic = topic;
+  document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyVisibility();
+}
+
+function setShowFilter(f, btn) {
+  showFilter = f;
+  document.querySelectorAll('.so-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyVisibility();
+}
+
+function applySearch() { applyVisibility(); }
+
+function applyVisibility() {
+  const search = document.getElementById('searchBox').value.toLowerCase();
+  let visible = 0;
+
+  QB.forEach(q => {
+    const card = document.getElementById(`qc${q.id}`);
+    if (!card) return;
+
+    const topicMatch = currentTopic === 'all' || q.topic === currentTopic;
+    const ans = answers[q.id];
+    const showMatch =
+      showFilter === 'all' ||
+      (showFilter === 'unanswered' && !ans) ||
+      (showFilter === 'wrong' && ans && !ans.correct);
+    const searchMatch = !search ||
+      q.q.toLowerCase().includes(search) ||
+      q.opts.some(o => o.toLowerCase().includes(search));
+
+    const show = topicMatch && showMatch && searchMatch;
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+
+  // Empty state
+  let es = document.getElementById('empty-state');
+  const wrap = document.getElementById('questions-wrap');
+  if (visible === 0) {
+    if (!es) { es = document.createElement('div'); es.id='empty-state'; es.className='empty-state'; wrap.appendChild(es); }
+    es.innerHTML = '<span class="e-icon">🔍</span><p>No questions match your filters.</p>';
+    es.style.display = '';
+  } else if (es) {
+    es.style.display = 'none';
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  RESULTS
+// ══════════════════════════════════════════════════════════
+function showResults() {
+  const total = QB.length;
+  const done = Object.keys(answers).length;
+  const correct = Object.values(answers).filter(a => a.correct).length;
+  const pct = done ? Math.round(correct / done * 100) : 0;
+
+  let title, sub, arcColor;
+  if (pct >= 85) { title = '🏆 Outstanding!'; sub = 'Python master level — keep it up!'; arcColor = '#57F287'; }
+  else if (pct >= 70) { title = '✅ Great Job!'; sub = 'Strong understanding across the topics.'; arcColor = '#5865F2'; }
+  else if (pct >= 50) { title = '📖 Good Start!'; sub = 'Review the topics you missed.'; arcColor = '#FEE75C'; }
+  else { title = '💪 Keep Practicing!'; sub = 'Go back to the material and retry.'; arcColor = '#ED4245'; }
+
+  document.getElementById('resBig').textContent = correct;
+  document.getElementById('resTot').textContent = total;
+  document.getElementById('resTitle').textContent = title;
+  document.getElementById('resSub').textContent = sub;
+  document.getElementById('rs-c').textContent = correct;
+  document.getElementById('rs-w').textContent = done - correct;
+  document.getElementById('rs-p').textContent = pct + '%';
+
+  const m = Math.floor(timerSec / 60);
+  const s = String(timerSec % 60).padStart(2,'0');
+  document.getElementById('rs-t').textContent = `${m}:${s}`;
+
+  // Ring animation
+  const arc = document.getElementById('resArc');
+  arc.style.stroke = arcColor;
+  setTimeout(() => {
+    const circ = 345;
+    arc.style.strokeDashoffset = circ - (circ * pct / 100);
+  }, 100);
+
+  // Topic breakdown
+  const bd = document.getElementById('topicBreakdown');
+  bd.innerHTML = '';
+  const topicColors = { vars:'#C39BD3', strings:'#64B5F6', conds:'#FEE75C', while:'#57F287', for:'#FFA726', lists:'#7986CB' };
+  Object.entries(TOPICS).forEach(([key, label]) => {
+    const qs = QB.filter(q => q.topic === key);
+    const ans = qs.filter(q => answers[q.id]?.correct);
+    const tot = qs.length;
+    const p = tot ? Math.round(ans.length / tot * 100) : 0;
+    const color = topicColors[key] || '#5865F2';
+    const row = document.createElement('div');
+    row.className = 'topic-row';
+    row.innerHTML = `
+      <div class="topic-row-name">${label}</div>
+      <div class="topic-bar-wrap">
+        <div class="topic-bar-fill" style="width:0%;background:${color}" data-pct="${p}"></div>
+      </div>
+      <div class="topic-pct">${ans.length}/${tot}</div>`;
+    bd.appendChild(row);
+  });
+  setTimeout(() => {
+    document.querySelectorAll('.topic-bar-fill').forEach(b => {
+      b.style.width = b.dataset.pct + '%';
+    });
+  }, 200);
+
+  document.getElementById('results').classList.add('show');
+}
+
+function retryAll() {
+  answers = {}; pending = {};
+  document.getElementById('results').classList.remove('show');
+  renderAll();
+  applyVisibility();
+  updateStats();
+  timerSec = 0;
+  document.getElementById('timer').textContent = '00:00';
+}
+
+// ══════════════════════════════════════════════════════════
+//  KEYBOARD
+// ══════════════════════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (document.getElementById('results').classList.contains('show')) return;
+  if (['A','B','C','D'].includes(e.key.toUpperCase())) {
+    const visible = QB.filter(q => {
+      const card = document.getElementById(`qc${q.id}`);
+      return card && card.style.display !== 'none' && !answers[q.id];
+    });
+    if (visible.length > 0) {
+      const idx = ['A','B','C','D'].indexOf(e.key.toUpperCase());
+      const first = visible[0];
+      selectOpt(first.id, idx);
+    }
+  }
+});
+
+// ══════════════════════════════════════════════════════════
+//  SIDEBAR / TIMER / INIT
+// ══════════════════════════════════════════════════════════
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+document.getElementById('menuBtn').addEventListener('click', () => {
+  sidebar.classList.toggle('open'); overlay.classList.toggle('open');
+});
+overlay.addEventListener('click', () => {
+  sidebar.classList.remove('open'); overlay.classList.remove('open');
+});
+
+function startTimer() {
+  timerInt = setInterval(() => {
+    timerSec++;
+    const m = String(Math.floor(timerSec / 60)).padStart(2,'0');
+    const s = String(timerSec % 60).padStart(2,'0');
+    document.getElementById('timer').textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+// Init
+countTopics();
+renderAll();
+applyVisibility();
+updateStats();
+startTimer();
+</script>
+</body>
+</html>
