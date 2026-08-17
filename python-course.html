@@ -1,248 +1,1040 @@
-import cv2
-import math
-import mediapipe as mp
-import numpy as np
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python from Scratch | Lists, Tuples, Dicts, and Sets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0d141d;
+    --surface:#131e2a;
+    --surface-2:#182635;
+    --line: rgba(159,176,192,0.14);
+    --gold:#f2b705;
+    --gold-dim: rgba(242,183,5,0.14);
+    --teal:#4fd1c5;
+    --teal-dim: rgba(79,209,197,0.13);
+    --text:#edf2f4;
+    --muted:#93a7ba;
+    --good:#6ee7a8;
+    --bad:#ff6b6b;
+    --list-c:#6ea8ff;
+    --tuple-c:#c792ea;
+    --dict-c:#f2b705;
+    --set-c:#4fd1c5;
+    --loop-c:#ff9d6b;
+    --radius: 14px;
+    --font-disp:'Inter', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-code:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(242,183,5,0.07), transparent 60%),
+      radial-gradient(1000px 500px at -10% 20%, rgba(79,209,197,0.06), transparent 60%),
+      var(--ink);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.9;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--gold); color:#0d141d; }
+  a{color:inherit;}
+  code, pre, .mono{ font-family:var(--font-code); direction:ltr; text-align:left; unicode-bidi:isolate; }
 
-# Model and MediaPipe setup
-model_path = "hand_landmarker.task"
-BaseOptions = mp.tasks.BaseOptions
-HandLandmarker = mp.tasks.vision.HandLandmarker
-HandLandmarkerOptions = mp.tasks.vision.HandLandmarkerOptions
-VisionRunningMode = mp.tasks.vision.RunningMode
-ImageFormat = mp.ImageFormat
+  /* ---------- layout shell ---------- */
+  .shell{
+    display:grid;
+    grid-template-columns: 260px 1fr;
+    min-height:100vh;
+  }
+  @media (max-width: 980px){
+    .shell{ grid-template-columns: 1fr; }
+    .sidebar{ position:static; height:auto; }
+  }
 
-# FIXED: VIDEO mode for webcam - supports multiple hands
-options = HandLandmarkerOptions(
-    base_options=BaseOptions(model_asset_path=model_path),
-    running_mode=VisionRunningMode.VIDEO,
-    min_hand_detection_confidence=0.7,
-    num_hands=2  # Enable both hands
-)
-hands = HandLandmarker.create_from_options(options)
+  /* ---------- sidebar ---------- */
+  .sidebar{
+    position:sticky; top:0; height:100vh; overflow-y:auto;
+    border-right:1px solid var(--line);
+    padding:28px 20px;
+    background:linear-gradient(180deg, var(--surface), var(--ink) 85%);
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px; margin-bottom:26px;
+  }
+  .brand-mark{
+    width:38px; height:38px; border-radius:10px;
+    background:conic-gradient(from 220deg, var(--gold), var(--teal), var(--gold));
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-code); font-weight:700; color:#0d141d; font-size:14px;
+  }
+  .brand-txt{ font-family:var(--font-disp); font-weight:900; font-size:17px; letter-spacing:.2px; }
+  .brand-txt span{ display:block; font-family:var(--font-body); font-weight:400; font-size:11.5px; color:var(--muted); }
 
-# Camera setup
-video = cv2.VideoCapture(0)
-video.set(3, 1000)
-video.set(4, 780)
+  .navlist{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px; }
+  .navlist a{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px; border-radius:10px; text-decoration:none;
+    font-size:14.5px; color:var(--muted); font-weight:500;
+    border-left:2px solid transparent;
+    transition: all .15s ease;
+  }
+  .navlist a:hover{ background:var(--surface-2); color:var(--text); }
+  .navlist a.active{ background:var(--gold-dim); color:var(--gold); border-left-color:var(--gold); }
+  .navlist .dot{ width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.6; flex:0 0 auto;}
+  .nav-group-label{ font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color:var(--muted); opacity:.6; margin:18px 10px 6px; font-weight:700;}
 
-# Preload magic circle PNGs
-img_1 = cv2.imread('magic_circles/magic_circle_ccw.png', cv2.IMREAD_UNCHANGED)
-img_2 = cv2.imread('magic_circles/magic_circle_cw.png', cv2.IMREAD_UNCHANGED)
+  .sidebar-foot{ margin-top:26px; padding:14px; border-radius:12px; background:var(--surface-2); border:1px solid var(--line); font-size:12.5px; color:var(--muted);}
+  .progress-wrap{ height:6px; border-radius:99px; background:var(--ink); overflow:hidden; margin-top:8px;}
+  .progress-bar{ height:100%; width:0%; background:linear-gradient(90deg,var(--teal),var(--gold)); transition:width .25s ease;}
 
-# Animation variables for BOTH hands
-deg1_left, deg2_left = 0, 0
-deg1_right, deg2_right = 0, 0
-frame_timestamp_ms = 0
-ratio_left, ratio_right = 0.0, 0.0
+  /* ---------- main ---------- */
+  main{ padding: 0; min-width:0; }
+  .hero{
+    padding: 72px 56px 56px;
+    border-bottom:1px solid var(--line);
+    position:relative; overflow:hidden;
+  }
+  @media (max-width:700px){ .hero{ padding:52px 22px 40px; } }
+  .hero::after{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background: linear-gradient(180deg, transparent 60%, var(--ink));
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--font-code); font-size:12px; letter-spacing:1px;
+    color:var(--teal); background:var(--teal-dim); padding:6px 12px; border-radius:99px;
+    border:1px solid rgba(79,209,197,.25); margin-bottom:22px;
+  }
+  h1.title{
+    font-family:var(--font-disp); font-weight:900; font-size:clamp(34px, 5vw, 56px);
+    margin:0 0 18px; line-height:1.25;
+  }
+  h1.title .hl{ color:var(--gold); }
+  .subtitle{ font-size:17px; color:var(--muted); max-width:680px; margin:0 0 30px; }
+  .hero-badges{ display:flex; flex-wrap:wrap; gap:10px; }
+  .badge{
+    font-size:13px; padding:8px 14px; border-radius:10px; background:var(--surface-2);
+    border:1px solid var(--line); color:var(--text); display:flex; align-items:center; gap:8px;
+  }
+  .badge b{ color:var(--gold); }
 
-def position_data(lmlist):
-    return {
-        'wrist': (lmlist[0][0], lmlist[0][1]),
-        'thumb_tip': (lmlist[4][0], lmlist[4][1]),
-        'index_mcp': (lmlist[5][0], lmlist[5][1]),
-        'index_tip': (lmlist[8][0], lmlist[8][1]),
-        'midle_mcp': (lmlist[9][0], lmlist[9][1]),
-        'midle_tip': (lmlist[12][0], lmlist[12][1]),
-        'ring_mcp': (lmlist[13][0], lmlist[13][1]),
-        'ring_tip': (lmlist[16][0], lmlist[16][1]),
-        'pinky_mcp': (lmlist[17][0], lmlist[17][1]),
-        'pinky_tip': (lmlist[20][0], lmlist[20][1])
-    }
+  /* signature: data-structure visual strip */
+  .struct-strip{
+    margin-top:44px; display:grid; grid-template-columns:repeat(4,1fr); gap:14px;
+  }
+  @media (max-width:820px){ .struct-strip{ grid-template-columns:repeat(2,1fr); } }
+  .struct-card{
+    border-radius:var(--radius); padding:16px; border:1px solid var(--line); background:var(--surface);
+    cursor:pointer; transition:transform .15s ease, border-color .15s ease;
+  }
+  .struct-card:hover{ transform:translateY(-3px); }
+  .struct-card .k{ font-family:var(--font-code); font-size:11px; color:var(--muted); }
+  .struct-card .v{ font-family:var(--font-disp); font-weight:700; font-size:16px; margin-top:4px;}
+  .struct-card .bar{ height:4px; border-radius:99px; margin-top:12px; }
 
-def draw_glowing_line(img, p1, p2, color, thickness=5, glow_intensity=1.5):
-    """Draw glowing line with multiple layers for finger glow effect"""
-    # Main thick line
-    cv2.line(img, p1, p2, color, thickness)
-    # Inner glow highlight
-    cv2.line(img, p1, p2, (255, 255, 255), round(thickness / 2))
-    # Outer glow layers
-    glow_thick = round(thickness * glow_intensity)
-    cv2.line(img, p1, p2, tuple(c//2 for c in color), glow_thick)
-    cv2.line(img, p1, p2, (255, 255, 255), round(glow_thick / 2))
+  section.topic{ padding:64px 56px; border-bottom:1px solid var(--line); scroll-margin-top: 20px;}
+  @media (max-width:700px){ section.topic{ padding:46px 22px; } }
 
-def draw_glowing_finger(img, positions, line_color, glow_size=12):
-    """Draw glowing fingertips matching ring color"""
-    tips = ['thumb_tip', 'index_tip', 'midle_tip', 'ring_tip', 'pinky_tip']
-    
-    for tip_key in tips:
-        if tip_key in positions:
-            cx, cy = positions[tip_key]
-            # Glowing circles at fingertips
-            cv2.circle(img, (cx, cy), glow_size, line_color, -1)
-            cv2.circle(img, (cx, cy), glow_size, (255, 255, 255), 3)
-            cv2.circle(img, (cx, cy), glow_size*2, tuple(c//3 for c in line_color), 4)
+  .topic-head{ display:flex; align-items:center; gap:14px; margin-bottom:8px; }
+  .topic-num{
+    font-family:var(--font-code); font-size:13px; color:var(--ink); font-weight:700;
+    background:var(--accent, var(--gold)); width:34px; height:34px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center; flex:0 0 auto;
+  }
+  h2.topic-title{ font-family:var(--font-disp); font-weight:900; font-size:clamp(24px,3vw,32px); margin:0; }
+  .topic-tagline{ color:var(--muted); font-size:15px; margin:10px 0 30px; max-width:720px;}
 
-def draw_finger_connections(img, positions, line_color):
-    """Draw connections between all fingertips and MCP joints with matching ring color"""
-    tips = ['thumb_tip', 'index_tip', 'midle_tip', 'ring_tip', 'pinky_tip']
-    mcps = ['index_mcp', 'midle_mcp', 'ring_mcp', 'pinky_mcp']
-    
-    # GLOWING FINGERTIPS first
-    draw_glowing_finger(img, positions, line_color)
-    
-    # Connect fingertips to their MCP joints (main finger lines)
-    for i, tip_key in enumerate(tips[1:]):  # Skip thumb
-        if tip_key in positions and mcps[i] in positions:
-            draw_glowing_line(img, positions[tip_key], positions[mcps[i]], line_color)
-    
-    # Connect thumb tip to index MCP
-    if 'thumb_tip' in positions and 'index_mcp' in positions:
-        draw_glowing_line(img, positions['thumb_tip'], positions['index_mcp'], line_color)
-    
-    # Connect ALL fingertips to EACH OTHER (pentagram-style connections)
-    for i in range(len(tips)):
-        for j in range(i+1, len(tips)):
-            if tips[i] in positions and tips[j] in positions:
-                p1 = positions[tips[i]]
-                p2 = positions[tips[j]]
-                # Slightly thinner glowing lines for cross-connections
-                draw_glowing_line(img, p1, p2, line_color, thickness=3)
+  .grid-2{ display:grid; grid-template-columns: 1.1fr .9fr; gap:26px; align-items:start;}
+  @media (max-width:900px){ .grid-2{ grid-template-columns:1fr; } }
 
-def calculate_distance(p1, p2):
-    return math.hypot(p2[0] - p1[0], p2[1] - p1[1])
+  p{ margin:0 0 16px; font-size:15.5px; color:#dbe4ea; }
+  p b, li b{ color:var(--text); }
+  h3{ font-family:var(--font-disp); font-size:18px; font-weight:700; margin:28px 0 12px; color:var(--text);}
+  ul, ol{ padding-inline-start:22px; margin:0 0 16px; color:#dbe4ea; font-size:15px;}
+  li{ margin-bottom:8px; }
 
-def transparent_overlay(base_img, overlay_img, x, y, size=None):
-    if overlay_img is None:
-        return base_img
-    
-    if size is not None:
-        overlay_img = cv2.resize(overlay_img, size)
-    
-    h, w = overlay_img.shape[:2]
-    img_h, img_w = base_img.shape[:2]
-    
-    # Boundary checks
-    x = max(0, x)
-    y = max(0, y)
-    w = min(w, img_w - x)
-    h = min(h, img_h - y)
-    
-    if w <= 0 or h <= 0:
-        return base_img
-    
-    roi = base_img[y:y+h, x:x+w]
-    b, g, r, a = cv2.split(overlay_img[:h, :w])
-    overlay_color = cv2.merge([b, g, r])
-    mask = cv2.medianBlur(a, 5)
-    
-    img1_bg = cv2.bitwise_and(roi, roi, mask=cv2.bitwise_not(mask))
-    img2_fg = cv2.bitwise_and(overlay_color, overlay_color, mask=mask)
-    base_img[y:y+h, x:x+w] = cv2.add(img1_bg, img2_fg)
-    return base_img
+  /* code blocks */
+  .code-block{
+    background:#0a1119; border:1px solid var(--line); border-radius:12px; overflow:hidden;
+    margin:16px 0;
+  }
+  .code-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:9px 14px; background:var(--surface-2); border-bottom:1px solid var(--line);
+    font-family:var(--font-code); font-size:11.5px; color:var(--muted);
+  }
+  .code-dots{ display:flex; gap:6px; }
+  .code-dots span{ width:9px; height:9px; border-radius:50%; background:#2a3b4d; }
+  .copy-btn{
+    font-family:var(--font-code); font-size:11px; color:var(--muted); background:transparent;
+    border:1px solid var(--line); padding:4px 10px; border-radius:7px; cursor:pointer;
+  }
+  .copy-btn:hover{ color:var(--gold); border-color:var(--gold); }
+  pre{ margin:0; padding:16px 18px; overflow-x:auto; font-size:13.5px; line-height:1.75; }
+  .c-kw{ color:#ff9d6b; } .c-str{ color:#a8e6a3; } .c-com{ color:#5d7285; font-style:italic;}
+  .c-num{ color:#c792ea; } .c-fn{ color:#4fd1c5; } .c-out{ color:#f2b705; }
 
-print("Dual Hand Magic Shield - ORANGE GLOW! Press 'q' to quit. Open palms (ratio > 1.10)!")
+  .callout{
+    border-radius:12px; padding:16px 18px; margin:18px 0; border:1px solid var(--line);
+    font-size:14.5px; display:flex; gap:12px;
+  }
+  .callout .ico{ font-size:18px; flex:0 0 auto; }
+  .callout-tip{ background:var(--gold-dim); border-color:rgba(242,183,5,.3); }
+  .callout-warn{ background:rgba(255,107,107,.08); border-color:rgba(255,107,107,.28); }
+  .callout-pro{ background:var(--teal-dim); border-color:rgba(79,209,197,.3); }
+  .callout b{ color:var(--text); }
 
-while True:
-    ret, img = video.read()
-    if not ret:
-        break
-    
-    img = cv2.flip(img, 1)
-    h, w, c = img.shape
-    
-    # Convert and process with MediaPipe
-    rgbimg = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    mp_image = mp.Image(image_format=ImageFormat.SRGB, data=rgbimg)
-    
-    # Increment timestamp
-    frame_timestamp_ms += 33  # ~30fps
-    result = hands.detect_for_video(mp_image, frame_timestamp_ms)
-    
-    shield_left = False
-    shield_right = False
-    
-    if result.hand_landmarks:
-        for idx, hand_landmarks in enumerate(result.hand_landmarks):
-            lmList = []
-            for lm in hand_landmarks:
-                lmList.append([int(lm.x * w), int(lm.y * h)])
-            
-            if len(lmList) == 21:
-                positions = position_data(lmList)
-                palm = calculate_distance(positions['wrist'], positions['index_mcp'])
-                distance = calculate_distance(positions['index_tip'], positions['pinky_tip'])
-                
-                if palm > 0:
-                    hand_ratio = distance / palm
-                    
-                    # BOTH HANDS NOW USE ORANGE COLOR
-                    line_color = (0, 165, 255)  # VIBRANT ORANGE for both hands
-                    
-                    ratio_left = hand_ratio if positions['wrist'][0] < w/2 else ratio_left
-                    ratio_right = hand_ratio if positions['wrist'][0] >= w/2 else ratio_right
-                    
-                    print(f"Hand {idx+1} Ratio: {hand_ratio:.2f} (L:{ratio_left:.2f} R:{ratio_right:.2f})")
-                    
-                    # Gesture preparation + MAGIC FINGER CONNECTIONS (0.3 < ratio OR shield active)
-                    if hand_ratio > 0.3:
-                        draw_finger_connections(img, positions, line_color)
-                    
-                    # MAGIC CIRCLES ACTIVATION (ratio > 1.10) - LOWERED FROM 1.3
-                    if hand_ratio > 1.10:
-                        if positions['wrist'][0] < w/2:  # Left hand
-                            shield_left = True
-                            deg1_left += 2.5
-                            deg2_left -= 2.0
-                            if deg1_left >= 360: deg1_left = 0
-                            if deg2_left <= -360: deg2_left = 0
-                        else:  # Right hand
-                            shield_right = True
-                            deg1_right += 2.5
-                            deg2_right -= 2.0
-                            if deg1_right >= 360: deg1_right = 0
-                            if deg2_right <= -360: deg2_right = 0
-                        
-                        centerx, centery = positions['midle_mcp']
-                        diameter = int(palm * 3.0)
-                        
-                        # Smart boundary clipping
-                        x1 = max(0, int(centerx - diameter/2))
-                        y1 = max(0, int(centery - diameter/2))
-                        max_diameter = min(w - x1, h - y1, diameter)
-                        
-                        if max_diameter > 50:
-                            hei, wid = img_1.shape[:2]
-                            cen = (wid//2, hei//2)
-                            
-                            # Use current degrees for rotation
-                            if positions['wrist'][0] < w/2:
-                                current_deg1, current_deg2 = deg1_left, deg2_left
-                            else:
-                                current_deg1, current_deg2 = deg1_right, deg2_right
-                            
-                            # Rotate magic circles
-                            M1 = cv2.getRotationMatrix2D(cen, current_deg1, 1.0)
-                            M2 = cv2.getRotationMatrix2D(cen, current_deg2, 1.0)
-                            rotated1 = cv2.warpAffine(img_1, M1, (wid, hei))
-                            rotated2 = cv2.warpAffine(img_2, M2, (wid, hei))
-                            
-                            shield_size = (max_diameter, max_diameter)
-                            img = transparent_overlay(img, rotated1, x1, y1, shield_size)
-                            img = transparent_overlay(img, rotated2, x1, y1, shield_size)
-    
-    # Dual status display - ORANGE
-    cv2.putText(img, f"L:{ratio_left:.2f} R:{ratio_right:.2f}", (20, 50), 
-                cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 165, 255), 3)  # ORANGE status text
-    
-    status = []
-    if shield_left: status.append("LEFT SHIELD")
-    if shield_right: status.append("RIGHT SHIELD")
-    if not status:
-        status = ["Open palms (ratio > 1.10)"]
-    
-    for i, text in enumerate(status):
-        color = (0, 165, 255)  # ORANGE for all status text
-        cv2.putText(img, text, (20, 90 + i*30), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, color, 2)
-    
-    cv2.putText(img, "'q' to quit", (20, h-30), 
-                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 165, 255), 2)  # ORANGE quit text
-    
-    cv2.imshow("Dual Hand Magic Shield - ORANGE FIRE (1.10)", img)
-    
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+  .try-box{
+    background:var(--surface); border:1px dashed rgba(242,183,5,.4); border-radius:12px; padding:16px 18px; margin:18px 0;
+  }
+  .try-box .lbl{ font-family:var(--font-code); font-size:11px; color:var(--gold); margin-bottom:8px; letter-spacing:.5px;}
 
-video.release()
-cv2.destroyAllWindows()
-hands.close()
+  table{ width:100%; border-collapse:collapse; margin:16px 0; font-size:14px; }
+  th,td{ padding:10px 12px; border-bottom:1px solid var(--line); text-align:left; }
+  th{ color:var(--muted); font-weight:600; font-family:var(--font-code); font-size:12px; }
+  td .mono{ color:var(--teal); }
+
+  /* mini visual panel used per structure */
+  .visual-panel{
+    border-radius:14px; border:1px solid var(--line); background:var(--surface);
+    padding:20px; position:sticky; top:24px;
+  }
+  .visual-title{ font-family:var(--font-code); font-size:11.5px; color:var(--muted); margin-bottom:14px; letter-spacing:.5px;}
+  .cells{ display:flex; gap:8px; flex-wrap:wrap; }
+  .cell{
+    min-width:46px; height:46px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-code); font-size:13px; background:var(--surface-2); border:1px solid var(--line); position:relative;
+  }
+  .cell .idx{ position:absolute; top:-18px; font-size:10px; color:var(--muted); }
+  .kv-row{ display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+  .kv-key{ background:var(--gold-dim); color:var(--gold); border-radius:8px; padding:8px 12px; font-family:var(--font-code); font-size:13px; min-width:70px; text-align:center;}
+  .kv-val{ background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:8px 12px; font-family:var(--font-code); font-size:13px; flex:1;}
+  .blob{ display:flex; flex-wrap:wrap; gap:8px; }
+  .blob .cell{ border-radius:50%; }
+
+  /* quiz */
+  .quiz-shell{ max-width:820px; margin:0 auto; }
+  .quiz-meta{ display:flex; justify-content:space-between; align-items:center; margin-bottom:22px; flex-wrap:wrap; gap:10px;}
+  .quiz-score{
+    font-family:var(--font-code); font-size:13px; background:var(--surface-2); border:1px solid var(--line);
+    padding:8px 14px; border-radius:10px;
+  }
+  .qcard{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:22px; margin-bottom:16px;
+  }
+  .qcard .qnum{ font-family:var(--font-code); font-size:12px; color:var(--gold); margin-bottom:8px;}
+  .qcard .qtext{ font-size:16px; font-weight:500; margin-bottom:16px; color:var(--text); }
+  .opt{
+    display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:10px;
+    border:1px solid var(--line); margin-bottom:8px; cursor:pointer; transition:.15s ease; font-size:14.5px;
+  }
+  .opt:hover{ border-color:var(--teal); background:var(--teal-dim); }
+  .opt input{ accent-color:var(--gold); }
+  .opt.correct{ border-color:var(--good); background:rgba(110,231,168,.1); }
+  .opt.wrong{ border-color:var(--bad); background:rgba(255,107,107,.1); }
+  .opt.disabled{ pointer-events:none; opacity:.85; }
+  .qexpl{
+    display:none; margin-top:12px; padding:12px 14px; border-radius:10px; background:var(--ink);
+    border:1px solid var(--line); font-size:13.5px; color:var(--muted);
+  }
+  .qexpl.show{ display:block; }
+  .submit-wrap{ text-align:center; margin:30px 0 10px; }
+  .btn{
+    font-family:var(--font-disp); font-weight:700; font-size:15px; background:var(--gold); color:#0d141d;
+    border:none; padding:14px 34px; border-radius:12px; cursor:pointer; transition:.15s ease;
+  }
+  .btn:hover{ transform:translateY(-2px); box-shadow:0 8px 24px rgba(242,183,5,.25); }
+  .btn.secondary{ background:transparent; border:1px solid var(--line); color:var(--text); }
+  .result-card{
+    display:none; text-align:center; padding:40px 20px; border-radius:16px; background:var(--surface); border:1px solid var(--line); margin-top:16px;
+  }
+  .result-card.show{ display:block; }
+  .result-score{ font-family:var(--font-disp); font-size:54px; font-weight:900; color:var(--gold); }
+  .result-msg{ color:var(--muted); font-size:15px; margin-top:8px; }
+
+  footer{ padding:40px 56px 70px; text-align:center; color:var(--muted); font-size:13px; }
+
+  ::-webkit-scrollbar{ width:9px; height:9px; }
+  ::-webkit-scrollbar-thumb{ background:#233247; border-radius:99px; }
+  ::-webkit-scrollbar-track{ background:transparent; }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior:auto; }
+    *{ transition:none !important; animation:none !important; }
+  }
+  :focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">Py</div>
+      <div class="brand-txt">Python from Scratch
+        <span>Data Structures Deep Dive</span>
+      </div>
+    </div>
+
+    <div class="nav-group-label">Getting Started</div>
+    <ul class="navlist">
+      <li><a href="#intro"><span class="dot"></span> Quick Intro</a></li>
+    </ul>
+
+    <div class="nav-group-label">Core Structures</div>
+    <ul class="navlist">
+      <li><a href="#lists"><span class="dot" style="color:var(--list-c)"></span> Lists</a></li>
+      <li><a href="#tuples"><span class="dot" style="color:var(--tuple-c)"></span> Tuples</a></li>
+      <li><a href="#dicts"><span class="dot" style="color:var(--dict-c)"></span> Dicts</a></li>
+      <li><a href="#sets"><span class="dot" style="color:var(--set-c)"></span> Sets</a></li>
+      <li><a href="#loops"><span class="dot" style="color:var(--loop-c)"></span> Loops</a></li>
+    </ul>
+
+    <div class="nav-group-label">Advanced</div>
+    <ul class="navlist">
+      <li><a href="#tricks"><span class="dot"></span> Pro Tips & Tricks</a></li>
+      <li><a href="#compare"><span class="dot"></span> Full Comparison</a></li>
+      <li><a href="#quiz"><span class="dot"></span> Quiz (20 Questions)</a></li>
+    </ul>
+
+    <div class="sidebar-foot">
+      Your reading progress
+      <div class="progress-wrap"><div class="progress-bar" id="readProgress"></div></div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main>
+
+    <!-- HERO -->
+    <section class="hero" id="intro">
+      <span class="eyebrow">◆ From zero to pro — no prior experience needed</span>
+      <h1 class="title">Understand Python, don't just <span class="hl">memorize</span> it</h1>
+      <p class="subtitle">
+        This page is designed to take you from your very first line of Python all the way to a solid understanding of
+        lists, tuples, dicts, sets, and loops at an Advanced level — not just knowing how to write code,
+        but understanding <b>why it's written that way</b>, when to use each structure, and what the real differences are under the hood.
+      </p>
+      <div class="hero-badges">
+        <div class="badge">🎯 <b>Audience:</b>&nbsp;Complete beginners</div>
+        <div class="badge">🧠 <b>Approach:</b>&nbsp;Understand before memorizing</div>
+        <div class="badge">⚙️ <b>Target level:</b>&nbsp;Advanced</div>
+        <div class="badge">📝 <b>At the end:</b>&nbsp;20-question quiz</div>
+      </div>
+
+      <div class="struct-strip">
+        <div class="struct-card" onclick="location.hash='lists'">
+          <div class="k">[ ordered • mutable ]</div>
+          <div class="v" style="color:var(--list-c)">List</div>
+          <div class="bar" style="background:var(--list-c)"></div>
+        </div>
+        <div class="struct-card" onclick="location.hash='tuples'">
+          <div class="k">( ordered • immutable )</div>
+          <div class="v" style="color:var(--tuple-c)">Tuple</div>
+          <div class="bar" style="background:var(--tuple-c)"></div>
+        </div>
+        <div class="struct-card" onclick="location.hash='dicts'">
+          <div class="k">{ key : value }</div>
+          <div class="v" style="color:var(--dict-c)">Dict</div>
+          <div class="bar" style="background:var(--dict-c)"></div>
+        </div>
+        <div class="struct-card" onclick="location.hash='sets'">
+          <div class="k">{ unique • unordered }</div>
+          <div class="v" style="color:var(--set-c)">Set</div>
+          <div class="bar" style="background:var(--set-c)"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== LISTS ===================== -->
+    <section class="topic" id="lists" style="--accent:var(--list-c)">
+      <div class="topic-head">
+        <div class="topic-num">01</div>
+        <h2 class="topic-title">Lists <span class="mono" style="color:var(--list-c)">list</span></h2>
+      </div>
+      <p class="topic-tagline">A train with numbered cars — you can add a car, remove a car, or change their order — and the order here actually matters.</p>
+
+      <div class="grid-2">
+        <div>
+          <p>The <b>List</b> is the most important data structure you'll use in Python. Simply put: an <b>ordered collection of items</b> that can hold any data type (numbers, strings, even lists inside lists). Its two most important properties:</p>
+          <ul>
+            <li><b>Ordered:</b> Every item has a fixed position (index) starting from zero.</li>
+            <li><b>Mutable:</b> You can change, add, or remove items without creating a new list.</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>list_basics.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="c-fn">fruits</span> = [<span class="c-str">"apple"</span>, <span class="c-str">"mango"</span>, <span class="c-str">"banana"</span>]
+
+<span class="c-com"># Access by index (starts at 0)</span>
+<span class="c-kw">print</span>(fruits[0])        <span class="c-com"># apple</span>
+<span class="c-kw">print</span>(fruits[-1])       <span class="c-com"># banana -> negative means from the end</span>
+
+<span class="c-com"># Slicing: extract part of the list</span>
+<span class="c-kw">print</span>(fruits[0:2])     <span class="c-com"># ['apple', 'mango']</span>
+<span class="c-kw">print</span>(fruits[:2])      <span class="c-com"># same as above, start is optional</span>
+<span class="c-kw">print</span>(fruits[::-1])    <span class="c-com"># the list reversed</span></pre>
+          </div>
+
+          <h3>Why does the index start at zero?</h3>
+          <p>Because the index isn't really "position" — it's <b>the number of steps you walk from the first element</b>. The first element requires zero steps to reach, so its index is 0. This idea is crucial when you start understanding slicing.</p>
+
+          <div class="callout callout-warn">
+            <div class="ico">⚠️</div>
+            <div><b>The most common beginner trap — Reference, not Copy:</b><br>
+            When you write <span class="mono">b = a</span>, you're not making a new copy — you're making <span class="mono">b</span> point to the same list that <span class="mono">a</span> points to. So any change in <span class="mono">b</span> will show up in <span class="mono">a</span> too.</div>
+          </div>
+
+          <div class="code-block">
+            <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>reference_trap.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="c-fn">a</span> = [1, 2, 3]
+<span class="c-fn">b</span> = a              <span class="c-com"># b points to the same list</span>
+b.append(4)
+<span class="c-kw">print</span>(a)             <span class="c-com"># [1, 2, 3, 4]  -- changed too!</span>
+
+<span class="c-com"># The correct way if you want an independent copy:</span>
+<span class="c-fn">c</span> = a.copy()      <span class="c-com"># or list(a) or a[:]</span>
+c.append(99)
+<span class="c-kw">print</span>(a)             <span class="c-com"># stays the same</span></pre>
+          </div>
+
+          <h3>Key Methods</h3>
+          <table>
+            <tr><th>Method</th><th>What it does</th></tr>
+            <tr><td class="mono">append(x)</td><td>Adds one item at the end</td></tr>
+            <tr><td class="mono">extend(iter)</td><td>Merges items from another iterable into the list</td></tr>
+            <tr><td class="mono">insert(i, x)</td><td>Inserts an item at a specific position</td></tr>
+            <tr><td class="mono">pop(i)</td><td>Removes and returns the item (without index, removes the last one)</td></tr>
+            <tr><td class="mono">remove(x)</td><td>Removes the first item equal to this value</td></tr>
+            <tr><td class="mono">sort(key=, reverse=)</td><td>Sorts the list itself (in-place)</td></tr>
+            <tr><td class="mono">sorted(list)</td><td>A function, not a method — returns a new sorted copy</td></tr>
+          </table>
+
+          <div class="callout callout-pro">
+            <div class="ico">💡</div>
+            <div><b>What pros know:</b> <span class="mono">list.sort()</span> sorts the original list and returns <span class="mono">None</span>.
+            <span class="mono">sorted(list)</span> is a built-in function that works on any iterable and returns a new list without touching the original. Common mistake: <span class="mono">a = a.sort()</span> makes <span class="mono">a</span> become <span class="mono">None</span>!</div>
+          </div>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-title">// LIST — numbered train cars</div>
+          <div class="cells">
+            <div class="cell"><span class="idx">0</span>"apple"</div>
+            <div class="cell"><span class="idx">1</span>"mango"</div>
+            <div class="cell"><span class="idx">2</span>"banana"</div>
+          </div>
+          <p style="margin-top:18px; font-size:13px;">Each car (index) has a fixed position, but you can change its contents, add a new car, or remove one — and it's still the same train (same object in memory).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== TUPLES ===================== -->
+    <section class="topic" id="tuples" style="--accent:var(--tuple-c)">
+      <div class="topic-head">
+        <div class="topic-num">02</div>
+        <h2 class="topic-title">Tuples <span class="mono" style="color:var(--tuple-c)">tuple</span></h2>
+      </div>
+      <p class="topic-tagline">A box sealed with wax: you can look inside, but you can never change what's in it.</p>
+
+      <div class="grid-2">
+        <div>
+          <p>A <b>Tuple</b> is exactly like a List in terms of order and index access, but the key difference: <b>Immutable</b> — once created, its contents cannot be changed at all. Why is that useful?</p>
+
+          <div class="code-block">
+            <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>tuple_basics.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="c-fn">point</span> = (3, 7)
+<span class="c-kw">print</span>(point[0])       <span class="c-com"># 3</span>
+
+point[0] = 10        <span class="c-com"># TypeError: 'tuple' object does not support item assignment</span>
+
+<span class="c-com"># A single-element tuple needs a comma!</span>
+<span class="c-fn">one_item</span> = (5,)      <span class="c-com"># actually a tuple</span>
+<span class="c-fn">not_tuple</span> = (5)      <span class="c-com"># just a regular number!</span></pre>
+          </div>
+
+          <h3>Why use a Tuple when we have Lists?</h3>
+          <ul>
+            <li><b>Safety:</b> If you want to guarantee this data won't accidentally change anywhere in your code, use a Tuple.</li>
+            <li><b>Performance:</b> Tuples are slightly faster than Lists to create and access, and use less memory.</li>
+            <li><b>Hashable:</b> This is the most important point! A Tuple can be a <b>key</b> in a Dictionary or an element in a Set — a List cannot (you'll see why in the Dicts section).</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>unpacking.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="c-com"># Unpacking - the most common pro use of Tuple</span>
+<span class="c-fn">name</span>, <span class="c-fn">age</span>, <span class="c-fn">city</span> = (<span class="c-str">"Ali"</span>, 22, <span class="c-str">"Cairo"</span>)
+<span class="c-kw">print</span>(name)    <span class="c-com"># Ali</span>
+
+<span class="c-com"># Swap values without a temp variable</span>
+<span class="c-fn">x</span>, <span class="c-fn">y</span> = 1, 2
+x, y = y, x           <span class="c-com"># x=2, y=1 -- this is tuple packing/unpacking!</span>
+
+<span class="c-com"># Returning multiple values from a function -- actually returns a tuple</span>
+<span class="c-kw">def</span> <span class="c-fn">min_max</span>(nums):
+    <span class="c-kw">return</span> <span class="c-kw">min</span>(nums), <span class="c-kw">max</span>(nums)
+
+low, high = min_max([4, 1, 9, 2])</pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <div class="ico">🎓</div>
+            <div><b>A fact only Advanced devs know:</b> A Tuple can "contain" a mutable element like a List inside it — because Tuple immutability guarantees the <b>references</b> themselves don't change, not that everything inside is completely frozen. So <span class="mono">t = ([1,2],)</span> — you can do <span class="mono">t[0].append(3)</span> but you cannot do <span class="mono">t[0] = something</span>.</div>
+          </div>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-title">// TUPLE — sealed box</div>
+          <div class="cells">
+            <div class="cell" style="border-color:var(--tuple-c)"><span class="idx">0</span>3</div>
+            <div class="cell" style="border-color:var(--tuple-c)"><span class="idx">1</span>7</div>
+          </div>
+          <p style="margin-top:18px; font-size:13px;">🔒 Once sealed, nobody — not even you — can open it and change what's inside. If you want a different value, you have to make an entirely new box.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== DICTS ===================== -->
+    <section class="topic" id="dicts" style="--accent:var(--dict-c)">
+      <div class="topic-head">
+        <div class="topic-num">03</div>
+        <h2 class="topic-title">Dicts <span class="mono" style="color:var(--dict-c)">dict</span></h2>
+      </div>
+      <p class="topic-tagline">A phone book: you don't look up a person by position — you look up by name and get their number instantly.</p>
+
+      <div class="grid-2">
+        <div>
+          <p>A <b>Dictionary</b> stores data as <b>key-value pairs</b>. There's no numeric index here — you reach a value directly through its <b>key</b>, which is much faster than searching through a List item by item.</p>
+
+          <div class="code-block">
+            <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>dict_basics.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="c-fn">student</span> = {
+    <span class="c-str">"name"</span>: <span class="c-str">"Sara"</span>,
+    <span class="c-str">"grade"</span>: 3,
+    <span class="c-str">"subjects"</span>: [<span class="c-str">"Math"</span>, <span class="c-str">"Science"</span>]
+}
+
+<span class="c-kw">print</span>(student[<span class="c-str">"name"</span>])          <span class="c-com"># Sara</span>
+<span class="c-kw">print</span>(student.get(<span class="c-str">"age"</span>, <span class="c-str">"?"</span>))  <span class="c-com"># "?" -- get is safe, no Error</span>
+
+student[<span class="c-str">"age"</span>] = 16               <span class="c-com"># add a new key</span>
+<span class="c-kw">del</span> student[<span class="c-str">"grade"</span>]              <span class="c-com"># delete a key</span></pre>
+          </div>
+
+          <div class="callout callout-warn">
+            <div class="ico">⚠️</div>
+            <div><b>The difference between <span class="mono">[]</span> and <span class="mono">.get()</span>:</b> If you use <span class="mono">student["age"]</span> when it doesn't exist, you'll get a <span class="mono">KeyError</span> and the program stops. But <span class="mono">student.get("age", "undefined")</span> returns a default value instead of crashing. Rule of thumb: use <span class="mono">.get()</span> when you're not sure the key exists.</div>
+          </div>
+
+          <h3>Why must the key be Hashable?</h3>
+          <p>Python converts every key into a unique number (hash) and stores it in an internal table, which makes key lookup very fast — roughly O(1) — instead of searching item by item like a List. The problem is that <b>mutable objects like Lists</b> can change, so their hash can change too, which would break the internal table. That's why a List can't be a key, but Tuple, String, and Number can (because they're immutable).</p>
+
+          <div class="code-block">
+            <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>iteration.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="c-kw">for</span> key, value <span class="c-kw">in</span> student.items():
+    <span class="c-kw">print</span>(<span class="c-fn">f</span><span class="c-str">"{key}: {value}"</span>)
+
+<span class="c-kw">for</span> key <span class="c-kw">in</span> student.keys():     <span class="c-com"># or for key in student: (same thing)</span>
+    <span class="c-kw">print</span>(key)
+
+<span class="c-kw">for</span> value <span class="c-kw">in</span> student.values():
+    <span class="c-kw">print</span>(value)</pre>
+          </div>
+
+          <div class="callout callout-pro">
+            <div class="ico">💡</div>
+            <div><b>From Python 3.7+:</b> Dictionaries officially preserve <b>insertion order</b>. That doesn't mean they're "ordered" like a List by index — you still access by key only — but when you loop over one, items appear in the same order you added them.</div>
+          </div>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-title">// DICT — phone book</div>
+          <div class="kv-row"><div class="kv-key">"name"</div><div class="kv-val">"Sara"</div></div>
+          <div class="kv-row"><div class="kv-key">"grade"</div><div class="kv-val">3</div></div>
+          <div class="kv-row"><div class="kv-key">"age"</div><div class="kv-val">16</div></div>
+          <p style="margin-top:14px; font-size:13px;">You don't search for "grade" from first to last — you tell the book: get it, and it finds it instantly.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SETS ===================== -->
+    <section class="topic" id="sets" style="--accent:var(--set-c)">
+      <div class="topic-head">
+        <div class="topic-num">04</div>
+        <h2 class="topic-title">Sets <span class="mono" style="color:var(--set-c)">set</span></h2>
+      </div>
+      <p class="topic-tagline">A bag of colored balls: no two balls share the same color, and there's no "first ball" or "second ball" — just presence or absence.</p>
+
+      <div class="grid-2">
+        <div>
+          <p>A <b>Set</b> is a collection of <b>unique</b> and <b>unordered</b> elements. What does that mean?</p>
+          <ul>
+            <li>No duplicates — if you add an element that already exists, it won't be added again.</li>
+            <li>No index — you can't do <span class="mono">my_set[0]</span>.</li>
+            <li>Lookup is very fast (similar to Dict) because it's built on the same hashing idea.</li>
+          </ul>
+
+          <div class="code-block">
+            <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>set_basics.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="c-fn">nums</span> = {1, 2, 2, 3, 3, 3}
+<span class="c-kw">print</span>(nums)          <span class="c-com"># {1, 2, 3}  -- duplicates removed automatically</span>
+
+<span class="c-fn">empty</span> = <span class="c-kw">set</span>()      <span class="c-com"># must use set() -- because {} is an empty Dict, not a Set!</span>
+
+nums.add(4)
+nums.discard(1)      <span class="c-com"># no Error if not found (unlike remove)</span></pre>
+          </div>
+
+          <h3>Operations that make Sets incredibly powerful</h3>
+          <div class="code-block">
+            <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>set_operations.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="c-fn">a</span> = {1, 2, 3, 4}
+<span class="c-fn">b</span> = {3, 4, 5, 6}
+
+<span class="c-kw">print</span>(a & b)   <span class="c-com"># Intersection -> {3, 4}</span>
+<span class="c-kw">print</span>(a | b)   <span class="c-com"># Union -> {1,2,3,4,5,6}</span>
+<span class="c-kw">print</span>(a - b)   <span class="c-com"># Difference -> {1, 2} (only in a)</span>
+<span class="c-kw">print</span>(a ^ b)   <span class="c-com"># Symmetric diff -> {1,2,5,6} (everything except shared)</span></pre>
+          </div>
+
+          <div class="callout callout-tip">
+            <div class="ico">🎓</div>
+            <div><b>Very common pro use case:</b> Remove duplicates from a List quickly: <span class="mono">unique = list(set(my_list))</span>. Or find shared elements between two lists: <span class="mono">common = set(list1) & set(list2)</span>. The performance difference is huge with large lists.</div>
+          </div>
+
+          <div class="callout callout-warn">
+            <div class="ico">⚠️</div>
+            <div><b>You must know this:</b> Set elements must be <b>hashable</b> too (exactly like Dict keys) — meaning you can't put a List inside a Set, but a Tuple is fine.</div>
+          </div>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-title">// SET — bag of unique balls</div>
+          <div class="blob">
+            <div class="cell" style="border-color:var(--set-c)">1</div>
+            <div class="cell" style="border-color:var(--set-c)">2</div>
+            <div class="cell" style="border-color:var(--set-c)">3</div>
+            <div class="cell" style="border-color:var(--set-c)">4</div>
+          </div>
+          <p style="margin-top:18px; font-size:13px;">There's no order you can feel, and no duplicate copies of the same ball — the bag refuses to accept a color that's already in it.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== LOOPS ===================== -->
+    <section class="topic" id="loops" style="--accent:var(--loop-c)">
+      <div class="topic-head">
+        <div class="topic-num">05</div>
+        <h2 class="topic-title">Loops <span class="mono" style="color:var(--loop-c)">loops</span></h2>
+      </div>
+      <p class="topic-tagline">The tool that lets you repeat anything without writing it 100 times by hand.</p>
+
+      <div class="grid-2">
+        <div>
+          <h3>for loop — when you know what you're iterating over</h3>
+          <div class="code-block">
+            <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>for_loop.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="c-kw">for</span> fruit <span class="c-kw">in</span> [<span class="c-str">"apple"</span>, <span class="c-str">"mango"</span>]:
+    <span class="c-kw">print</span>(fruit)
+
+<span class="c-com"># range(start, stop, step) -- stop is NOT included!</span>
+<span class="c-kw">for</span> i <span class="c-kw">in</span> <span class="c-kw">range</span>(0, 10, 2):
+    <span class="c-kw">print</span>(i)          <span class="c-com"># 0 2 4 6 8</span>
+
+<span class="c-com"># enumerate -- get index and value together</span>
+<span class="c-kw">for</span> i, fruit <span class="c-kw">in</span> <span class="c-kw">enumerate</span>([<span class="c-str">"apple"</span>, <span class="c-str">"mango"</span>]):
+    <span class="c-kw">print</span>(i, fruit)   <span class="c-com"># 0 apple  /  1 mango</span></pre>
+          </div>
+
+          <h3>while loop — when you don't know how many times, but you know the condition</h3>
+          <div class="code-block">
+            <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>while_loop.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="c-fn">balance</span> = 100
+<span class="c-kw">while</span> balance &gt; 0:
+    balance -= 30
+    <span class="c-kw">print</span>(<span class="c-fn">f</span><span class="c-str">"Balance: {balance}"</span>)</pre>
+          </div>
+
+          <h3>break, continue, and the hidden gem: for...else</h3>
+          <div class="code-block">
+            <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>control_flow.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+            <pre><span class="c-kw">for</span> n <span class="c-kw">in</span> <span class="c-kw">range</span>(10):
+    <span class="c-kw">if</span> n == 5:
+        <span class="c-kw">break</span>       <span class="c-com"># stops the entire loop immediately</span>
+    <span class="c-kw">if</span> n % 2 == 0:
+        <span class="c-kw">continue</span>    <span class="c-com"># skips the rest and moves to the next item</span>
+    <span class="c-kw">print</span>(n)
+
+<span class="c-com"># for...else -- else runs if the loop finishes normally without break</span>
+<span class="c-kw">for</span> n <span class="c-kw">in</span> [1, 3, 5]:
+    <span class="c-kw">if</span> n % 2 == 0:
+        <span class="c-kw">break</span>
+<span class="c-kw">else</span>:
+    <span class="c-kw">print</span>(<span class="c-str">"No even number in the list"</span>)  <span class="c-com"># this will run here</span></pre>
+          </div>
+
+          <div class="callout callout-pro">
+            <div class="ico">💡</div>
+            <div><b>Advanced trick:</b> Pros use <span class="mono">for...else</span> instead of a flag variable (like <span class="mono">found = False</span>) to know whether the loop found something or not.</div>
+          </div>
+
+          <h3>Looping over each data structure</h3>
+          <table>
+            <tr><th>Structure</th><th>What the loop yields</th></tr>
+            <tr><td>List / Tuple</td><td>Elements in order</td></tr>
+            <tr><td>Dict</td><td>Keys only (use <span class="mono">.values()</span> for values)</td></tr>
+            <tr><td>Set</td><td>Elements in unpredictable order</td></tr>
+          </table>
+        </div>
+
+        <div class="visual-panel">
+          <div class="visual-title">// LOOP — the spinning wheel</div>
+          <p style="font-size:13px;">Think of a for loop as grabbing each item in the list one after another and handing it to you temporarily in a variable to work on — that item changes every "rotation".</p>
+          <div class="cells">
+            <div class="cell" style="border-color:var(--loop-c)">n=0</div>
+            <div class="cell" style="border-color:var(--loop-c)">n=1</div>
+            <div class="cell" style="border-color:var(--loop-c)">n=2</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== TRICKS ===================== -->
+    <section class="topic" id="tricks">
+      <div class="topic-head">
+        <div class="topic-num">★</div>
+        <h2 class="topic-title">Pro Tips & Tricks</h2>
+      </div>
+      <p class="topic-tagline">The things that separate someone who writes Python from someone who truly understands Python.</p>
+
+      <h3>1) List / Dict / Set Comprehension</h3>
+      <p>Instead of writing a full loop to build a new List, Python gives you a shorter syntax that's also faster.</p>
+      <div class="code-block">
+        <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>comprehensions.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="c-com"># The regular way</span>
+<span class="c-fn">squares</span> = []
+<span class="c-kw">for</span> x <span class="c-kw">in</span> <span class="c-kw">range</span>(6):
+    <span class="c-kw">if</span> x % 2 == 0:
+        squares.append(x**2)
+
+<span class="c-com"># List Comprehension -- same result in one line</span>
+<span class="c-fn">squares</span> = [x**2 <span class="c-kw">for</span> x <span class="c-kw">in</span> <span class="c-kw">range</span>(6) <span class="c-kw">if</span> x % 2 == 0]
+<span class="c-com"># [0, 4, 16]</span>
+
+<span class="c-com"># Dict Comprehension</span>
+<span class="c-fn">squared_map</span> = {x: x**2 <span class="c-kw">for</span> x <span class="c-kw">in</span> <span class="c-kw">range</span>(4)}
+<span class="c-com"># {0:0, 1:1, 2:4, 3:9}</span>
+
+<span class="c-com"># Set Comprehension</span>
+<span class="c-fn">unique_lengths</span> = {<span class="c-kw">len</span>(w) <span class="c-kw">for</span> w <span class="c-kw">in</span> [<span class="c-str">"hi"</span>, <span class="c-str">"cairo"</span>, <span class="c-str">"go"</span>]}</pre>
+      </div>
+
+      <h3>2) zip() — combine multiple lists together</h3>
+      <div class="code-block">
+        <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>zip_trick.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="c-fn">names</span> = [<span class="c-str">"Ali"</span>, <span class="c-str">"Sara"</span>]
+<span class="c-fn">ages</span> = [22, 19]
+
+<span class="c-kw">for</span> name, age <span class="c-kw">in</span> <span class="c-kw">zip</span>(names, ages):
+    <span class="c-kw">print</span>(<span class="c-fn">f</span><span class="c-str">"{name} -> {age}"</span>)
+
+<span class="c-com"># Convert directly to a Dict</span>
+<span class="c-fn">people</span> = <span class="c-kw">dict</span>(<span class="c-kw">zip</span>(names, ages))</pre>
+      </div>
+
+      <h3>3) sorted() with key — smart sorting</h3>
+      <div class="code-block">
+        <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>sort_key.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="c-fn">students</span> = [{<span class="c-str">"name"</span>: <span class="c-str">"Ali"</span>, <span class="c-str">"grade"</span>: 85},
+            {<span class="c-str">"name"</span>: <span class="c-str">"Sara"</span>, <span class="c-str">"grade"</span>: 92}]
+
+<span class="c-com"># Sort by grade without writing a loop</span>
+<span class="c-fn">ranked</span> = <span class="c-kw">sorted</span>(students, key=<span class="c-kw">lambda</span> s: s[<span class="c-str">"grade"</span>], reverse=<span class="c-kw">True</span>)</pre>
+      </div>
+
+      <h3>4) The Walrus Operator <span class="mono">:=</span></h3>
+      <div class="code-block">
+        <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>walrus.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="c-com"># Instead of computing the value twice</span>
+<span class="c-fn">data</span> = [1, 2, 3, 4, 5]
+<span class="c-kw">if</span> (n := <span class="c-kw">len</span>(data)) &gt; 3:
+    <span class="c-kw">print</span>(<span class="c-fn">f</span><span class="c-str">"The list has {n} items"</span>)  <span class="c-com"># n computed only once</span></pre>
+      </div>
+
+      <h3>5) collections — ready-made tools that save you a lot of code</h3>
+      <div class="code-block">
+        <div class="code-head"><div class="code-dots"><span></span><span></span><span></span></div><span>collections_module.py</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="c-kw">from</span> collections <span class="c-kw">import</span> Counter, defaultdict
+
+<span class="c-com"># Counter -- counts occurrences automatically</span>
+<span class="c-fn">votes</span> = [<span class="c-str">"A"</span>, <span class="c-str">"B"</span>, <span class="c-str">"A"</span>, <span class="c-str">"A"</span>, <span class="c-str">"C"</span>]
+<span class="c-kw">print</span>(Counter(votes))
+<span class="c-com"># Counter({'A': 3, 'B': 1, 'C': 1})</span>
+
+<span class="c-com"># defaultdict -- Dict with automatic default value, prevents KeyError</span>
+<span class="c-fn">groups</span> = defaultdict(<span class="c-kw">list</span>)
+groups[<span class="c-str">"fruits"</span>].append(<span class="c-str">"apple"</span>)  <span class="c-com"># works without initializing [] first</span></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="ico">🚀</div>
+        <div><b>Golden rule for performance:</b> If you'll search for an element frequently, use a <span class="mono">set</span> or <span class="mono">dict</span> instead of a <span class="mono">list</span>. Searching a List takes longer as it grows (O(n)), while searching a Set/Dict is nearly constant (O(1)) thanks to hashing.</div>
+      </div>
+    </section>
+
+    <!-- ===================== COMPARE ===================== -->
+    <section class="topic" id="compare">
+      <div class="topic-head">
+        <div class="topic-num">◈</div>
+        <h2 class="topic-title">Full Comparison — When to Use What</h2>
+      </div>
+      <table>
+        <tr><th>Structure</th><th>Ordered?</th><th>Duplicates allowed?</th><th>Mutable?</th><th>Access</th><th>Use when...</th></tr>
+        <tr><td style="color:var(--list-c)">List</td><td>✅</td><td>✅</td><td>✅</td><td>Index</td><td>You need order and frequent changes</td></tr>
+        <tr><td style="color:var(--tuple-c)">Tuple</td><td>✅</td><td>✅</td><td>❌</td><td>Index</td><td>Fixed data, or you need it as a Dict key</td></tr>
+        <tr><td style="color:var(--dict-c)">Dict</td><td>✅ (insertion order)</td><td>❌ for keys</td><td>✅</td><td>Key</td><td>You need to link each value to a name/key</td></tr>
+        <tr><td style="color:var(--set-c)">Set</td><td>❌</td><td>❌</td><td>✅</td><td>None</td><td>You need unique elements or fast lookup</td></tr>
+      </table>
+    </section>
+
+    <!-- ===================== QUIZ ===================== -->
+    <section class="topic" id="quiz">
+      <div class="topic-head">
+        <div class="topic-num">📝</div>
+        <h2 class="topic-title">Test Yourself — 20 Questions</h2>
+      </div>
+      <p class="topic-tagline">Medium-difficulty questions on Loops, List, Tuple, Dict, and Set. Pick an answer for each question and see your score at the end.</p>
+
+      <div class="quiz-shell">
+        <div class="quiz-meta">
+          <div class="quiz-score">Answered: <span id="answeredCount">0</span> / 20</div>
+          <button class="btn secondary" onclick="resetQuiz()">Try Again</button>
+        </div>
+
+        <div id="quizContainer"></div>
+
+        <div class="submit-wrap">
+          <button class="btn" id="submitBtn" onclick="submitQuiz()">Submit Answers</button>
+        </div>
+
+        <div class="result-card" id="resultCard">
+          <div class="result-score" id="resultScore">0/20</div>
+          <div class="result-msg" id="resultMsg"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Made with love ❤️ for your first step in Python — understand, try, and break the code yourself to learn it better.
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  /* ---------------- copy code ---------------- */
+  function copyCode(btn){
+    const pre = btn.closest('.code-block').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText).then(()=>{
+      const old = btn.textContent;
+      btn.textContent = "✓ Copied";
+      setTimeout(()=> btn.textContent = old, 1400);
+    });
+  }
+
+  /* ---------------- active nav + progress ---------------- */
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.navlist a');
+  function onScroll(){
+    let currentId = sections[0].id;
+    sections.forEach(sec=>{
+      if(window.scrollY + 140 >= sec.offsetTop) currentId = sec.id;
+    });
+    navLinks.forEach(a=>{
+      a.classList.toggle('active', a.getAttribute('href') === '#' + currentId);
+    });
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = scrollable > 0 ? (window.scrollY / scrollable) * 100 : 0;
+    document.getElementById('readProgress').style.width = Math.min(pct,100) + '%';
+  }
+  document.addEventListener('scroll', onScroll);
+  onScroll();
+
+  /* ---------------- quiz data ---------------- */
+  const QUESTIONS = [
+    {
+      topic:"List", q:'What is the result of <span class="mono">[10,20,30,40][1:3]</span>?',
+      opts:['<span class="mono">[10,20]</span>','<span class="mono">[20,30]</span>','<span class="mono">[20,30,40]</span>','<span class="mono">[30,40]</span>'],
+      correct:1, expl:'Slicing [1:3] takes from index 1 up to index 2 (3 is not included), so 20 and 30.'
+    },
+    {
+      topic:"List", q:'<span class="mono">a=[1,2,3]; b=a; b.append(4)</span> — what is the value of <span class="mono">a</span> after this?',
+      opts:['<span class="mono">[1,2,3]</span>','<span class="mono">[1,2,3,4]</span>','Error','<span class="mono">[4,1,2,3]</span>'],
+      correct:1, expl:'b points to the same List as a (not a copy), so any change in b shows up in a too.'
+    },
+    {
+      topic:"List", q:'What is the key difference between <span class="mono">list.sort()</span> and <span class="mono">sorted(list)</span>?',
+      opts:['No difference at all','sort() sorts the list itself and returns None, sorted() returns a new copy','sorted() only works with numbers','sort() is a built-in function and sorted() is a method'],
+      correct:1, expl:'sort() is a method that modifies the original list in-place and returns None, while sorted() is a built-in function that returns a new sorted List without touching the original.'
+    },
+    {
+      topic:"List", q:'What is the result of <span class="mono">[1,2,3] + [4,5]</span>?',
+      opts:['Error, you cannot add Lists','<span class="mono">[5,7,3]</span>','<span class="mono">[1,2,3,4,5]</span>','<span class="mono">[1,2,3,[4,5]]</span>'],
+      correct:2, expl:'The + operator between Lists performs concatenation, not arithmetic addition, returning one List with all elements.'
+    },
+    {
+      topic:"Tuple", q:'What happens if you run <span class="mono">t=(1,2,3); t[0]=10</span>?',
+      opts:['t becomes (10,2,3)','TypeError because Tuple is immutable','No effect','SyntaxError'],
+      correct:1, expl:'Tuple is immutable, so any attempt to modify an element raises a TypeError.'
+    },
+    {
+      topic:"Tuple", q:'How do you write a Tuple with a single element (the number 5)?',
+      opts:['<span class="mono">(5)</span>','<span class="mono">[5]</span>','<span class="mono">(5,)</span>','<span class="mono">tuple(5)</span>'],
+      correct:2, expl:'You need a comma after the element, because (5) without a comma is just a regular number in parentheses, not a Tuple.'
+    },
+    {
+      topic:"Tuple", q:'Why do we sometimes use a Tuple as a Dictionary key instead of a List?',
+      opts:['Because Tuple is faster to print','Because List cannot be stored at all','Because Tuple is immutable and therefore hashable, and List is not hashable','No difference, both work'],
+      correct:2, expl:'Dict keys must be hashable, which is only available for immutable objects like Tuple. List is mutable so it is not hashable.'
+    },
+    {
+      topic:"Tuple", q:'What is the result of this code? <span class="mono">x, y = 5, 10; x, y = y, x</span>',
+      opts:['x=5, y=10 (unchanged)','x=10, y=5','Error','x=15, y=15'],
+      correct:1, expl:'This is tuple packing/unpacking that swaps values at the same time: x becomes 10 and y becomes 5.'
+    },
+    {
+      topic:"Dict", q:'What is the result of <span class="mono">{"a":1,"b":2}.get("c", 0)</span>?',
+      opts:['KeyError','None','0','"c"'],
+      correct:2, expl:'.get() returns the default value you specified (0) if the key is missing, without raising an Error.'
+    },
+    {
+      topic:"Dict", q:'Which of these can be a key in a Dictionary?',
+      opts:['List','Set','Tuple','Another Dictionary'],
+      correct:2, expl:'Tuple is immutable and hashable so it can be a key, unlike List, Set, and Dict which are all mutable.'
+    },
+    {
+      topic:"Dict", q:'What does <span class="mono">for x in {"a":1,"b":2}:</span> return in each iteration?',
+      opts:['The value','A tuple of (key, value)','The key','A numeric index'],
+      correct:2, expl:'A regular loop over a Dict iterates over keys only — use .values() or .items() for anything else.'
+    },
+    {
+      topic:"Dict", q:'What is the result of this code? <span class="mono">d={"x":1}; d["x"] = d["x"] + 1</span>',
+      opts:['<span class="mono">{"x": 1}</span>','<span class="mono">{"x": 2}</span>','KeyError','<span class="mono">{"x": 11}</span>'],
+      correct:1, expl:'We take the current value (1), add one, and store it back under the same key, so it becomes 2.'
+    },
+    {
+      topic:"Set", q:'What is the result of <span class="mono">{1,2,2,3,3,3}</span>?',
+      opts:['<span class="mono">{1,2,2,3,3,3}</span>','<span class="mono">{1,2,3}</span>','Error, duplicates not allowed','<span class="mono">[1,2,3]</span>'],
+      correct:1, expl:'Set automatically removes duplicates, leaving only the unique elements {1,2,3}.'
+    },
+    {
+      topic:"Set", q:'What is the result of <span class="mono">{1,2,3} & {2,3,4}</span>?',
+      opts:['<span class="mono">{1,2,3,4}</span>','<span class="mono">{2,3}</span>','<span class="mono">{1,4}</span>','Error'],
+      correct:1, expl:'& is the intersection operation — it returns only the elements shared between both sets.'
+    },
+    {
+      topic:"Set", q:'How do you correctly create an empty Set?',
+      opts:['<span class="mono">x = {}</span>','<span class="mono">x = set()</span>','<span class="mono">x = []</span>','<span class="mono">x = ()</span>'],
+      correct:1, expl:'{} by itself creates an empty Dict, not an empty Set — you must explicitly use the set() function.'
+    },
+    {
+      topic:"Set", q:'Why is searching for an element in a Set faster than in a large List?',
+      opts:['Because Set sorts elements alphabetically','Because Set uses hashing so lookup is roughly O(1), while List searches item by item O(n)','Because Set stores fewer elements','There is no real performance difference'],
+      correct:1, expl:'Set (like Dict) is built on a hash table, so it reaches an element almost directly, unlike a List that must check every element until it finds a match.'
+    },
+    {
+      topic:"Loop", q:'What is the result of <span class="mono">list(range(1,10,3))</span>?',
+      opts:['<span class="mono">[1,4,7]</span>','<span class="mono">[1,2,3]</span>','<span class="mono">[1,4,7,10]</span>','<span class="mono">[3,6,9]</span>'],
+      correct:0, expl:'range(1,10,3) starts at 1, adds 3 each time, and stops before reaching 10, so the result is 1, 4, 7.'
+    },
+    {
+      topic:"Loop", q:'What is the difference between <span class="mono">break</span> and <span class="mono">continue</span>?',
+      opts:['Exactly the same thing','break stops the entire loop, continue skips to the next iteration only','continue stops the loop, break skips one iteration','Both stop the entire program'],
+      correct:1, expl:'break exits the loop entirely, while continue ignores the rest of the code in the current iteration and moves to the next item.'
+    },
+    {
+      topic:"Loop", q:'In <span class="mono">for i, val in enumerate(["x","y","z"]):</span> — what are i and val in the first iteration?',
+      opts:['i=1, val="x"','i=0, val="x"','i="x", val=0','i=0, val="z"'],
+      correct:1, expl:'enumerate() returns (index, value) starting from index=0, so in the first iteration i=0 and val="x".'
+    },
+    {
+      topic:"Mixed", q:'Which of these structures has a comprehension that automatically produces unique elements?',
+      opts:['List comprehension','Tuple comprehension','Set comprehension','All types produce unique elements'],
+      correct:2, expl:'Set comprehension ({...}) builds a Set, and by nature a Set automatically removes any duplicate elements.'
+    },
+  ];
+
+  const container = document.getElementById('quizContainer');
+  const userAnswers = new Array(QUESTIONS.length).fill(null);
+
+  function renderQuiz(){
+    container.innerHTML = QUESTIONS.map((item, qi)=>{
+      const opts = item.opts.map((opt, oi)=>`
+        <label class="opt" data-qi="${qi}" data-oi="${oi}">
+          <input type="radio" name="q${qi}" value="${oi}" onchange="selectAnswer(${qi}, ${oi})">
+          <span>${opt}</span>
+        </label>`).join('');
+      return `
+        <div class="qcard" id="qcard-${qi}">
+          <div class="qnum">Question ${qi+1} / ${QUESTIONS.length} · ${item.topic}</div>
+          <div class="qtext">${item.q}</div>
+          ${opts}
+          <div class="qexpl" id="expl-${qi}"></div>
+        </div>`;
+    }).join('');
+  }
+  renderQuiz();
+
+  function selectAnswer(qi, oi){
+    userAnswers[qi] = oi;
+    document.getElementById('answeredCount').textContent = userAnswers.filter(a=>a!==null).length;
+  }
+
+  function submitQuiz(){
+    let score = 0;
+    QUESTIONS.forEach((item, qi)=>{
+      const options = document.querySelectorAll(`#qcard-${qi} .opt`);
+      options.forEach(opt=>{
+        opt.classList.add('disabled');
+        const oi = parseInt(opt.dataset.oi);
+        if(oi === item.correct) opt.classList.add('correct');
+        else if(oi === userAnswers[qi]) opt.classList.add('wrong');
+      });
+      if(userAnswers[qi] === item.correct) score++;
+      const explBox = document.getElementById(`expl-${qi}`);
+      explBox.innerHTML = `<b>${userAnswers[qi]===item.correct ? '✅ Correct' : '❌ Wrong'}:</b> ${item.expl}`;
+      explBox.classList.add('show');
+    });
+
+    document.getElementById('submitBtn').style.display = 'none';
+    const resultCard = document.getElementById('resultCard');
+    resultCard.classList.add('show');
+    document.getElementById('resultScore').textContent = `${score} / ${QUESTIONS.length}`;
+    let msg = '';
+    if(score >= 18) msg = 'Excellent! You truly understand these structures 🔥';
+    else if(score >= 13) msg = 'Very good — review the questions you got wrong and you\'ll be a pro.';
+    else msg = 'No worries — go back, read the sections again, and try the examples yourself. First time is enough!';
+    document.getElementById('resultMsg').textContent = msg;
+    resultCard.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
+  function resetQuiz(){
+    userAnswers.fill(null);
+    document.getElementById('answeredCount').textContent = 0;
+    document.getElementById('submitBtn').style.display = 'inline-block';
+    document.getElementById('resultCard').classList.remove('show');
+    renderQuiz();
+    document.getElementById('quiz').scrollIntoView({behavior:'smooth'});
+  }
+</script>
+</body>
+</html>
