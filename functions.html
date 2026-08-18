@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Functions — From Zero to Advanced</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;1,400&family=Cascadia+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ════════ TOKENS ════════ */
+:root {
+  --bg:       #0B1512;
+  --bg2:      #111E19;
+  --bg3:      #172820;
+  --card:     #142018;
+  --card2:    #1C2E22;
+  --border:   #243D2C;
+  --border2:  #2F5038;
+
+  --mint:     #3DFF9A;
+  --mint2:    #28D97A;
+  --mint3:    #18A35C;
+  --mint-l:   rgba(61,255,154,.1);
+  --mint-bd:  rgba(61,255,154,.25);
+
+  --amber:    #FFB830;
+  --amber2:   #D49520;
+  --amber-l:  rgba(255,184,48,.1);
+  --amber-bd: rgba(255,184,48,.25);
+
+  --coral:    #FF6B6B;
+  --coral-l:  rgba(255,107,107,.1);
+  --coral-bd: rgba(255,107,107,.25);
+
+  --blue:     #5B9BF0;
+  --blue-l:   rgba(91,155,240,.1);
+  --blue-bd:  rgba(91,155,240,.25);
+
+  --purple:   #C084FC;
+  --purple-l: rgba(192,132,252,.1);
+  --purple-bd:rgba(192,132,252,.25);
+
+  --text:     #E8F0EA;
+  --text2:    #7A9E85;
+  --text3:    #3D5E45;
+
+  --font-d: 'Outfit', sans-serif;
+  --font-b: 'Lora', serif;
+  --font-c: 'Cascadia Code', monospace;
+  --r: 12px;
+  --rsm: 7px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);line-height:1.75;font-size:16px;overflow-x:hidden}
+::selection{background:var(--mint-l);color:var(--mint)}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--mint3)}
+
+/* ════════ TOP NAV ════════ */
+#topnav {
+  position:sticky;top:0;z-index:100;
+  background:rgba(11,21,18,.95);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner {
+  max-width:1100px;margin:0 auto;
+  display:flex;align-items:center;
+  padding:0 32px;height:60px;gap:20px;
+}
+.nav-brand {
+  display:flex;align-items:center;gap:9px;
+  font-family:var(--font-d);font-size:15px;font-weight:700;
+  color:var(--text);flex-shrink:0;
+}
+.brand-icon{font-size:20px}
+.brand-tag{
+  background:var(--mint);color:var(--bg);
+  font-size:10px;font-weight:800;padding:2px 8px;
+  border-radius:4px;letter-spacing:.06em;
+}
+.nav-tabs {
+  display:flex;gap:2px;flex:1;overflow-x:auto;
+  scrollbar-width:none;
+}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab {
+  flex-shrink:0;padding:6px 14px;
+  font-family:var(--font-d);font-size:13px;font-weight:500;
+  color:var(--text3);cursor:pointer;
+  border-radius:var(--rsm);border:none;background:none;
+  transition:all .15s;white-space:nowrap;
+}
+.nav-tab:hover{color:var(--text2);background:var(--bg3)}
+.nav-tab.active{color:var(--mint);background:var(--mint-l);font-weight:600}
+.nav-tab.done{color:var(--mint3)}
+.nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-prog-wrap{display:flex;align-items:center;gap:8px}
+.nav-prog-bar{width:80px;height:4px;background:var(--border);border-radius:99px;overflow:hidden}
+.nav-prog-fill{height:100%;background:var(--mint);border-radius:99px;width:0%;transition:width .4s ease}
+.nav-prog-txt{font-family:var(--font-d);font-size:11px;color:var(--text3);white-space:nowrap}
+.menu-btn{display:none;background:none;border:1px solid var(--border);border-radius:var(--rsm);color:var(--text);padding:6px 10px;font-size:15px;cursor:pointer}
+
+/* mobile drawer */
+#drawer{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.7);
+}
+#drawer.open{display:flex;align-items:flex-start;justify-content:flex-end}
+.drawer-panel{
+  width:260px;height:100vh;background:var(--bg2);
+  border-left:1px solid var(--border);
+  padding:24px 20px;overflow-y:auto;
+}
+.drawer-close{
+  display:flex;justify-content:flex-end;margin-bottom:20px;
+}
+.drawer-close button{background:none;border:none;color:var(--text2);font-size:22px;cursor:pointer}
+.drawer-item{
+  display:block;padding:10px 12px;
+  font-family:var(--font-d);font-size:14px;
+  color:var(--text2);cursor:pointer;
+  border-radius:var(--rsm);margin-bottom:4px;
+  transition:all .15s;border:none;background:none;width:100%;text-align:left;
+}
+.drawer-item:hover{background:var(--bg3);color:var(--text)}
+.drawer-item.active{color:var(--mint);background:var(--mint-l)}
+
+@media(max-width:780px){
+  .nav-tabs{display:none}
+  .nav-prog-wrap{display:none}
+  .menu-btn{display:block}
+}
+
+/* ════════ LAYOUT ════════ */
+#content{max-width:860px;margin:0 auto;padding:56px 32px 120px}
+
+/* ════════ HERO ════════ */
+.hero{margin-bottom:88px}
+.hero-eyebrow{
+  font-family:var(--font-d);font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.18em;color:var(--mint);
+  display:flex;align-items:center;gap:10px;margin-bottom:20px;
+}
+.hero-eyebrow::before{content:'';width:28px;height:2px;background:var(--mint);border-radius:99px;display:block}
+.hero-h{
+  font-family:var(--font-d);
+  font-size:clamp(38px,5.5vw,68px);
+  font-weight:800;line-height:1.06;
+  letter-spacing:-.03em;margin-bottom:22px;
+}
+.hero-h .hm{color:var(--mint)}
+.hero-h .ha{color:var(--amber)}
+.hero-desc{
+  font-size:17px;color:var(--text2);
+  max-width:560px;line-height:1.8;
+  margin-bottom:40px;font-weight:400;
+}
+
+/* Stats strip */
+.hero-stats{display:flex;gap:36px;flex-wrap:wrap;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:48px}
+.hs{}.hs-n{font-family:var(--font-d);font-size:32px;font-weight:800;color:var(--text);line-height:1}
+.hs-n .a{color:var(--mint)}
+.hs-l{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-family:var(--font-d);margin-top:3px}
+
+/* ═══ FUNCTION ANATOMY (Signature) ═══ */
+.anatomy-wrap{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.anat-bar{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 20px;background:var(--bg3);
+  border-bottom:1px solid var(--border);
+}
+.anat-dots{display:flex;gap:5px}
+.anat-dots span{width:10px;height:10px;border-radius:50%}
+.ad1{background:#FF5F56}.ad2{background:#FFBD2E}.ad3{background:#27C93F}
+.anat-title{font-family:var(--font-c);font-size:11px;color:var(--text3);margin-left:4px}
+.anat-body{padding:28px 32px}
+.anat-label{font-family:var(--font-d);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--text3);margin-bottom:20px}
+/* The anatomy code line */
+.anat-code-line{
+  font-family:var(--font-c);font-size:clamp(14px,2.2vw,20px);
+  line-height:1.6;display:flex;flex-wrap:wrap;gap:0;margin-bottom:24px;
+  background:#060E0A;border-radius:var(--r);padding:18px 22px;
+  border:1px solid var(--border);
+}
+.anat-part{
+  cursor:pointer;padding:2px 4px;border-radius:4px;
+  transition:all .2s;border-bottom:2px solid transparent;
+}
+.anat-part:hover,.anat-part.lit{border-bottom-color:currentColor}
+.ap-kw   {color:#C084FC}
+.ap-name {color:var(--mint)}
+.ap-paren{color:var(--text2)}
+.ap-param{color:var(--amber)}
+.ap-colon{color:var(--text2)}
+.ap-body {color:var(--text);background:rgba(255,255,255,.03)}
+.ap-ret  {color:var(--coral)}
+.anat-explain{
+  min-height:60px;background:var(--bg3);
+  border-radius:var(--rsm);padding:14px 18px;
+  font-family:var(--font-d);font-size:14px;line-height:1.65;
+  border:1px solid var(--border);transition:all .2s;
+}
+.anat-explain .part-name{font-weight:700;margin-right:6px}
+.anat-explain p{color:var(--text2);margin-top:4px;font-size:13.5px}
+
+/* ════════ SECTIONS ════════ */
+.section{margin-bottom:96px;scroll-margin-top:72px}
+.sec-head{
+  display:flex;gap:18px;align-items:flex-start;
+  margin-bottom:34px;padding-bottom:22px;
+  border-bottom:1px solid var(--border);
+}
+.sec-badge{
+  font-family:var(--font-d);font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.1em;
+  padding:4px 10px;border-radius:var(--rsm);flex-shrink:0;margin-top:5px;
+}
+.bm {color:var(--mint);  background:var(--mint-l);  border:1px solid var(--mint-bd)}
+.ba {color:var(--amber); background:var(--amber-l); border:1px solid var(--amber-bd)}
+.bc {color:var(--coral); background:var(--coral-l); border:1px solid var(--coral-bd)}
+.bb {color:var(--blue);  background:var(--blue-l);  border:1px solid var(--blue-bd)}
+.bp {color:var(--purple);background:var(--purple-l);border:1px solid var(--purple-bd)}
+
+.sec-title{font-family:var(--font-d);font-size:27px;font-weight:700;letter-spacing:-.02em;line-height:1.2;color:var(--text)}
+.sec-title small{display:block;font-size:14px;font-weight:400;color:var(--text2);margin-top:4px;letter-spacing:0;font-family:var(--font-b)}
+
+/* ════════ CODE BLOCKS ════════ */
+.cw{background:#060E0A;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:26px}
+.cw-bar{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:#040A07;border-bottom:1px solid var(--border)}
+.cw-dots{display:flex;gap:5px}
+.cw-dots span{width:9px;height:9px;border-radius:50%}
+.cd1{background:#FF5F5640}.cd2{background:#FFBD2E40}.cd3{background:#27C93F40}
+.cw-fname{font-family:var(--font-c);font-size:11px;color:var(--text3)}
+.cw-copy{background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--text3);font-size:11px;padding:3px 10px;cursor:pointer;transition:all .2s;font-family:var(--font-b)}
+.cw-copy:hover{border-color:var(--mint);color:var(--mint)}
+.cw-copy.copied{border-color:var(--mint);color:var(--mint)}
+pre{padding:20px 22px;overflow-x:auto;font-family:var(--font-c);font-size:13.5px;line-height:1.9;color:#B8D4BE}
+pre::-webkit-scrollbar{height:4px}
+pre::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+/* Syntax */
+.kw {color:#C084FC;font-weight:600}
+.fn {color:#7DD3FC}
+.st {color:#86EFAC}
+.nm {color:#FCA5A5}
+.cm {color:#2E4D38;font-style:italic}
+.va {color:#E8F0EA}
+.op {color:#FCD34D}
+.bl {color:#67E8F9;font-weight:600}
+.de {color:var(--mint);font-weight:600}
+.rt {color:var(--coral)}
+
+.cw-out{border-top:1px solid var(--border);background:#030806;padding:13px 22px}
+.out-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-family:var(--font-d);margin-bottom:8px}
+.ol{font-family:var(--font-c);font-size:13px;color:var(--mint);line-height:1.8}
+.ol.err{color:var(--coral)}
+.ol.dim{color:var(--text3)}
+
+/* ════════ CONCEPT BOX ════════ */
+.cb{border-radius:var(--r);padding:20px 26px;margin-bottom:24px;position:relative;overflow:hidden}
+.cb::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.cbm{background:var(--mint-l);border:1px solid var(--mint-bd)}.cbm::before{background:var(--mint)}
+.cba{background:var(--amber-l);border:1px solid var(--amber-bd)}.cba::before{background:var(--amber)}
+.cbc{background:var(--coral-l);border:1px solid var(--coral-bd)}.cbc::before{background:var(--coral)}
+.cbb{background:var(--blue-l);border:1px solid var(--blue-bd)}.cbb::before{background:var(--blue)}
+.cbp{background:var(--purple-l);border:1px solid var(--purple-bd)}.cbp::before{background:var(--purple)}
+.cb-tag{font-family:var(--font-d);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px}
+.cbm .cb-tag{color:var(--mint)}.cba .cb-tag{color:var(--amber)}
+.cbc .cb-tag{color:var(--coral)}.cbb .cb-tag{color:var(--blue)}.cbp .cb-tag{color:var(--purple)}
+.cb p{color:var(--text2);font-size:15px;line-height:1.75}
+.cb p+p{margin-top:8px}
+.cb strong{color:var(--text)}
+.cb code{font-family:var(--font-c);font-size:12.5px;background:rgba(255,255,255,.06);border-radius:4px;padding:1px 6px;color:var(--amber)}
+
+/* callouts */
+.tip,.warn,.trick,.danger{border-radius:var(--r);padding:15px 19px;margin-bottom:22px;display:flex;gap:13px;align-items:flex-start;font-size:14.5px}
+.tip   {background:var(--mint-l);  border:1px solid var(--mint-bd)}
+.warn  {background:var(--amber-l); border:1px solid var(--amber-bd)}
+.trick {background:var(--blue-l);  border:1px solid var(--blue-bd)}
+.danger{background:var(--coral-l); border:1px solid var(--coral-bd)}
+.tip   .ico{color:var(--mint);  font-size:17px;flex-shrink:0;margin-top:1px}
+.warn  .ico{color:var(--amber); font-size:17px;flex-shrink:0;margin-top:1px}
+.trick .ico{color:var(--blue);  font-size:17px;flex-shrink:0;margin-top:1px}
+.danger .ico{color:var(--coral);font-size:17px;flex-shrink:0;margin-top:1px}
+.tc p{color:var(--text2);line-height:1.65;font-size:14px}
+.tc strong{display:block;margin-bottom:3px;color:var(--text);font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-family:var(--font-d);font-weight:700}
+.tc code{font-family:var(--font-c);font-size:12px;background:rgba(255,255,255,.06);border-radius:4px;padding:1px 5px;color:var(--amber)}
+
+/* prose */
+.prose{color:var(--text2);font-size:15.5px;line-height:1.85;margin-bottom:20px}
+.prose strong{color:var(--text);font-weight:600}
+.prose em{color:var(--mint);font-style:normal;font-weight:500}
+.prose code{font-family:var(--font-c);font-size:13px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:1px 6px;color:var(--amber)}
+
+/* h3 inline */
+.h3{font-family:var(--font-d);font-size:19px;font-weight:700;margin:32px 0 14px;color:var(--text);letter-spacing:-.01em}
+
+/* ════════ COMPARISON TABLE ════════ */
+.ctbl{width:100%;border-collapse:collapse;margin-bottom:26px;font-size:14px;border-radius:var(--r);overflow:hidden}
+.ctbl th{background:var(--bg3);padding:12px 18px;text-align:left;font-family:var(--font-d);font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border)}
+.ctbl th:first-child{color:var(--mint)}
+.ctbl td{padding:12px 18px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;line-height:1.55}
+.ctbl td:first-child{color:var(--text);font-weight:600;font-family:var(--font-d)}
+.ctbl tr:last-child td{border-bottom:none}
+.ctbl tr:hover td{background:rgba(255,255,255,.015)}
+.ctbl code{font-family:var(--font-c);font-size:12px;color:var(--amber);background:var(--amber-l);padding:1px 5px;border-radius:3px}
+
+/* ════════ PARAM CARDS GRID ════════ */
+.param-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:13px;margin-bottom:26px}
+.param-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;transition:all .2s}
+.param-card:hover{border-color:var(--mint-bd);transform:translateY(-2px);box-shadow:0 8px 24px rgba(61,255,154,.06)}
+.pc-name{font-family:var(--font-c);font-size:14px;font-weight:600;color:var(--mint);margin-bottom:5px}
+.pc-type{font-family:var(--font-c);font-size:10.5px;color:var(--text3);margin-bottom:10px;font-style:italic}
+.pc-desc{font-size:13px;color:var(--text2);line-height:1.6}
+.pc-ex{margin-top:10px;font-family:var(--font-c);font-size:11.5px;color:var(--amber);background:var(--amber-l);border-radius:var(--rsm);padding:6px 10px;border:1px solid var(--amber-bd)}
+
+/* ════════ CHALLENGE CARDS ════════ */
+.ch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:13px;margin-bottom:26px}
+.ch{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:20px;transition:all .2s}
+.ch:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.ch-badge{font-family:var(--font-d);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:3px 9px;border-radius:99px;display:inline-block;margin-bottom:12px}
+.lv1{background:var(--mint-l);  color:var(--mint);  border:1px solid var(--mint-bd)}
+.lv2{background:var(--amber-l); color:var(--amber); border:1px solid var(--amber-bd)}
+.lv3{background:var(--coral-l); color:var(--coral); border:1px solid var(--coral-bd)}
+.ch-title{font-family:var(--font-d);font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.35}
+.ch-desc{font-size:13px;color:var(--text2);line-height:1.6}
+.ch-hint{margin-top:12px;font-family:var(--font-c);font-size:11.5px;color:var(--text3);background:var(--bg3);border-radius:var(--rsm);padding:7px 11px}
+
+/* ════════ QUIZ ════════ */
+.qw{background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
+.qw-head{background:var(--bg3);padding:13px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border)}
+.qw-num{width:28px;height:28px;border-radius:7px;background:var(--mint);color:var(--bg);font-family:var(--font-d);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.qw-ht{font-family:var(--font-d);font-size:14px;font-weight:600;color:var(--text)}
+.qw-ht small{font-size:11px;color:var(--text3);font-weight:400;display:block}
+.qw-body{padding:18px 20px}
+.qw-q{font-size:15px;font-weight:500;color:var(--text);margin-bottom:14px;line-height:1.6}
+.qw-q code{font-family:var(--font-c);font-size:13px;color:var(--amber);background:var(--amber-l);padding:1px 6px;border-radius:4px}
+.qw-code{font-family:var(--font-c);font-size:12.5px;background:#040A07;border:1px solid var(--border);border-radius:var(--rsm);padding:12px 16px;margin-bottom:14px;overflow-x:auto;white-space:pre;line-height:1.85;color:#B8D4BE}
+.qw-opts{display:flex;flex-direction:column;gap:7px;margin-bottom:13px}
+.qw-opt{display:flex;align-items:center;gap:11px;padding:11px 15px;border:1.5px solid var(--border);border-radius:var(--rsm);cursor:pointer;font-size:14px;color:var(--text2);transition:all .15s;user-select:none}
+.qw-opt:hover{border-color:var(--mint);color:var(--text);background:var(--mint-l)}
+.qw-opt.sel  {border-color:var(--mint);  background:var(--mint-l);  color:var(--mint)}
+.qw-opt.ok   {border-color:var(--mint);  background:var(--mint-l);  color:var(--mint)}
+.qw-opt.bad  {border-color:var(--coral); background:var(--coral-l); color:var(--coral)}
+.qw-key{width:24px;height:24px;border-radius:5px;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-c);font-size:11px;font-weight:600;color:var(--text3);flex-shrink:0;transition:all .2s}
+.qw-opt.sel .qw-key,.qw-opt.ok .qw-key{background:var(--mint);border-color:var(--mint);color:var(--bg)}
+.qw-opt.bad .qw-key{background:var(--coral);border-color:var(--coral);color:#fff}
+.qw-actions{display:flex;gap:8px}
+.qw-sub{background:var(--mint2);color:var(--bg);font-family:var(--font-d);font-size:13px;font-weight:700;border:none;border-radius:var(--rsm);padding:10px 22px;cursor:pointer;transition:all .2s}
+.qw-sub:hover{background:var(--mint)}
+.qw-sub:disabled{opacity:.3;cursor:not-allowed}
+.qw-next{background:transparent;border:1px solid var(--border2);color:var(--text2);font-family:var(--font-d);font-size:13px;font-weight:600;border-radius:var(--rsm);padding:10px 20px;cursor:pointer;transition:all .2s;display:none}
+.qw-next:hover{border-color:var(--mint);color:var(--mint)}
+.qw-next.show{display:block}
+.qw-fb{margin-top:13px;padding:12px 15px;border-radius:var(--rsm);font-size:14px;line-height:1.65;display:none}
+.qw-fb.show{display:block}
+.qw-fb.ok {background:var(--mint-l);border:1px solid var(--mint-bd);color:#86EFAC}
+.qw-fb.bad{background:var(--coral-l);border:1px solid var(--coral-bd);color:#FCA5A5}
+.qw-fb strong{display:block;margin-bottom:3px}
+
+/* ════════ FOOTER ════════ */
+#footer{border-top:1px solid var(--border);padding:56px 32px;text-align:center;background:var(--bg2);margin-top:40px}
+.foot-icon{font-size:46px;display:block;margin-bottom:14px}
+.foot-h{font-family:var(--font-d);font-size:22px;font-weight:700;margin-bottom:7px}
+.foot-s{color:var(--text3);font-size:14px}
+
+/* ════════ RESPONSIVE ════════ */
+@media(max-width:700px){
+  #content{padding:32px 16px 80px}
+  .ch-grid,.param-grid{grid-template-columns:1fr}
+  .sec-title{font-size:21px}
+  .hero-stats{gap:20px}
+  .anat-code-line{font-size:13px;padding:14px 14px}
+  .ctbl{font-size:13px}
+  .ctbl th,.ctbl td{padding:9px 12px}
+  .nav-inner{padding:0 16px}
+  #footer{padding:40px 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ TOP NAV ═══════ -->
+<nav id="topnav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <span class="brand-icon">🐍</span>
+      <span>Python</span>
+      <span class="brand-tag">FUNCTIONS</span>
+    </div>
+    <div class="nav-tabs" id="navTabs">
+      <button class="nav-tab active" data-sec="intro"      onclick="navTo('intro',this)">Intro</button>
+      <button class="nav-tab" data-sec="anatomy"   onclick="navTo('anatomy',this)">Anatomy</button>
+      <button class="nav-tab" data-sec="params"    onclick="navTo('params',this)">Parameters</button>
+      <button class="nav-tab" data-sec="returns"   onclick="navTo('returns',this)">Return Values</button>
+      <button class="nav-tab" data-sec="scope"     onclick="navTo('scope',this)">Scope</button>
+      <button class="nav-tab" data-sec="defaults"  onclick="navTo('defaults',this)">Defaults & kwargs</button>
+      <button class="nav-tab" data-sec="advanced"  onclick="navTo('advanced',this)">Advanced</button>
+      <button class="nav-tab" data-sec="lambda"    onclick="navTo('lambda',this)">Lambda</button>
+      <button class="nav-tab" data-sec="recursion" onclick="navTo('recursion',this)">Recursion</button>
+      <button class="nav-tab" data-sec="quiz"      onclick="navTo('quiz',this)">Quiz</button>
+      <button class="nav-tab" data-sec="challenges"onclick="navTo('challenges',this)">Challenges</button>
+    </div>
+    <div class="nav-right">
+      <div class="nav-prog-wrap">
+        <div class="nav-prog-bar"><div class="nav-prog-fill" id="navProgFill"></div></div>
+        <span class="nav-prog-txt" id="navProgTxt">0/11</span>
+      </div>
+      <button class="menu-btn" id="menuBtn">☰</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile drawer -->
+<div id="drawer">
+  <div class="drawer-panel">
+    <div class="drawer-close"><button onclick="closeDrawer()">✕</button></div>
+    <button class="drawer-item active" onclick="navTo('intro',this);closeDrawer()">🌱 Intro</button>
+    <button class="drawer-item" onclick="navTo('anatomy',this);closeDrawer()">🔬 Anatomy</button>
+    <button class="drawer-item" onclick="navTo('params',this);closeDrawer()">⚙️ Parameters</button>
+    <button class="drawer-item" onclick="navTo('returns',this);closeDrawer()">↩️ Return Values</button>
+    <button class="drawer-item" onclick="navTo('scope',this);closeDrawer()">🔭 Scope</button>
+    <button class="drawer-item" onclick="navTo('defaults',this);closeDrawer()">🎛️ Defaults & kwargs</button>
+    <button class="drawer-item" onclick="navTo('advanced',this);closeDrawer()">⚡ Advanced</button>
+    <button class="drawer-item" onclick="navTo('lambda',this);closeDrawer()">λ Lambda</button>
+    <button class="drawer-item" onclick="navTo('recursion',this);closeDrawer()">🌀 Recursion</button>
+    <button class="drawer-item" onclick="navTo('quiz',this);closeDrawer()">🎯 Quiz</button>
+    <button class="drawer-item" onclick="navTo('challenges',this);closeDrawer()">🏆 Challenges</button>
+  </div>
+</div>
+
+<div id="content">
+
+<!-- ═══════ HERO ═══════ -->
+<div class="hero">
+  <div class="hero-eyebrow">Python for Everyone — Functions Edition</div>
+  <h1 class="hero-h">
+    Stop Repeating<br>
+    Yourself. Write<br>
+    <span class="hm">Functions</span> <span class="ha">Once.</span>
+  </h1>
+  <p class="hero-desc">
+    Functions are the single most important concept in programming. They let you package a task, name it, and reuse it anywhere. Master them and your code becomes clean, powerful, and professional.
+  </p>
+
+  <div class="hero-stats">
+    <div class="hs"><div class="hs-n"><span class="a">11</span></div><div class="hs-l">Chapters</div></div>
+    <div class="hs"><div class="hs-n"><span class="a">35+</span></div><div class="hs-l">Code Examples</div></div>
+    <div class="hs"><div class="hs-n"><span class="a">15</span></div><div class="hs-l">Quiz Questions</div></div>
+    <div class="hs"><div class="hs-n"><span class="a">DRY</span></div><div class="hs-l">Principle</div></div>
+  </div>
+
+  <!-- FUNCTION ANATOMY — Signature Element -->
+  <div class="anatomy-wrap">
+    <div class="anat-bar">
+      <div class="anat-dots"><span class="ad1"></span><span class="ad2"></span><span class="ad3"></span></div>
+      <span class="anat-title">function_anatomy.py — hover any part to learn what it does</span>
+    </div>
+    <div class="anat-body">
+      <div class="anat-label">Interactive Function Anatomy — Click any colored part below</div>
+      <div class="anat-code-line" id="anatLine">
+        <span class="anat-part ap-kw"   data-part="kw"    onclick="explainPart('kw')">def</span>
+        <span style="color:var(--text2)">&nbsp;</span>
+        <span class="anat-part ap-name" data-part="name"  onclick="explainPart('name')">greet</span>
+        <span class="anat-part ap-paren"data-part="paren" onclick="explainPart('paren')">(</span>
+        <span class="anat-part ap-param"data-part="param" onclick="explainPart('param')">name</span>
+        <span class="anat-part ap-paren"data-part="paren2"onclick="explainPart('paren')">,&nbsp;</span>
+        <span class="anat-part ap-param"data-part="param2"onclick="explainPart('param')">times=1</span>
+        <span class="anat-part ap-paren"data-part="paren3"onclick="explainPart('paren')">)</span>
+        <span class="anat-part ap-colon"data-part="colon" onclick="explainPart('colon')">:</span>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="anat-part ap-body" data-part="body"  onclick="explainPart('body')">message = f"Hello, {'{name}'}! " * times</span>
+        <br>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="anat-part ap-ret"  data-part="ret"   onclick="explainPart('ret')">return message</span>
+      </div>
+      <div class="anat-explain" id="anatExplain">
+        <span style="color:var(--text3);font-size:13px">👆 Click on any colored part of the function above to learn what it does.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     S1: INTRO
+══════════════════════════════════ -->
+<section class="section" id="intro" data-sec="intro">
+  <div class="sec-head">
+    <div class="sec-badge bm">Ch 01</div>
+    <div>
+      <h2 class="sec-title">What is a Function?
+        <small>The art of packaging reusable work into a named block</small>
+      </h2>
+    </div>
+  </div>
+
+  <div class="cb cbm">
+    <div class="cb-tag">💡 Core Concept</div>
+    <p>A <strong>function</strong> is a named block of code that performs a specific task. You define it once, then call it as many times as you need. Think of it like a recipe: write it once, cook it whenever you want.</p>
+    <p>The core principle is <strong>DRY</strong> — Don't Repeat Yourself. If you find yourself writing the same code twice, that code belongs in a function.</p>
+  </div>
+
+  <p class="prose">Without functions, every time you want to greet a user, you repeat code. With functions, you write it once:</p>
+
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">without_functions.py — The painful way</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="cm"># Without functions — messy, repetitive</span>
+<span class="fn">print</span>(<span class="st">"Hello, Ahmed! Welcome."</span>)
+<span class="fn">print</span>(<span class="st">"Hello, Sara! Welcome."</span>)
+<span class="fn">print</span>(<span class="st">"Hello, Mona! Welcome."</span>)
+<span class="cm"># What if you need to change the format? Edit 3 lines!</span>
+
+<span class="cm"># With a function — define once, use everywhere ✨</span>
+<span class="de">def</span> <span class="fn">greet</span>(<span class="va">name</span>):
+    <span class="fn">print</span>(<span class="st">f"Hello, {name}! Welcome."</span>)
+
+<span class="fn">greet</span>(<span class="st">"Ahmed"</span>)
+<span class="fn">greet</span>(<span class="st">"Sara"</span>)
+<span class="fn">greet</span>(<span class="st">"Mona"</span>)
+<span class="cm"># Need to change? Edit ONE place — the function body.</span></pre>
+    <div class="cw-out">
+      <div class="out-lbl">Output</div>
+      <div class="ol">Hello, Ahmed! Welcome.</div>
+      <div class="ol">Hello, Sara! Welcome.</div>
+      <div class="ol">Hello, Mona! Welcome.</div>
+    </div>
+  </div>
+
+  <div class="h3">Why Functions Matter — Three Superpowers</div>
+  <div class="cb cba">
+    <div class="cb-tag">🦸 The 3 Superpowers</div>
+    <p><strong>1. Reusability</strong> — Write once, call anywhere. Your greet() function works for a million users with zero extra code.<br><br>
+    <strong>2. Readability</strong> — <code>calculate_tax(price)</code> tells you exactly what's happening. Without it, you'd see raw math and have to guess.<br><br>
+    <strong>3. Maintainability</strong> — When the logic changes, you update one function. Every call gets the update automatically.</p>
+  </div>
+
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">first_function.py — Your very first function</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="cm"># Step 1: DEFINE the function (this doesn't run it yet!)</span>
+<span class="de">def</span> <span class="fn">say_hello</span>():           <span class="cm"># "def" = define, () = no inputs needed</span>
+    <span class="fn">print</span>(<span class="st">"Hello, World!"</span>) <span class="cm"># indented body — runs when called</span>
+    <span class="fn">print</span>(<span class="st">"Python is fun!"</span>)
+
+<span class="cm"># Step 2: CALL the function (this actually runs it)</span>
+<span class="fn">say_hello</span>()   <span class="cm"># First call</span>
+<span class="fn">say_hello</span>()   <span class="cm"># Second call — same function, runs again!</span>
+<span class="fn">say_hello</span>()   <span class="cm"># Third call</span>
+
+<span class="cm"># The function body ran 3 times from 3 short calls</span></pre>
+    <div class="cw-out">
+      <div class="out-lbl">Output</div>
+      <div class="ol">Hello, World!</div>
+      <div class="ol">Python is fun!</div>
+      <div class="ol">Hello, World!</div>
+      <div class="ol">Python is fun!</div>
+      <div class="ol">Hello, World!</div>
+      <div class="ol">Python is fun!</div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <div class="ico">💡</div>
+    <div class="tc">
+      <strong>Define vs Call — Know the Difference</strong>
+      <p>Defining a function with <code>def</code> does NOT run it. It just saves the code for later. Calling the function by writing its name with <code>()</code> is what actually executes it. You can define once and call thousands of times.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     S2: ANATOMY
+══════════════════════════════════ -->
+<section class="section" id="anatomy" data-sec="anatomy">
+  <div class="sec-head">
+    <div class="sec-badge bm">Ch 02</div>
+    <div>
+      <h2 class="sec-title">Function Anatomy
+        <small>Every piece of the syntax — what it means and why it's there</small>
+      </h2>
+    </div>
+  </div>
+
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">anatomy.py — All parts labelled</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="cm">#  keyword   name       parameter(s)  colon</span>
+<span class="cm">#     ↓        ↓              ↓          ↓</span>
+    <span class="de">def</span>   <span class="fn">add_numbers</span>(<span class="va">a</span>, <span class="va">b</span>)<span class="op">:</span>
+    <span class="fn">print</span>(<span class="st">f"Adding {a} + {b}"</span>)   <span class="cm"># ← function body (indented)</span>
+    <span class="va">result</span> <span class="op">=</span> <span class="va">a</span> <span class="op">+</span> <span class="va">b</span>
+    <span class="rt">return</span> <span class="va">result</span>               <span class="cm"># ← return value</span>
+
+<span class="cm"># Calling it: pass arguments that fill the parameters</span>
+<span class="va">total</span> <span class="op">=</span> <span class="fn">add_numbers</span>(<span class="nm">3</span>, <span class="nm">7</span>)    <span class="cm"># a=3, b=7</span>
+<span class="fn">print</span>(<span class="va">total</span>)                   <span class="cm"># 10</span></pre>
+  </div>
+
+  <table class="ctbl">
+    <thead><tr><th>Part</th><th>What It Is</th><th>Example</th><th>Required?</th></tr></thead>
+    <tbody>
+      <tr><td>def</td><td>Keyword that tells Python "I'm defining a function"</td><td><code>def</code></td><td>✅ Always</td></tr>
+      <tr><td>Function name</td><td>The name you give it — use snake_case, be descriptive</td><td><code>add_numbers</code></td><td>✅ Always</td></tr>
+      <tr><td>Parentheses ()</td><td>Holds parameters. Empty () if no parameters needed</td><td><code>(a, b)</code></td><td>✅ Always</td></tr>
+      <tr><td>Parameters</td><td>Variable names that receive values when called</td><td><code>a, b</code></td><td>Optional</td></tr>
+      <tr><td>Colon :</td><td>Marks the end of the function header — always required</td><td><code>:</code></td><td>✅ Always</td></tr>
+      <tr><td>Body</td><td>The indented code that runs when the function is called</td><td><code>result = a + b</code></td><td>✅ Always</td></tr>
+      <tr><td>return</td><td>Sends a value back to the caller — exits the function</td><td><code>return result</code></td><td>Optional</td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn">
+    <div class="ico">⚠️</div>
+    <div class="tc">
+      <strong>Naming Rules — Follow These Always</strong>
+      <p>Function names must start with a letter or underscore, use only letters/digits/underscores, and are <strong>case-sensitive</strong>. Use snake_case: <code>calculate_tax</code> ✅, NOT <code>CalculateTax</code> or <code>calculate-tax</code>. Name it by what it DOES: <code>get_user</code>, <code>send_email</code>, <code>is_valid</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     S3: PARAMETERS
+══════════════════════════════════ -->
+<section class="section" id="params" data-sec="params">
+  <div class="sec-head">
+    <div class="sec-badge ba">Ch 03</div>
+    <div>
+      <h2 class="sec-title">Parameters &amp; Arguments
+        <small>How data flows INTO a function</small>
+      </h2>
+    </div>
+  </div>
+
+  <div class="cb cba">
+    <div class="cb-tag">⚙️ Parameter vs Argument</div>
+    <p>A <strong>parameter</strong> is the variable name in the function definition — it's a placeholder. An <strong>argument</strong> is the actual value you pass when calling the function. Think of parameters as empty boxes; arguments are what you put in the boxes.</p>
+    <p><code>def greet(name):</code> — here <strong>name</strong> is the parameter. <code>greet("Ahmed")</code> — here <strong>"Ahmed"</strong> is the argument.</p>
+  </div>
+
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">parameters.py — Single, multiple, and no parameters</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="cm"># No parameters</span>
+<span class="de">def</span> <span class="fn">show_menu</span>():
+    <span class="fn">print</span>(<span class="st">"1. Start\n2. Settings\n3. Quit"</span>)
+
+<span class="fn">show_menu</span>()  <span class="cm"># no arguments needed</span>
+
+<span class="cm"># One parameter</span>
+<span class="de">def</span> <span class="fn">square</span>(<span class="va">n</span>):
+    <span class="fn">print</span>(<span class="va">n</span> <span class="op">**</span> <span class="nm">2</span>)
+
+<span class="fn">square</span>(<span class="nm">5</span>)   <span class="cm"># 25</span>
+<span class="fn">square</span>(<span class="nm">9</span>)   <span class="cm"># 81</span>
+
+<span class="cm"># Multiple parameters</span>
+<span class="de">def</span> <span class="fn">describe_person</span>(<span class="va">name</span>, <span class="va">age</span>, <span class="va">city</span>):
+    <span class="fn">print</span>(<span class="st">f"{name} is {age} years old and lives in {city}."</span>)
+
+<span class="fn">describe_person</span>(<span class="st">"Sara"</span>, <span class="nm">22</span>, <span class="st">"Cairo"</span>)    <span class="cm"># positional</span>
+<span class="fn">describe_person</span>(<span class="va">age</span><span class="op">=</span><span class="nm">25</span>, <span class="va">name</span><span class="op">=</span><span class="st">"Ali"</span>, <span class="va">city</span><span class="op">=</span><span class="st">"Alex"</span>)  <span class="cm"># keyword</span></pre>
+    <div class="cw-out">
+      <div class="out-lbl">Output</div>
+      <div class="ol">Sara is 22 years old and lives in Cairo.</div>
+      <div class="ol">Ali is 25 years old and lives in Alex.</div>
+    </div>
+  </div>
+
+  <div class="h3">Positional vs Keyword Arguments</div>
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">arg_types.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="de">def</span> <span class="fn">power</span>(<span class="va">base</span>, <span class="va">exponent</span>):
+    <span class="rt">return</span> <span class="va">base</span> <span class="op">**</span> <span class="va">exponent</span>
+
+<span class="cm"># Positional — order matters!</span>
+<span class="fn">print</span>(<span class="fn">power</span>(<span class="nm">2</span>, <span class="nm">10</span>))    <span class="cm"># base=2, exponent=10 → 1024</span>
+<span class="fn">print</span>(<span class="fn">power</span>(<span class="nm">10</span>, <span class="nm">2</span>))    <span class="cm"># base=10, exponent=2 → 100 (different!)</span>
+
+<span class="cm"># Keyword — order doesn't matter</span>
+<span class="fn">print</span>(<span class="fn">power</span>(<span class="va">exponent</span><span class="op">=</span><span class="nm">3</span>, <span class="va">base</span><span class="op">=</span><span class="nm">5</span>))  <span class="cm"># base=5, exponent=3 → 125</span></pre>
+    <div class="cw-out">
+      <div class="out-lbl">Output</div>
+      <div class="ol">1024</div>
+      <div class="ol">100</div>
+      <div class="ol">125</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     S4: RETURN VALUES
+══════════════════════════════════ -->
+<section class="section" id="returns" data-sec="returns">
+  <div class="sec-head">
+    <div class="sec-badge ba">Ch 04</div>
+    <div>
+      <h2 class="sec-title">Return Values
+        <small>Functions that give you something back</small>
+      </h2>
+    </div>
+  </div>
+
+  <div class="cb cba">
+    <div class="cb-tag">↩️ Concept</div>
+    <p>The <strong>return</strong> statement sends a value back to whoever called the function, and immediately exits the function. Without return, a function returns <code>None</code> by default.</p>
+    <p>Think of it like ordering food: you call the restaurant (call the function), they cook (run the body), and hand you the meal (return the value). You can then use that meal (use the returned value) however you like.</p>
+  </div>
+
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">return_values.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="cm"># Return a single value</span>
+<span class="de">def</span> <span class="fn">celsius_to_fahrenheit</span>(<span class="va">c</span>):
+    <span class="rt">return</span> (<span class="va">c</span> <span class="op">*</span> <span class="nm">9</span> <span class="op">/</span> <span class="nm">5</span>) <span class="op">+</span> <span class="nm">32</span>
+
+<span class="va">temp</span> <span class="op">=</span> <span class="fn">celsius_to_fahrenheit</span>(<span class="nm">100</span>)
+<span class="fn">print</span>(<span class="st">f"100°C = {temp}°F"</span>)     <span class="cm"># 212.0</span>
+
+<span class="cm"># Return multiple values (as a tuple)</span>
+<span class="de">def</span> <span class="fn">min_max</span>(<span class="va">numbers</span>):
+    <span class="rt">return</span> <span class="fn">min</span>(<span class="va">numbers</span>), <span class="fn">max</span>(<span class="va">numbers</span>)
+
+<span class="va">lo</span>, <span class="va">hi</span> <span class="op">=</span> <span class="fn">min_max</span>([<span class="nm">5</span>, <span class="nm">2</span>, <span class="nm">9</span>, <span class="nm">1</span>, <span class="nm">7</span>])
+<span class="fn">print</span>(<span class="st">f"Min: {lo}, Max: {hi}"</span>)   <span class="cm"># Min: 1, Max: 9</span>
+
+<span class="cm"># Early return — exit as soon as condition met</span>
+<span class="de">def</span> <span class="fn">is_even</span>(<span class="va">n</span>):
+    <span class="kw">if</span> <span class="va">n</span> <span class="op">%</span> <span class="nm">2</span> <span class="op">==</span> <span class="nm">0</span>:
+        <span class="rt">return</span> <span class="bl">True</span>    <span class="cm"># exits immediately</span>
+    <span class="rt">return</span> <span class="bl">False</span>       <span class="cm"># only reached if not even</span>
+
+<span class="fn">print</span>(<span class="fn">is_even</span>(<span class="nm">4</span>))   <span class="cm"># True</span>
+<span class="fn">print</span>(<span class="fn">is_even</span>(<span class="nm">7</span>))   <span class="cm"># False</span>
+
+<span class="cm"># No return → returns None</span>
+<span class="de">def</span> <span class="fn">just_print</span>(<span class="va">msg</span>):
+    <span class="fn">print</span>(<span class="va">msg</span>)
+    <span class="cm"># no return statement</span>
+
+<span class="va">result</span> <span class="op">=</span> <span class="fn">just_print</span>(<span class="st">"hi"</span>)
+<span class="fn">print</span>(<span class="va">result</span>)   <span class="cm"># None</span></pre>
+  </div>
+
+  <div class="trick">
+    <div class="ico">⚡</div>
+    <div class="tc">
+      <strong>Return Exits the Function Immediately</strong>
+      <p>Any code after a <code>return</code> statement is <strong>unreachable</strong> — it never runs. This is useful for early exits (like validation guards) and makes functions easier to reason about.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     S5: SCOPE
+══════════════════════════════════ -->
+<section class="section" id="scope" data-sec="scope">
+  <div class="sec-head">
+    <div class="sec-badge bc">Ch 05</div>
+    <div>
+      <h2 class="sec-title">Variable Scope
+        <small>Local vs global — where variables live and who can see them</small>
+      </h2>
+    </div>
+  </div>
+
+  <div class="cb cbc">
+    <div class="cb-tag">🔭 Concept</div>
+    <p><strong>Scope</strong> is the region of code where a variable is visible and accessible. Variables created inside a function are <em>local</em> — they exist only inside that function and disappear when it ends. Variables created outside are <em>global</em> — visible everywhere.</p>
+  </div>
+
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">scope.py — Local vs Global</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="cm"># GLOBAL variable — lives outside any function</span>
+<span class="va">greeting</span> <span class="op">=</span> <span class="st">"Hello"</span>   <span class="cm"># visible everywhere</span>
+
+<span class="de">def</span> <span class="fn">say_hi</span>(<span class="va">name</span>):
+    <span class="cm"># LOCAL variable — only exists inside say_hi()</span>
+    <span class="va">message</span> <span class="op">=</span> <span class="st">f"{greeting}, {name}!"</span>  <span class="cm"># can READ global</span>
+    <span class="fn">print</span>(<span class="va">message</span>)
+
+<span class="fn">say_hi</span>(<span class="st">"Ahmed"</span>)          <span class="cm"># Hello, Ahmed!</span>
+<span class="cm"># print(message)         # ← NameError! message is LOCAL</span>
+
+<span class="cm"># Two functions, same local name — no conflict!</span>
+<span class="de">def</span> <span class="fn">func_a</span>():
+    <span class="va">x</span> <span class="op">=</span> <span class="nm">10</span>
+    <span class="fn">print</span>(<span class="st">f"func_a: x = {x}"</span>)
+
+<span class="de">def</span> <span class="fn">func_b</span>():
+    <span class="va">x</span> <span class="op">=</span> <span class="nm">99</span>    <span class="cm"># completely different x!</span>
+    <span class="fn">print</span>(<span class="st">f"func_b: x = {x}"</span>)
+
+<span class="fn">func_a</span>()    <span class="cm"># func_a: x = 10</span>
+<span class="fn">func_b</span>()    <span class="cm"># func_b: x = 99</span></pre>
+    <div class="cw-out">
+      <div class="out-lbl">Output</div>
+      <div class="ol">Hello, Ahmed!</div>
+      <div class="ol">func_a: x = 10</div>
+      <div class="ol">func_b: x = 99</div>
+    </div>
+  </div>
+
+  <div class="h3">Modifying a Global Variable — The global Keyword</div>
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">global_keyword.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="va">count</span> <span class="op">=</span> <span class="nm">0</span>   <span class="cm"># global</span>
+
+<span class="de">def</span> <span class="fn">increment</span>():
+    <span class="kw">global</span> <span class="va">count</span>    <span class="cm"># tell Python: use the GLOBAL count</span>
+    <span class="va">count</span> <span class="op">+=</span> <span class="nm">1</span>
+
+<span class="fn">increment</span>()
+<span class="fn">increment</span>()
+<span class="fn">increment</span>()
+<span class="fn">print</span>(<span class="va">count</span>)   <span class="cm"># 3</span></pre>
+  </div>
+
+  <div class="danger">
+    <div class="ico">🚨</div>
+    <div class="tc">
+      <strong>Avoid globals — they create hidden dependencies</strong>
+      <p>Using <code>global</code> makes code hard to understand and debug. The better approach is to pass values as arguments and return results. Functions that only use their parameters and return results are called <strong>pure functions</strong> — they're predictable and easy to test.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     S6: DEFAULTS & KWARGS
+══════════════════════════════════ -->
+<section class="section" id="defaults" data-sec="defaults">
+  <div class="sec-head">
+    <div class="sec-badge bb">Ch 06</div>
+    <div>
+      <h2 class="sec-title">Default Parameters &amp; *args / **kwargs
+        <small>Flexible functions that work with any number of inputs</small>
+      </h2>
+    </div>
+  </div>
+
+  <div class="h3">Default Parameter Values</div>
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">defaults.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="cm"># Default values: used when caller doesn't provide that argument</span>
+<span class="de">def</span> <span class="fn">greet</span>(<span class="va">name</span>, <span class="va">greeting</span><span class="op">=</span><span class="st">"Hello"</span>, <span class="va">punctuation</span><span class="op">=</span><span class="st">"!"</span>):
+    <span class="fn">print</span>(<span class="st">f"{greeting}, {name}{punctuation}"</span>)
+
+<span class="fn">greet</span>(<span class="st">"Ahmed"</span>)                         <span class="cm"># Hello, Ahmed!</span>
+<span class="fn">greet</span>(<span class="st">"Sara"</span>, <span class="st">"Hi"</span>)                    <span class="cm"># Hi, Sara!</span>
+<span class="fn">greet</span>(<span class="st">"Mona"</span>, <span class="st">"Hey"</span>, <span class="st">"."</span>)             <span class="cm"># Hey, Mona.</span>
+<span class="fn">greet</span>(<span class="st">"Ali"</span>, <span class="va">punctuation</span><span class="op">=</span><span class="st">"???"</span>)        <span class="cm"># Hello, Ali???</span>
+
+<span class="cm"># Real-world example: repeat with default</span>
+<span class="de">def</span> <span class="fn">print_separator</span>(<span class="va">char</span><span class="op">=</span><span class="st">"-"</span>, <span class="va">length</span><span class="op">=</span><span class="nm">40</span>):
+    <span class="fn">print</span>(<span class="va">char</span> <span class="op">*</span> <span class="va">length</span>)
+
+<span class="fn">print_separator</span>()             <span class="cm"># ----------------------------------------</span>
+<span class="fn">print_separator</span>(<span class="st">"="</span>)          <span class="cm"># ========================================</span>
+<span class="fn">print_separator</span>(<span class="st">"*"</span>, <span class="nm">10</span>)      <span class="cm"># **********</span></pre>
+  </div>
+
+  <div class="h3">*args — Accept Any Number of Positional Arguments</div>
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">args_kwargs.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="cm"># *args — collects extra positional args into a TUPLE</span>
+<span class="de">def</span> <span class="fn">add_all</span>(<span class="op">*</span><span class="va">numbers</span>):
+    <span class="fn">print</span>(<span class="st">f"Got: {numbers}"</span>)  <span class="cm"># numbers is a tuple</span>
+    <span class="rt">return</span> <span class="fn">sum</span>(<span class="va">numbers</span>)
+
+<span class="fn">print</span>(<span class="fn">add_all</span>(<span class="nm">1</span>, <span class="nm">2</span>))            <span class="cm"># Got: (1, 2) → 3</span>
+<span class="fn">print</span>(<span class="fn">add_all</span>(<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>))  <span class="cm"># Got: (1,2,3,4,5) → 15</span>
+
+<span class="cm"># **kwargs — collects extra keyword args into a DICT</span>
+<span class="de">def</span> <span class="fn">create_profile</span>(<span class="op">**</span><span class="va">info</span>):
+    <span class="fn">print</span>(<span class="st">"Profile:"</span>)
+    <span class="kw">for</span> <span class="va">key</span>, <span class="va">val</span> <span class="kw">in</span> <span class="va">info</span>.<span class="fn">items</span>():
+        <span class="fn">print</span>(<span class="st">f"  {key}: {val}"</span>)
+
+<span class="fn">create_profile</span>(<span class="va">name</span><span class="op">=</span><span class="st">"Sara"</span>, <span class="va">age</span><span class="op">=</span><span class="nm">22</span>, <span class="va">city</span><span class="op">=</span><span class="st">"Cairo"</span>)
+
+<span class="cm"># Combining all types — strict order required:</span>
+<span class="cm"># def func(pos, /, normal, *, keyword_only)</span>
+<span class="de">def</span> <span class="fn">full_example</span>(<span class="va">name</span>, <span class="op">*</span><span class="va">scores</span>, <span class="va">bonus</span><span class="op">=</span><span class="nm">0</span>, <span class="op">**</span><span class="va">extra</span>):
+    <span class="va">avg</span> <span class="op">=</span> <span class="fn">sum</span>(<span class="va">scores</span>) <span class="op">/</span> <span class="fn">len</span>(<span class="va">scores</span>) <span class="kw">if</span> <span class="va">scores</span> <span class="kw">else</span> <span class="nm">0</span>
+    <span class="fn">print</span>(<span class="st">f"{name}: avg={avg:.1f}, bonus={bonus}, extra={extra}"</span>)
+
+<span class="fn">full_example</span>(<span class="st">"Ahmed"</span>, <span class="nm">80</span>, <span class="nm">90</span>, <span class="nm">85</span>, <span class="va">bonus</span><span class="op">=</span><span class="nm">5</span>, <span class="va">subject</span><span class="op">=</span><span class="st">"Math"</span>)</pre>
+    <div class="cw-out">
+      <div class="out-lbl">Output</div>
+      <div class="ol">Profile:</div>
+      <div class="ol">  name: Sara</div>
+      <div class="ol">  age: 22</div>
+      <div class="ol">  city: Cairo</div>
+      <div class="ol">Ahmed: avg=85.0, bonus=5, extra={'subject': 'Math'}</div>
+    </div>
+  </div>
+
+  <div class="cb cbm">
+    <div class="cb-tag">📌 The Order Rule</div>
+    <p>When combining parameter types, you MUST follow this order: <strong>regular params → *args → defaults → **kwargs</strong>. Example: <code>def func(a, b, *args, key=val, **kwargs)</code>. Breaking this order causes a SyntaxError.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     S7: ADVANCED PATTERNS
+══════════════════════════════════ -->
+<section class="section" id="advanced" data-sec="advanced">
+  <div class="sec-head">
+    <div class="sec-badge bb">Ch 07</div>
+    <div>
+      <h2 class="sec-title">Advanced Function Patterns
+        <small>Docstrings, type hints, higher-order functions &amp; more</small>
+      </h2>
+    </div>
+  </div>
+
+  <div class="h3">Docstrings — Document Your Functions</div>
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">docstrings.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="de">def</span> <span class="fn">calculate_bmi</span>(<span class="va">weight_kg</span>, <span class="va">height_m</span>):
+    <span class="st">"""
+    Calculate Body Mass Index (BMI).
+
+    Args:
+        weight_kg (float): Weight in kilograms.
+        height_m  (float): Height in meters.
+
+    Returns:
+        float: The BMI value rounded to 2 decimal places.
+
+    Example:
+        >>> calculate_bmi(70, 1.75)
+        22.86
+    """</span>
+    <span class="va">bmi</span> <span class="op">=</span> <span class="va">weight_kg</span> <span class="op">/</span> (<span class="va">height_m</span> <span class="op">**</span> <span class="nm">2</span>)
+    <span class="rt">return</span> <span class="fn">round</span>(<span class="va">bmi</span>, <span class="nm">2</span>)
+
+<span class="cm"># Access the docstring programmatically</span>
+<span class="fn">print</span>(<span class="fn">calculate_bmi</span>.<span class="va">__doc__</span>)
+<span class="fn">help</span>(<span class="fn">calculate_bmi</span>)   <span class="cm"># displays formatted docs</span></pre>
+  </div>
+
+  <div class="h3">Type Hints — Modern Python Best Practice</div>
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">type_hints.py — Python 3.5+</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="cm"># Type hints tell readers what types are expected</span>
+<span class="cm"># Python doesn't enforce them at runtime — they're documentation</span>
+<span class="de">def</span> <span class="fn">greet</span>(<span class="va">name</span>: <span class="fn">str</span>, <span class="va">times</span>: <span class="fn">int</span> <span class="op">=</span> <span class="nm">1</span>) <span class="op">-></span> <span class="fn">str</span>:
+    <span class="rt">return</span> (<span class="st">f"Hello, {name}! "</span>) <span class="op">*</span> <span class="va">times</span>
+
+<span class="de">def</span> <span class="fn">add</span>(<span class="va">a</span>: <span class="fn">int</span>, <span class="va">b</span>: <span class="fn">int</span>) <span class="op">-></span> <span class="fn">int</span>:
+    <span class="rt">return</span> <span class="va">a</span> <span class="op">+</span> <span class="va">b</span>
+
+<span class="de">def</span> <span class="fn">get_scores</span>(<span class="va">names</span>: <span class="fn">list</span>) <span class="op">-></span> <span class="fn">dict</span>:
+    <span class="rt">return</span> {<span class="va">name</span>: <span class="nm">0</span> <span class="kw">for</span> <span class="va">name</span> <span class="kw">in</span> <span class="va">names</span>}
+
+<span class="cm"># ->  shows what the function RETURNS</span>
+<span class="cm"># : type  shows what each parameter expects</span></pre>
+  </div>
+
+  <div class="h3">Functions as Arguments — Higher-Order Functions</div>
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">higher_order.py — Functions are first-class objects</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="cm"># In Python, functions are objects — you can pass them around!</span>
+<span class="de">def</span> <span class="fn">double</span>(<span class="va">x</span>): <span class="rt">return</span> <span class="va">x</span> <span class="op">*</span> <span class="nm">2</span>
+<span class="de">def</span> <span class="fn">square</span>(<span class="va">x</span>): <span class="rt">return</span> <span class="va">x</span> <span class="op">**</span> <span class="nm">2</span>
+<span class="de">def</span> <span class="fn">negate</span>(<span class="va">x</span>): <span class="rt">return</span> <span class="op">-</span><span class="va">x</span>
+
+<span class="de">def</span> <span class="fn">apply_to_all</span>(<span class="va">numbers</span>, <span class="va">func</span>):   <span class="cm"># func is a parameter!</span>
+    <span class="rt">return</span> [<span class="fn">func</span>(<span class="va">n</span>) <span class="kw">for</span> <span class="va">n</span> <span class="kw">in</span> <span class="va">numbers</span>]
+
+<span class="va">nums</span> <span class="op">=</span> [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>]
+
+<span class="fn">print</span>(<span class="fn">apply_to_all</span>(<span class="va">nums</span>, <span class="fn">double</span>))  <span class="cm"># [2, 4, 6, 8, 10]</span>
+<span class="fn">print</span>(<span class="fn">apply_to_all</span>(<span class="va">nums</span>, <span class="fn">square</span>))  <span class="cm"># [1, 4, 9, 16, 25]</span>
+<span class="fn">print</span>(<span class="fn">apply_to_all</span>(<span class="va">nums</span>, <span class="fn">negate</span>))  <span class="cm"># [-1, -2, -3, -4, -5]</span>
+
+<span class="cm"># Built-in higher-order functions</span>
+<span class="va">scores</span> <span class="op">=</span> [<span class="nm">72</span>, <span class="nm">95</span>, <span class="nm">60</span>, <span class="nm">88</span>, <span class="nm">45</span>]
+<span class="fn">print</span>(<span class="fn">sorted</span>(<span class="va">scores</span>, <span class="va">reverse</span><span class="op">=</span><span class="bl">True</span>))          <span class="cm"># [95,88,72,60,45]</span>
+<span class="fn">print</span>(<span class="fn">list</span>(<span class="fn">filter</span>(<span class="kw">lambda</span> <span class="va">x</span>: <span class="va">x</span><span class="op">>=</span><span class="nm">60</span>, <span class="va">scores</span>))) <span class="cm"># [72,95,60,88]</span>
+<span class="fn">print</span>(<span class="fn">list</span>(<span class="fn">map</span>(<span class="fn">double</span>, <span class="va">scores</span>)))             <span class="cm"># [144,190,120,176,90]</span></pre>
+  </div>
+
+  <div class="h3">Nested Functions &amp; Closures</div>
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">closures.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="cm"># A function defined INSIDE another function</span>
+<span class="de">def</span> <span class="fn">make_multiplier</span>(<span class="va">factor</span>):
+    <span class="de">def</span> <span class="fn">multiply</span>(<span class="va">x</span>):         <span class="cm"># inner function</span>
+        <span class="rt">return</span> <span class="va">x</span> <span class="op">*</span> <span class="va">factor</span>   <span class="cm"># "remembers" factor</span>
+    <span class="rt">return</span> <span class="fn">multiply</span>         <span class="cm"># return the function itself</span>
+
+<span class="cm"># Each call creates a NEW function with its own "memory"</span>
+<span class="va">triple</span> <span class="op">=</span> <span class="fn">make_multiplier</span>(<span class="nm">3</span>)
+<span class="va">times10</span> <span class="op">=</span> <span class="fn">make_multiplier</span>(<span class="nm">10</span>)
+
+<span class="fn">print</span>(<span class="fn">triple</span>(<span class="nm">5</span>))   <span class="cm"># 15  (5 × 3)</span>
+<span class="fn">print</span>(<span class="fn">triple</span>(<span class="nm">9</span>))   <span class="cm"># 27  (9 × 3)</span>
+<span class="fn">print</span>(<span class="fn">times10</span>(<span class="nm">7</span>)) <span class="cm"># 70  (7 × 10)</span></pre>
+    <div class="cw-out">
+      <div class="out-lbl">Output</div>
+      <div class="ol">15</div>
+      <div class="ol">27</div>
+      <div class="ol">70</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     S8: LAMBDA
+══════════════════════════════════ -->
+<section class="section" id="lambda" data-sec="lambda">
+  <div class="sec-head">
+    <div class="sec-badge bp">Ch 08</div>
+    <div>
+      <h2 class="sec-title">Lambda Functions
+        <small>Anonymous one-liners — for small throwaway functions</small>
+      </h2>
+    </div>
+  </div>
+
+  <div class="cb cbp">
+    <div class="cb-tag">λ Concept</div>
+    <p>A <strong>lambda</strong> is an anonymous (nameless) function defined in a single expression. It's perfect for small, quick operations — especially when passing a function as an argument. Formula: <code>lambda parameters: expression</code></p>
+    <p>Lambdas can only have ONE expression. No statements, no multiple lines, no return keyword (the expression IS the return value).</p>
+  </div>
+
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">lambda.py</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="cm"># Regular function vs lambda — equivalent</span>
+<span class="de">def</span> <span class="fn">square</span>(<span class="va">x</span>): <span class="rt">return</span> <span class="va">x</span> <span class="op">**</span> <span class="nm">2</span>
+<span class="va">square_l</span> <span class="op">=</span> <span class="kw">lambda</span> <span class="va">x</span>: <span class="va">x</span> <span class="op">**</span> <span class="nm">2</span>
+
+<span class="fn">print</span>(<span class="fn">square</span>(<span class="nm">5</span>))     <span class="cm"># 25</span>
+<span class="fn">print</span>(<span class="fn">square_l</span>(<span class="nm">5</span>))   <span class="cm"># 25</span>
+
+<span class="cm"># Lambda with multiple parameters</span>
+<span class="va">add</span> <span class="op">=</span> <span class="kw">lambda</span> <span class="va">a</span>, <span class="va">b</span>: <span class="va">a</span> <span class="op">+</span> <span class="va">b</span>
+<span class="fn">print</span>(<span class="fn">add</span>(<span class="nm">3</span>, <span class="nm">7</span>))      <span class="cm"># 10</span>
+
+<span class="cm"># Best use: sorting with a custom key</span>
+<span class="va">students</span> <span class="op">=</span> [
+    {<span class="st">"name"</span>: <span class="st">"Mona"</span>,  <span class="st">"grade"</span>: <span class="nm">88</span>},
+    {<span class="st">"name"</span>: <span class="st">"Ahmed"</span>, <span class="st">"grade"</span>: <span class="nm">95</span>},
+    {<span class="st">"name"</span>: <span class="st">"Sara"</span>,  <span class="st">"grade"</span>: <span class="nm">72</span>},
+]
+
+<span class="va">by_grade</span> <span class="op">=</span> <span class="fn">sorted</span>(<span class="va">students</span>, <span class="va">key</span><span class="op">=</span><span class="kw">lambda</span> <span class="va">s</span>: <span class="va">s</span>[<span class="st">"grade"</span>], <span class="va">reverse</span><span class="op">=</span><span class="bl">True</span>)
+<span class="kw">for</span> <span class="va">s</span> <span class="kw">in</span> <span class="va">by_grade</span>:
+    <span class="fn">print</span>(<span class="st">f"  {s['name']}: {s['grade']}"</span>)
+
+<span class="cm"># With filter and map</span>
+<span class="va">nums</span> <span class="op">=</span> [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>, <span class="nm">6</span>]
+<span class="va">evens</span>   <span class="op">=</span> <span class="fn">list</span>(<span class="fn">filter</span>(<span class="kw">lambda</span> <span class="va">x</span>: <span class="va">x</span> <span class="op">%</span> <span class="nm">2</span> <span class="op">==</span> <span class="nm">0</span>, <span class="va">nums</span>))
+<span class="va">doubled</span> <span class="op">=</span> <span class="fn">list</span>(<span class="fn">map</span>(<span class="kw">lambda</span> <span class="va">x</span>: <span class="va">x</span> <span class="op">*</span> <span class="nm">2</span>, <span class="va">nums</span>))
+<span class="fn">print</span>(<span class="va">evens</span>)    <span class="cm"># [2, 4, 6]</span>
+<span class="fn">print</span>(<span class="va">doubled</span>)  <span class="cm"># [2, 4, 6, 8, 10, 12]</span></pre>
+  </div>
+
+  <div class="trick">
+    <div class="ico">⚡</div>
+    <div class="tc">
+      <strong>When to Use Lambda vs def</strong>
+      <p>Use <code>lambda</code> for short, one-off operations — especially as arguments to <code>sorted()</code>, <code>filter()</code>, <code>map()</code>. Use <code>def</code> for anything that needs a name, a docstring, multiple lines, or will be used in more than one place. If the lambda feels complex, use def.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     S9: RECURSION
+══════════════════════════════════ -->
+<section class="section" id="recursion" data-sec="recursion">
+  <div class="sec-head">
+    <div class="sec-badge bp">Ch 09</div>
+    <div>
+      <h2 class="sec-title">Recursion
+        <small>Functions that call themselves — elegant solutions to complex problems</small>
+      </h2>
+    </div>
+  </div>
+
+  <div class="cb cbp">
+    <div class="cb-tag">🌀 Concept</div>
+    <p>A <strong>recursive function</strong> is one that calls itself inside its own body. Every recursive function needs two things: a <em>base case</em> (the stopping condition — prevents infinite loop) and a <em>recursive case</em> (the step that moves closer to the base).</p>
+    <p>Think of Russian nesting dolls: you open a doll, find a smaller one inside, open that, find a smaller one... until you reach the tiniest doll that can't be opened. That's your base case.</p>
+  </div>
+
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">recursion.py — Factorial: n! = n × (n-1)!</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="de">def</span> <span class="fn">factorial</span>(<span class="va">n</span>):
+    <span class="cm"># BASE CASE — stop here, return 1</span>
+    <span class="kw">if</span> <span class="va">n</span> <span class="op">==</span> <span class="nm">0</span> <span class="kw">or</span> <span class="va">n</span> <span class="op">==</span> <span class="nm">1</span>:
+        <span class="rt">return</span> <span class="nm">1</span>
+    <span class="cm"># RECURSIVE CASE — call ourselves with smaller n</span>
+    <span class="rt">return</span> <span class="va">n</span> <span class="op">*</span> <span class="fn">factorial</span>(<span class="va">n</span> <span class="op">-</span> <span class="nm">1</span>)
+
+<span class="fn">print</span>(<span class="fn">factorial</span>(<span class="nm">5</span>))   <span class="cm"># 5×4×3×2×1 = 120</span>
+<span class="fn">print</span>(<span class="fn">factorial</span>(<span class="nm">0</span>))   <span class="cm"># 1 (base case)</span>
+
+<span class="cm"># How it unwinds for factorial(4):</span>
+<span class="cm"># factorial(4)             → 4 * factorial(3)</span>
+<span class="cm"># factorial(3)             → 3 * factorial(2)</span>
+<span class="cm"># factorial(2)             → 2 * factorial(1)</span>
+<span class="cm"># factorial(1) = 1         ← BASE CASE reached</span>
+<span class="cm"># 2 * 1 = 2, 3 * 2 = 6, 4 * 6 = 24 ← unwinds back up</span></pre>
+    <div class="cw-out">
+      <div class="out-lbl">Output</div>
+      <div class="ol">120</div>
+      <div class="ol">1</div>
+    </div>
+  </div>
+
+  <div class="cw">
+    <div class="cw-bar"><div class="cw-dots"><span class="cd1"></span><span class="cd2"></span><span class="cd3"></span></div><span class="cw-fname">recursion_examples.py — Fibonacci &amp; countdown</span><button class="cw-copy" onclick="copyCode(this)">⎘ Copy</button></div>
+    <pre><span class="cm"># Fibonacci: fib(n) = fib(n-1) + fib(n-2)</span>
+<span class="de">def</span> <span class="fn">fib</span>(<span class="va">n</span>):
+    <span class="kw">if</span> <span class="va">n</span> <span class="op"><=</span> <span class="nm">1</span>: <span class="rt">return</span> <span class="va">n</span>   <span class="cm"># base cases: fib(0)=0, fib(1)=1</span>
+    <span class="rt">return</span> <span class="fn">fib</span>(<span class="va">n</span><span class="op">-</span><span class="nm">1</span>) <span class="op">+</span> <span class="fn">fib</span>(<span class="va">n</span><span class="op">-</span><span class="nm">2</span>)
+
+<span class="fn">print</span>([<span class="fn">fib</span>(<span class="va">i</span>) <span class="kw">for</span> <span class="va">i</span> <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">10</span>)])
+<span class="cm"># [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]</span>
+
+<span class="cm"># Sum of a list recursively</span>
+<span class="de">def</span> <span class="fn">recursive_sum</span>(<span class="va">lst</span>):
+    <span class="kw">if</span> <span class="kw">not</span> <span class="va">lst</span>: <span class="rt">return</span> <span class="nm">0</span>               <span class="cm"># base: empty list → 0</span>
+    <span class="rt">return</span> <span class="va">lst</span>[<span class="nm">0</span>] <span class="op">+</span> <span class="fn">recursive_sum</span>(<span class="va">lst</span>[<span class="nm">1</span>:])  <span class="cm"># first + rest</span>
+
+<span class="fn">print</span>(<span class="fn">recursive_sum</span>([<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>]))  <span class="cm"># 15</span></pre>
+  </div>
+
+  <div class="danger">
+    <div class="ico">🚨</div>
+    <div class="tc">
+      <strong>Always Have a Base Case — or Face Infinite Recursion</strong>
+      <p>Without a base case, a function calls itself forever until Python raises <code>RecursionError: maximum recursion depth exceeded</code>. Python's default limit is 1000 calls. Always make sure each recursive call brings you closer to the base case.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     S10: QUIZ
+══════════════════════════════════ -->
+<section class="section" id="quiz" data-sec="quiz">
+  <div class="sec-head">
+    <div class="sec-badge bm">Ch 10</div>
+    <div>
+      <h2 class="sec-title">Quiz Time 🎯
+        <small>15 questions covering everything — no peeking before you try!</small>
+      </h2>
+    </div>
+  </div>
+  <div class="cb cbm">
+    <div class="cb-tag">📋 Instructions</div>
+    <p>Read each question carefully — many are trace questions where you need to mentally run the code. After checking your answer, read the explanation regardless of whether you got it right. That's where the real learning happens.</p>
+  </div>
+  <div id="quizContainer"></div>
+</section>
+
+<!-- ══════════════════════════════════
+     S11: CHALLENGES
+══════════════════════════════════ -->
+<section class="section" id="challenges" data-sec="challenges">
+  <div class="sec-head">
+    <div class="sec-badge bm">Ch 11</div>
+    <div>
+      <h2 class="sec-title">Coding Challenges 🏆
+        <small>Write the code yourself — mastery is built in the practice</small>
+      </h2>
+    </div>
+  </div>
+  <p class="prose">Try each challenge before peeking at the hint. The harder the struggle, the stronger the memory. These patterns come up constantly in real Python code.</p>
+
+  <div class="ch-grid">
+    <div class="ch"><div class="ch-badge lv1">⭐ Easy</div><div class="ch-title">Temperature Converter</div><div class="ch-desc">Write functions to convert Celsius→Fahrenheit and Fahrenheit→Celsius. Each function takes one number and returns the converted temperature.</div><div class="ch-hint">💡 F = (C × 9/5) + 32  ·  C = (F - 32) × 5/9</div></div>
+    <div class="ch"><div class="ch-badge lv1">⭐ Easy</div><div class="ch-title">Greeting Generator</div><div class="ch-desc">Write a greet(name, language="en") function. Support "en" → "Hello", "ar" → "Ahlan", "fr" → "Bonjour". Use elif chain.</div><div class="ch-hint">💡 Use if/elif on language parameter with default "en"</div></div>
+    <div class="ch"><div class="ch-badge lv1">⭐ Easy</div><div class="ch-title">Max of Three</div><div class="ch-desc">Write a function that takes three numbers and returns the largest one WITHOUT using the built-in max().</div><div class="ch-hint">💡 if a >= b and a >= c: return a — elif...</div></div>
+    <div class="ch"><div class="ch-badge lv1">⭐ Easy</div><div class="ch-title">is_palindrome()</div><div class="ch-desc">Write a function that takes a string and returns True if it reads the same forwards and backwards (like "racecar"), False otherwise.</div><div class="ch-hint">💡 return word == word[::-1]</div></div>
+    <div class="ch"><div class="ch-badge lv2">⚡ Medium</div><div class="ch-title">Grade Calculator</div><div class="ch-desc">Write get_grade(score) that takes a score 0-100 and returns the letter grade A/B/C/D/F. Write a second function that takes a LIST of scores and returns the class average.</div><div class="ch-hint">💡 Two separate functions — one calls the other</div></div>
+    <div class="ch"><div class="ch-badge lv2">⚡ Medium</div><div class="ch-title">Count Vowels</div><div class="ch-desc">Write count_vowels(text) that counts the number of vowels (a,e,i,o,u) in a string, case-insensitive. Return the count.</div><div class="ch-hint">💡 for ch in text.lower(): if ch in "aeiou": count += 1</div></div>
+    <div class="ch"><div class="ch-badge lv2">⚡ Medium</div><div class="ch-title">*args Calculator</div><div class="ch-desc">Write a function that accepts any number of numbers and returns their sum, average, minimum, and maximum as a tuple. Use *args.</div><div class="ch-hint">💡 def stats(*nums): return sum(nums), sum/len, min, max</div></div>
+    <div class="ch"><div class="ch-badge lv2">⚡ Medium</div><div class="ch-title">Function Factory</div><div class="ch-desc">Write make_adder(n) that returns a function. The returned function takes a number and adds n to it. Create add5 = make_adder(5) and test it.</div><div class="ch-hint">💡 Closure pattern: inner function "remembers" n</div></div>
+    <div class="ch"><div class="ch-badge lv2">⚡ Medium</div><div class="ch-title">Apply Twice</div><div class="ch-desc">Write apply_twice(func, value) that applies the given function to value TWICE. Test it with your double() and square() functions.</div><div class="ch-hint">💡 return func(func(value))</div></div>
+    <div class="ch"><div class="ch-badge lv3">🔥 Hard</div><div class="ch-title">Recursive Power</div><div class="ch-desc">Implement power(base, exp) recursively WITHOUT using **. power(2, 0) = 1, power(2, 1) = 2, power(2, n) = 2 * power(2, n-1).</div><div class="ch-hint">💡 Base case: exp == 0 → return 1</div></div>
+    <div class="ch"><div class="ch-badge lv3">🔥 Hard</div><div class="ch-title">Memoized Fibonacci</div><div class="ch-desc">Basic recursive fib() is slow for large n. Add a cache dict to store already-computed results. fib(35) should be instant.</div><div class="ch-hint">💡 cache = {}; if n in cache: return cache[n]; cache[n] = fib(n-1)+fib(n-2)</div></div>
+    <div class="ch"><div class="ch-badge lv3">🔥 Hard</div><div class="ch-title">Decorator Pattern</div><div class="ch-desc">Write a timer(func) function that takes a function, runs it, measures how long it took using time.time(), and prints the duration. Use it to time your fib() function.</div><div class="ch-hint">💡 import time; start = time.time(); result = func(); elapsed = time.time()-start</div></div>
+  </div>
+</section>
+
+<footer id="footer">
+  <span class="foot-icon">🎯</span>
+  <div class="foot-h">You've Mastered Python Functions!</div>
+  <div class="foot-s">def · parameters · return · scope · *args · **kwargs · lambda · recursion · closures — all yours now.</div>
+</footer>
+
+</div><!-- /content -->
+
+<script>
+// ═══════════ ANATOMY INTERACTIVE ═══════════
+const PARTS = {
+  kw:    { label: 'def — The Keyword',      color: '#C084FC', desc: 'The keyword <b>def</b> tells Python "I am defining a function." It must always come first. Python reads this and saves everything that follows as a reusable block of code.' },
+  name:  { label: 'greet — The Name',       color: '#3DFF9A', desc: 'The function name. Use snake_case and pick a descriptive verb: <b>calculate_tax</b>, <b>send_email</b>, <b>is_valid</b>. This is the name you use to call it later.' },
+  paren: { label: '( ) — Parentheses',      color: '#94A3B8', desc: 'Parentheses hold the parameter list. Even if there are no parameters, you must include empty () — they tell Python "this is a function call/definition, not a variable."' },
+  param: { label: 'Parameters',             color: '#FFB830', desc: 'Parameters are the input variables — placeholders for the values that will be passed in when the function is called. <b>name</b> and <b>times=1</b> are both parameters. The =1 gives a default value.' },
+  colon: { label: ': — The Colon',          color: '#94A3B8', desc: 'The colon ends the function header and tells Python that the indented block below is the function body. Forgetting the colon is one of the most common beginner SyntaxErrors.' },
+  body:  { label: 'Function Body',          color: '#E8F0EA', desc: 'The body is the indented code that runs every time the function is called. It must be indented exactly (4 spaces is standard). The body can be as long or as short as needed.' },
+  ret:   { label: 'return — Send Back',     color: '#FF6B6B', desc: 'The return statement sends a value back to the caller and immediately exits the function. Without it, the function returns None. You can return any Python value: numbers, strings, lists, dicts, even other functions.' },
+};
+
+function explainPart(part) {
+  const info = PARTS[part];
+  if (!info) return;
+  const box = document.getElementById('anatExplain');
+  box.innerHTML = `<span class="part-name" style="color:${info.color}">${info.label}</span><p>${info.desc}</p>`;
+  document.querySelectorAll('.anat-part').forEach(el => el.classList.remove('lit'));
+  document.querySelectorAll(`[data-part="${part}"], [data-part="${part}2"], [data-part="${part}3"]`).forEach(el => el.classList.add('lit'));
+}
+
+// ═══════════ QUIZ DATA ═══════════
+const QUIZ = [
+  {
+    q: 'What does this print?',
+    code: `def say(msg):\n    print(msg)\n\nsay("Hello")\nsay("World")`,
+    opts: ['Hello World', 'Hello\nWorld', 'Nothing — functions need return', 'Error'],
+    ans: 1,
+    ex: 'The function is defined first (no output), then called twice. Each call passes a different string to msg and prints it on a new line. Output: Hello then World.'
+  },
+  {
+    q: 'What is the output?',
+    code: `def add(a, b):\n    return a + b\n\nresult = add(3, 7)\nprint(result)`,
+    opts: ['37', '10', 'None', 'Error'],
+    ans: 1,
+    ex: 'add(3, 7) runs the function with a=3, b=7. It returns 3+7=10. That 10 is stored in result and printed.'
+  },
+  {
+    q: 'What does this print?',
+    code: `def greet(name, msg="Hi"):\n    print(f"{msg}, {name}!")\n\ngreet("Sara")\ngreet("Ali", "Hello")`,
+    opts: ['Hi, Sara!\nHi, Ali!', 'Hi, Sara!\nHello, Ali!', 'Error', 'None None'],
+    ans: 1,
+    ex: 'First call: msg uses its default value "Hi" → Hi, Sara! Second call: msg is given "Hello" explicitly → Hello, Ali!'
+  },
+  {
+    q: 'What is printed?',
+    code: `def mystery(x):\n    return x * 2\n\nprint(mystery(mystery(3)))`,
+    opts: ['6', '9', '12', '3'],
+    ans: 2,
+    ex: 'Inner call: mystery(3) = 3×2 = 6. Outer call: mystery(6) = 6×2 = 12. The result of the inner call becomes the argument for the outer call.'
+  },
+  {
+    q: 'What is the output of this scope example?',
+    code: `x = 10\n\ndef change():\n    x = 99\n    print("inside:", x)\n\nchange()\nprint("outside:", x)`,
+    opts: ['inside: 99\noutside: 99', 'inside: 99\noutside: 10', 'Error', 'inside: 10\noutside: 10'],
+    ans: 1,
+    ex: 'x = 99 inside change() creates a LOCAL variable — it does NOT modify the global x. After the function ends, the local x disappears. Global x remains 10.'
+  },
+  {
+    q: 'What does this lambda print?',
+    code: `triple = lambda n: n * 3\nprint(triple(7))`,
+    opts: ['3', '7', '21', 'Error'],
+    ans: 2,
+    ex: 'The lambda takes n and returns n*3. Calling triple(7) passes 7 as n. 7 × 3 = 21.'
+  },
+  {
+    q: 'What is the output?',
+    code: `def no_return(x):\n    x * 2\n\nresult = no_return(5)\nprint(result)`,
+    opts: ['10', '5', 'None', 'Error'],
+    ans: 2,
+    ex: 'x*2 is computed but the result is never returned! There is no return statement. Python automatically returns None when a function has no return. result = None.'
+  },
+  {
+    q: 'What does this *args function print?',
+    code: `def total(*nums):\n    return sum(nums)\n\nprint(total(1, 2, 3, 4))`,
+    opts: ['Error', '[1, 2, 3, 4]', '10', '(1, 2, 3, 4)'],
+    ans: 2,
+    ex: '*nums collects all positional arguments into a tuple: (1, 2, 3, 4). sum((1,2,3,4)) = 10. The function returns 10 and print() outputs it.'
+  },
+  {
+    q: 'What is the output of this recursion?',
+    code: `def countdown(n):\n    if n == 0:\n        print("Done!")\n        return\n    print(n)\n    countdown(n - 1)\n\ncountdown(3)`,
+    opts: ['3 2 1 Done!', 'Done! 1 2 3', '3 2 1', 'Infinite loop'],
+    ans: 0,
+    ex: 'countdown(3): prints 3, calls countdown(2). countdown(2): prints 2, calls countdown(1). countdown(1): prints 1, calls countdown(0). countdown(0): prints Done! and returns. Output: 3, 2, 1, Done!'
+  },
+  {
+    q: 'What does this print?',
+    code: `def make_counter():\n    count = 0\n    def increment():\n        nonlocal count\n        count += 1\n        return count\n    return increment\n\nc = make_counter()\nprint(c(), c(), c())`,
+    opts: ['1 1 1', '0 1 2', '1 2 3', 'Error'],
+    ans: 2,
+    ex: 'make_counter() creates a closure. nonlocal allows increment() to modify count in the enclosing scope. Each call to c() increments and returns count: 1, then 2, then 3.'
+  },
+  {
+    q: 'What is the output?',
+    code: `def apply(func, value):\n    return func(value)\n\nprint(apply(str.upper, "hello"))\nprint(apply(len, "world"))`,
+    opts: ['hello\n5', 'HELLO\n5', 'HELLO\nworld', 'Error'],
+    ans: 1,
+    ex: 'Functions are first-class objects. apply(str.upper, "hello") calls str.upper("hello") = "HELLO". apply(len, "world") calls len("world") = 5.'
+  },
+  {
+    q: 'What does this print?',
+    code: `def factorial(n):\n    if n <= 1: return 1\n    return n * factorial(n - 1)\n\nprint(factorial(4))`,
+    opts: ['4', '24', '12', '120'],
+    ans: 1,
+    ex: 'Trace: factorial(4) = 4 × factorial(3) = 4 × 3 × factorial(2) = 4 × 3 × 2 × factorial(1) = 4 × 3 × 2 × 1 = 24.'
+  },
+  {
+    q: 'Which function call is valid for this definition?',
+    code: `def power(base, exp=2):\n    return base ** exp`,
+    opts: ['power()', 'power(3)', 'power(base=3, 9)', 'power(exp=3)'],
+    ans: 1,
+    ex: 'power() fails — base has no default. power(3) works — base=3, exp uses default 2. power(base=3, 9) is SyntaxError (positional after keyword). power(exp=3) fails — base required.'
+  },
+  {
+    q: 'What does the function return?',
+    code: `def analyze(nums):\n    return min(nums), max(nums), sum(nums)/len(nums)\n\nlo, hi, avg = analyze([2, 4, 6, 8])\nprint(avg)`,
+    opts: ['5', '5.0', '(2, 8, 5.0)', 'Error'],
+    ans: 1,
+    ex: 'The function returns a tuple of 3 values. Tuple unpacking assigns them to lo, hi, avg. avg = (2+4+6+8)/4 = 20/4 = 5.0 (float division).'
+  },
+  {
+    q: 'What is the output of this **kwargs example?',
+    code: `def show(**data):\n    for k, v in data.items():\n        print(f"{k}={v}")\n\nshow(name="Ahmed", age=20)`,
+    opts: ['name=Ahmed\nage=20', "{'name':'Ahmed','age':20}", 'Error', 'Ahmed 20'],
+    ans: 0,
+    ex: '**data collects keyword arguments into a dict: {"name":"Ahmed","age":20}. The loop iterates over key-value pairs and prints each one formatted as key=value.'
+  },
+];
+
+// ═══════════ QUIZ RENDER ═══════════
+let qState = {};
+function renderQuiz(){
+  const c = document.getElementById('quizContainer');
+  QUIZ.forEach((q,i)=>{
+    const div = document.createElement('div');
+    div.className='qw'; div.id=`qw${i}`;
+    const keys=['A','B','C','D'];
+    div.innerHTML=`
+      <div class="qw-head">
+        <div class="qw-num">${i+1}</div>
+        <div class="qw-ht">Question ${i+1} of ${QUIZ.length}<small>Think before clicking</small></div>
+      </div>
+      <div class="qw-body">
+        <div class="qw-q">${q.q}</div>
+        ${q.code?`<div class="qw-code">${hlQuiz(q.code)}</div>`:''}
+        <div class="qw-opts">
+          ${q.opts.map((o,oi)=>`<div class="qw-opt" data-qi="${i}" data-oi="${oi}"><span class="qw-key">${keys[oi]}</span>${o}</div>`).join('')}
+        </div>
+        <div class="qw-actions">
+          <button class="qw-sub" id="sub${i}" onclick="checkQ(${i})" disabled>Check Answer</button>
+          ${i<QUIZ.length-1?`<button class="qw-next" id="nx${i}" onclick="nextQ(${i+1})">Next →</button>`:''}
+        </div>
+        <div class="qw-fb" id="fb${i}"></div>
+      </div>`;
+    c.appendChild(div);
+    div.querySelectorAll('.qw-opt').forEach(o=>o.addEventListener('click',()=>pickQ(i,+o.dataset.oi)));
+  });
+}
+
+function hlQuiz(code){
+  let s=code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  s=s.replace(/"([^"]*)"/g,'<span class="st">"$1"</span>');
+  s=s.replace(/\b(def|return|if|elif|else|for|while|in|and|or|not|nonlocal|global|lambda)\b/g,'<span class="kw">$1</span>');
+  s=s.replace(/\b(True|False|None)\b/g,'<span class="bl">$1</span>');
+  s=s.replace(/\b(print|range|len|sum|min|max|str|int|float|list|dict|sorted|map|filter)\b/g,'<span class="fn">$1</span>');
+  s=s.replace(/(?<![a-zA-Z_])(-?\d+\.?\d*)/g,'<span class="nm">$1</span>');
+  s=s.replace(/(#[^\n]*)/g,'<span class="cm">$1</span>');
+  return s;
+}
+
+let quizState={};
+function pickQ(qi,oi){
+  if(quizState[qi]!==undefined) return;
+  document.querySelectorAll(`[data-qi="${qi}"]`).forEach(o=>o.classList.remove('sel'));
+  document.querySelector(`[data-qi="${qi}"][data-oi="${oi}"]`).classList.add('sel');
+  document.getElementById(`sub${qi}`)._sel=oi;
+  document.getElementById(`sub${qi}`).disabled=false;
+}
+function checkQ(qi){
+  const btn=document.getElementById(`sub${qi}`);
+  const sel=btn._sel; if(sel===undefined) return;
+  const ok=sel===QUIZ[qi].ans;
+  quizState[qi]=ok;
+  document.querySelectorAll(`[data-qi="${qi}"]`).forEach((o,i)=>{
+    o.onclick=null; o.classList.remove('sel');
+    if(i===QUIZ[qi].ans) o.classList.add('ok');
+    else if(i===sel&&!ok) o.classList.add('bad');
+  });
+  const fb=document.getElementById(`fb${qi}`);
+  fb.className=`qw-fb ${ok?'ok':'bad'} show`;
+  fb.innerHTML=`<strong>${ok?'✅ Correct!':'❌ Not quite.'}</strong> ${QUIZ[qi].ex}`;
+  btn.disabled=true; btn.style.display='none';
+  const nx=document.getElementById(`nx${qi}`);
+  if(nx) nx.classList.add('show');
+}
+function nextQ(idx){
+  const el=document.getElementById(`qw${idx}`);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ═══════════ PROGRESS / NAV ═══════════
+const SECS=['intro','anatomy','params','returns','scope','defaults','advanced','lambda','recursion','quiz','challenges'];
+const seen=new Set();
+
+function updateProg(){
+  const pct=Math.round(seen.size/SECS.length*100);
+  document.getElementById('navProgFill').style.width=pct+'%';
+  document.getElementById('navProgTxt').textContent=`${seen.size}/${SECS.length}`;
+}
+
+function markSeen(sec){
+  if(!SECS.includes(sec)) return;
+  seen.add(sec);
+  const t=document.querySelector(`.nav-tab[data-sec="${sec}"]`);
+  if(t&&!t.classList.contains('active')) t.classList.add('done');
+  const d=document.querySelector(`.drawer-item[onclick*="'${sec}'"]`);
+  updateProg();
+}
+
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const s=e.target.dataset.sec;
+      markSeen(s);
+      document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+      const tab=document.querySelector(`.nav-tab[data-sec="${s}"]`);
+      if(tab){tab.classList.add('active');tab.classList.remove('done');}
+    }
+  });
+},{threshold:.15,rootMargin:'-55px 0px -30% 0px'});
+document.querySelectorAll('.section[data-sec]').forEach(el=>obs.observe(el));
+
+function navTo(sec,el){
+  const target=document.getElementById(sec);
+  if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ═══════════ MOBILE DRAWER ═══════════
+document.getElementById('menuBtn').addEventListener('click',()=>{
+  document.getElementById('drawer').classList.add('open');
+});
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+}
+document.getElementById('drawer').addEventListener('click',function(e){
+  if(e.target===this) closeDrawer();
+});
+
+// ═══════════ COPY CODE ═══════════
+function copyCode(btn){
+  const pre=btn.closest('.cw').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(()=>{
+    btn.textContent='✓ Copied!'; btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='⎘ Copy';btn.classList.remove('copied');},2000);
+  });
+}
+
+// ═══════════ INIT ═══════════
+renderQuiz();
+updateProg();
+</script>
+</body>
+</html>
