@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8 ">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NumPy — From Zero to Interview-Ready</title>
 <style>
@@ -479,10 +479,10 @@ footer.site-footer{border-top:1px solid var(--border); padding:34px 0; text-alig
       <h1 class="hero-title">Learn <em>NumPy</em> the way you'll actually use it</h1>
       <p class="hero-desc">A complete, interview-ready walkthrough of NumPy's foundations — arrays, creation routines, attributes and dtypes — with quizzes, flashcards and a cheat sheet built in.</p>
       <div class="hero-meta">
-        <div class="meta-pill"><span class="dot"></span><b id="meta-reading">18 min</b> read</div>
+        <div class="meta-pill"><span class="dot"></span><b id="meta-reading">45 min</b> read</div>
         <div class="meta-pill">Difficulty · <b>Beginner → Intermediate</b></div>
-        <div class="meta-pill">4 chapters · <b id="meta-sections">17 sections</b></div>
-        <div class="meta-pill">15 MCQs · 10 flashcards</div>
+        <div class="meta-pill">15 chapters · <b id="meta-sections">27 sections</b></div>
+        <div class="meta-pill">33 MCQs · 18 flashcards</div>
       </div>
       <div class="hero-actions">
         <button class="btn btn-primary" id="start-btn">Start Chapter 1 →</button>
@@ -817,6 +817,182 @@ const courseData = [
         takeaways:["`astype()` always returns a copy with the new dtype — the source array is unchanged.","Float → int truncates toward zero; it does not round.","Watch for overflow when downcasting to a smaller integer type."]
       }
     ]
+  },
+  {
+    id:"ch5", idx:4, title:"Indexing", sub:"الفصل 5 · Pulling single elements out of 1D and N-D arrays",
+    sections:[
+      {
+        id:"indexing-basics", title:"Indexing & Negative Indexing", tag:"np",
+        body:`<p>NumPy indexing starts the same way Python list indexing does — square brackets, zero-based, and negative indices count backward from the end.</p>`,
+        callouts:[{type:"tip", head:"Real-world analogy", text:"Negative indices are like counting floors down from the roof of a building instead of up from the ground — `arr[-1]` is always 'the last one', no matter how long the array is."}],
+        code:[{lang:"python", code:"arr = np.array([10, 20, 30, 40, 50])\narr[0]       # 10  -> first element\narr[-1]      # 50  -> last element\narr[-2]      # 40  -> second-to-last"}],
+        takeaways:["Indexing is zero-based, exactly like Python lists.","Negative indices count from the end: -1 is the last element."]
+      },
+      {
+        id:"multidim-indexing", title:"Multi-dimensional Indexing", tag:"np",
+        body:`<p>For arrays with more than one dimension, index each axis with a comma-separated tuple — <code>arr[row, col]</code> — instead of chaining brackets like nested Python lists.</p>`,
+        callouts:[{type:"mistake", head:"Common mistake", text:"`arr[1][2]` works but is slower and less idiomatic than `arr[1, 2]` — the comma form indexes both axes in a single lookup instead of creating an intermediate 1D array first."}],
+        code:[{lang:"python", code:"arr = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])\narr[1, 2]     # 6  -> row 1, column 2\narr[0, -1]    # 3  -> row 0, last column\narr[-1, -1]   # 9  -> last row, last column"}],
+        takeaways:["Use `arr[row, col]` (comma form), not `arr[row][col]`, for 2D+ arrays.","The same negative-index rules apply independently to each axis."]
+      }
+    ]
+  },
+  {
+    id:"ch6", idx:5, title:"Slicing", sub:"الفصل 6 · Extracting sub-arrays with start:stop:step",
+    sections:[
+      {
+        id:"slicing-1d-2d", title:"1D & 2D Slicing", tag:"np",
+        body:`<p>Slicing uses the familiar <code>start:stop:step</code> syntax. In 2D arrays, slice each axis separately, separated by a comma: <code>arr[rows, cols]</code>.</p>`,
+        callouts:[{type:"note", head:"Note", text:"A slice returns a view (see Chapter 10), not a copy — modifying the sliced result can modify the original array."}],
+        code:[{lang:"python", code:"arr = np.array([0, 1, 2, 3, 4, 5])\narr[1:4]      # [1 2 3]\narr[:3]       # [0 1 2]\narr[::2]      # [0 2 4]\n\ngrid = np.array([[1,2,3],[4,5,6],[7,8,9]])\ngrid[0:2, 1:3]   # [[2 3], [5 6]]  -> rows 0-1, cols 1-2\ngrid[:, 0]        # [1 4 7]  -> whole first column"}],
+        takeaways:["`start:stop:step` — stop is exclusive, same as Python.","2D slices take one slice per axis: `arr[rows, cols]`.","Slices return views, so edits propagate back to the source array."]
+      },
+      {
+        id:"slicing-3d", title:"3D Slicing", tag:"np",
+        body:`<p>The same pattern extends to any number of dimensions — one slice or index per axis, in order: <code>arr[depth, rows, cols]</code>.</p>`,
+        callouts:[{type:"interview", head:"Interview tip", text:"If you can confidently slice a 3D array (think: a stack of 2D images), you've demonstrated you generalize the pattern rather than having memorized only the 2D case."}],
+        code:[{lang:"python", code:"arr3d = np.arange(24).reshape(2, 3, 4)  # 2 blocks of 3x4\narr3d[0]            # first 3x4 block\narr3d[0, 1]          # row 1 of the first block\narr3d[0, 1, 2]       # a single element\narr3d[:, :, 0]        # first column of every row in every block"}],
+        takeaways:["Each additional axis just adds another comma-separated slice/index.","Omitting trailing axes (`arr3d[0]`) returns everything along the remaining axes."]
+      }
+    ]
+  },
+  {
+    id:"ch7", idx:6, title:"Reshaping", sub:"الفصل 7 · Changing an array's shape without changing its data",
+    sections:[
+      {
+        id:"reshape-flatten-ravel", title:"reshape(), flatten() & ravel()", tag:"np",
+        body:`<p><code>reshape()</code> reinterprets the same data under a new shape (total element count must match). <code>flatten()</code> and <code>ravel()</code> both collapse an array to 1D — the difference is whether you get a copy or a view.</p>`,
+        callouts:[
+          {type:"interview", head:"Interview tip", text:"'flatten() vs ravel()?' — flatten() always returns a copy (safe to mutate independently); ravel() returns a view whenever possible (faster, but changes can propagate back to the source)."},
+          {type:"tip", head:"Tip", text:"Use `-1` in one axis of reshape to let NumPy infer that dimension automatically, e.g. `arr.reshape(2, -1)`."}
+        ],
+        code:[{lang:"python", code:"arr = np.arange(6)              # [0 1 2 3 4 5]\narr.reshape(2, 3)                # [[0 1 2],[3 4 5]]\narr.reshape(3, -1)                # NumPy infers the second dim -> (3, 2)\n\ngrid = np.array([[1,2],[3,4]])\ngrid.flatten()                    # [1 2 3 4]  -> always a copy\ngrid.ravel()                      # [1 2 3 4]  -> a view when possible"}],
+        takeaways:["`reshape()` requires the new shape's total size to match the original.","`flatten()` copies; `ravel()` returns a view when it can — pick based on whether you need independence from the source."]
+      },
+      {
+        id:"transpose-t", title:"transpose() & .T", tag:"np",
+        body:`<p>Transposing swaps an array's axes — for a 2D matrix, that means flipping rows and columns. <code>.T</code> is a shorthand attribute for <code>transpose()</code> with no arguments.</p>`,
+        callouts:[{type:"production", head:"Production note", text:"Transpose returns a view, not a copy — it's essentially free (just a change in stride metadata), which is why it's used so heavily in linear algebra code without performance concern."}],
+        code:[{lang:"python", code:"m = np.array([[1, 2, 3], [4, 5, 6]])   # shape (2, 3)\nm.T                                      # shape (3, 2)\nnp.transpose(m)                          # same result as m.T"}],
+        takeaways:["`.T` and `transpose()` (with no args) do the same thing for 2D arrays.","Transpose is a view — essentially free, no data is copied."]
+      }
+    ]
+  },
+  {
+    id:"ch8", idx:7, title:"Joining Arrays", sub:"الفصل 8 · Combining multiple arrays into one",
+    sections:[
+      {
+        id:"joining", title:"concatenate(), hstack(), vstack(), dstack() & column_stack()", tag:"np",
+        body:`<p>NumPy offers a general-purpose <code>concatenate()</code> plus several convenience wrappers for the most common joining directions.</p>`,
+        callouts:[{type:"mistake", head:"Common mistake", text:"`concatenate()` needs matching shapes on every axis except the one you're joining along — mismatched shapes raise a `ValueError`, they don't get silently padded."}],
+        code:[{lang:"python", code:"a = np.array([1, 2]); b = np.array([3, 4])\nnp.concatenate([a, b])       # [1 2 3 4]\nnp.hstack([a, b])             # [1 2 3 4]  -> joins along columns (axis 1 for 2D, axis 0 for 1D)\nnp.vstack([a, b])             # [[1 2],[3 4]]  -> stacks as new rows\nnp.dstack([a, b])             # stacks along a new third axis (depth)\nnp.column_stack([a, b])       # [[1 3],[2 4]]  -> treats 1D arrays as columns"}],
+        table:{headers:["Function","Joins along"],rows:[
+          ["concatenate(axis=)","Any axis you specify"],
+          ["hstack()","Horizontally (columns)"],
+          ["vstack()","Vertically (rows)"],
+          ["dstack()","Depth (new 3rd axis)"],
+          ["column_stack()","As columns, even from 1D input"]
+        ]},
+        takeaways:["`concatenate()` is the general form; the `*stack()` functions are convenience shortcuts.","All shapes must match on every axis except the join axis."]
+      }
+    ]
+  },
+  {
+    id:"ch9", idx:8, title:"Splitting Arrays", sub:"الفصل 9 · Breaking one array into several",
+    sections:[
+      {
+        id:"splitting", title:"split(), hsplit(), vsplit() & array_split()", tag:"np",
+        body:`<p>Splitting is the inverse of joining. <code>split()</code> requires the array to divide evenly; <code>array_split()</code> tolerates uneven splits by giving earlier chunks the extra elements.</p>`,
+        callouts:[{type:"warning", head:"Warning", text:"`np.split(arr, 3)` raises a `ValueError` if `arr` doesn't divide evenly into 3 parts. If the size is unpredictable, use `array_split()` instead."}],
+        code:[{lang:"python", code:"arr = np.arange(9)\nnp.split(arr, 3)              # [array([0,1,2]), array([3,4,5]), array([6,7,8])]\nnp.array_split(np.arange(10), 3)  # tolerates uneven: [4,3,3] elements\n\ngrid = np.arange(16).reshape(4,4)\nnp.hsplit(grid, 2)             # split into 2 along columns\nnp.vsplit(grid, 2)             # split into 2 along rows"}],
+        takeaways:["`split()` demands an even division; `array_split()` handles remainders gracefully.","`hsplit`/`vsplit` are directional shortcuts, mirroring `hstack`/`vstack`."]
+      }
+    ]
+  },
+  {
+    id:"ch10", idx:9, title:"Copy vs View", sub:"الفصل 10 · وده من أهم المواضيع — one of the most important topics",
+    sections:[
+      {
+        id:"copy-vs-view", title:"copy() vs view()", tag:"np",
+        body:`<p>This is one of the most important — and most interview-tested — NumPy concepts. A <strong>view</strong> shares memory with its source array; a <strong>copy</strong> owns independent memory. Slicing, reshaping and transposing return views by default; <code>copy()</code> forces an independent array.</p>`,
+        callouts:[
+          {type:"warning", head:"Warning", text:"Modifying a view modifies the original array too — this is a very common source of subtle, hard-to-trace bugs in data pipelines."},
+          {type:"interview", head:"Interview tip", text:"You can check ownership with `arr.base`: a view's `.base` points back to the original array; a copy's `.base` is `None`. This is the canonical way to prove which one you have."}
+        ],
+        code:[{lang:"python", code:"arr = np.array([1, 2, 3, 4])\nview = arr[1:3]        # a view — shares memory\nview[0] = 99\nprint(arr)               # [1 99 3 4]  -> original changed too!\n\ncopy = arr[1:3].copy()  # an independent copy\ncopy[0] = -1\nprint(arr)               # unchanged\n\nprint(view.base is arr)   # True  -> it's a view\nprint(copy.base)           # None  -> it's a copy"}],
+        takeaways:["Slicing/reshaping/transposing return views by default — they share the original's memory.","Call `.copy()` explicitly whenever you need an independent array.","Check `arr.base` (None = copy, points to source = view) to confirm which you have."]
+      }
+    ]
+  },
+  {
+    id:"ch11", idx:10, title:"Iterating", sub:"الفصل 11 · Walking through array elements",
+    sections:[
+      {
+        id:"iterating", title:"for Loop, nditer() & ndenumerate()", tag:"np",
+        body:`<p>A plain Python <code>for</code> loop over a multi-dimensional array only iterates the first axis (returning sub-arrays). <code>np.nditer()</code> flattens iteration down to every scalar element regardless of dimensionality; <code>np.ndenumerate()</code> does the same but also yields each element's index.</p>`,
+        callouts:[{type:"mistake", head:"Common mistake", text:"Using a plain `for x in grid:` on a 2D array gives you rows, not individual elements — a frequent source of 'why is x an array?' confusion for beginners."}],
+        code:[{lang:"python", code:"grid = np.array([[1, 2], [3, 4]])\n\nfor row in grid:            # yields rows: [1 2], then [3 4]\n    print(row)\n\nfor x in np.nditer(grid):    # yields scalars: 1, 2, 3, 4\n    print(x)\n\nfor idx, x in np.ndenumerate(grid):  # ((0,0),1), ((0,1),2), ((1,0),3), ((1,1),4)\n    print(idx, x)"}],
+        takeaways:["A bare `for` loop iterates only the outermost axis.","`nditer()` flattens iteration to individual scalars across any number of dimensions.","`ndenumerate()` is `nditer()` plus the (row, col, ...) index of each element."]
+      }
+    ]
+  },
+  {
+    id:"ch12", idx:11, title:"Searching", sub:"الفصل 12 · Finding elements and positions that match a condition",
+    sections:[
+      {
+        id:"searching", title:"where(), argwhere() & searchsorted()", tag:"np",
+        body:`<p><code>where()</code> returns the indices matching a condition (or picks between two arrays elementwise). <code>argwhere()</code> returns those indices grouped as coordinate rows. <code>searchsorted()</code> finds where a value would be inserted to keep an already-sorted array sorted.</p>`,
+        callouts:[{type:"production", head:"Production note", text:"`searchsorted()` runs in O(log n) via binary search — it's the right tool for repeated lookups into a large sorted array, far faster than scanning with a boolean mask each time."}],
+        code:[{lang:"python", code:"arr = np.array([10, 20, 30, 40])\nnp.where(arr > 20)                 # (array([2, 3]),)  -> indices\nnp.where(arr > 20, arr, 0)          # [0 0 30 40]  -> elementwise choice\nnp.argwhere(arr > 20)                # [[2],[3]]  -> coordinate rows\nnp.searchsorted(arr, 25)             # 2  -> insert index to keep it sorted"}],
+        takeaways:["`where(cond)` returns matching indices; `where(cond, a, b)` picks elementwise between two arrays.","`argwhere()` gives indices as rows of coordinates — handy for N-D arrays.","`searchsorted()` assumes the input is already sorted and runs in O(log n)."]
+      }
+    ]
+  },
+  {
+    id:"ch13", idx:12, title:"Sorting", sub:"الفصل 13 · Ordering array elements",
+    sections:[
+      {
+        id:"sorting", title:"sort() & argsort()", tag:"np",
+        body:`<p><code>np.sort()</code> returns a sorted copy of the array. <code>np.argsort()</code> instead returns the <em>indices</em> that would sort the array — useful when you need to sort one array based on the order of another.</p>`,
+        callouts:[{type:"interview", head:"Interview tip", text:"A classic follow-up: 'how would you sort array B by the order of array A?' Answer: `order = np.argsort(A); B_sorted = B[order]`."}],
+        code:[{lang:"python", code:"arr = np.array([3, 1, 4, 1, 5])\nnp.sort(arr)          # [1 1 3 4 5]\nnp.argsort(arr)        # [1 3 0 2 4]  -> indices that would sort arr\n\nnames = np.array(['c','a','b'])\nscores = np.array([30, 10, 20])\norder = np.argsort(scores)\nnames[order]            # ['a' 'b' 'c']  -> names sorted by score"}],
+        takeaways:["`sort()` returns sorted values; `argsort()` returns the indices that produce that order.","`argsort()` is the tool for sorting one array 'by' another."]
+      }
+    ]
+  },
+  {
+    id:"ch14", idx:13, title:"Filtering", sub:"الفصل 14 · Selecting elements that satisfy a condition",
+    sections:[
+      {
+        id:"filtering", title:"Boolean Masking, Logical Operators & Filtering Conditions", tag:"np",
+        body:`<p>Comparing an array to a value produces a <strong>boolean mask</strong> — an array of True/False the same shape as the original. Indexing with that mask returns only the elements where it's True. Combine conditions with <code>&</code>, <code>|</code>, and <code>~</code> (not Python's <code>and</code>/<code>or</code>).</p>`,
+        callouts:[
+          {type:"mistake", head:"Common mistake", text:"Using Python's `and`/`or` on arrays raises `ValueError: truth value of an array is ambiguous`. Use the elementwise operators `&`, `|`, `~` instead — and wrap each condition in parentheses, since `&`/`|` bind tighter than comparisons."},
+          {type:"best", head:"Best practice", text:"Boolean masking is almost always faster and more readable than looping with `if` statements — reach for it before writing an explicit filter loop."}
+        ],
+        code:[{lang:"python", code:"arr = np.array([10, 15, 20, 25, 30])\nmask = arr > 18\nprint(mask)             # [False False True True True]\nprint(arr[mask])         # [20 25 30]\n\narr[(arr > 10) & (arr < 30)]   # [15 20 25]  -> combine with & , not 'and'\narr[~(arr > 20)]                 # [10 15 20]  -> negate with ~"}],
+        takeaways:["A comparison like `arr > 18` produces a boolean mask array.","Indexing with a boolean mask filters to only the True positions.","Combine conditions with `&` `|` `~`, always parenthesized — never Python's `and`/`or`."]
+      }
+    ]
+  },
+  {
+    id:"ch15", idx:14, title:"Mathematical Operations", sub:"الفصل 15 · Elementwise arithmetic across whole arrays",
+    sections:[
+      {
+        id:"math-ops", title:"Arithmetic operators: + - * / // % **", tag:"np",
+        body:`<p>Arithmetic operators on NumPy arrays apply <strong>elementwise</strong> — no loops needed, and (when shapes differ compatibly) NumPy uses broadcasting to line them up automatically.</p>`,
+        callouts:[{type:"tip", head:"Real-world analogy", text:"Think of it like applying a formula down an entire spreadsheet column at once, instead of typing it into each cell one by one."}],
+        code:[{lang:"python", code:"a = np.array([10, 20, 30])\nb = np.array([3, 4, 5])\n\na + b     # [13 24 35]\na - b     # [7 16 25]\na * b     # [30 80 150]\na / b     # [3.33 5. 6.]\na // b    # [3 5 6]   -> floor division\na % b     # [1 0 0]    -> remainder\na ** 2    # [100 400 900]"}],
+        takeaways:["All arithmetic operators apply elementwise across the whole array — no explicit loop.","Shapes that don't match exactly may still work via broadcasting rules."]
+      },
+      {
+        id:"sqrt-power", title:"sqrt() & power()", tag:"np",
+        body:`<p>NumPy provides dedicated elementwise functions ('ufuncs') for common math beyond the basic operators — <code>sqrt()</code> for square roots, <code>power()</code> for general exponents.</p>`,
+        callouts:[{type:"note", head:"Note", text:"`np.power(a, b)` is equivalent to `a ** b`, but as a named function it's easier to pass as an argument (e.g. to `functools.reduce`) or apply with a different exponent array elementwise."}],
+        code:[{lang:"python", code:"arr = np.array([1, 4, 9, 16])\nnp.sqrt(arr)              # [1. 2. 3. 4.]\nnp.power(arr, 2)           # [1 16 81 256]\nnp.power(arr, [1,2,1,2])    # [1 16 9 256]  -> elementwise exponents"}],
+        takeaways:["`sqrt()` and `power()` are elementwise ufuncs, just like the arithmetic operators.","`power()` accepts an array of exponents, not just a single scalar."]
+      }
+    ]
   }
 ];
 
@@ -838,7 +1014,25 @@ const quizData = [
   {q:"Which attribute tells you the total number of elements in an array?", options:["shape", "ndim", "size", "itemsize"], correct:2, explain:"size is the total element count — the product of all dimensions in shape."},
   {q:"How do nbytes, size, and itemsize relate?", options:["nbytes = size + itemsize", "nbytes = size * itemsize", "nbytes = size / itemsize", "They're unrelated"], correct:1, explain:"Total memory footprint (nbytes) equals element count (size) times bytes per element (itemsize)."},
   {q:"What happens when you mix an int and a string in np.array([1, 'a'])?", options:["It raises a TypeError immediately", "NumPy silently upcasts everything to a string/object dtype", "NumPy drops the string", "It creates a 2-element int array"], correct:1, explain:"NumPy silently upcasts the whole array to a common dtype (string or object) rather than raising an error — a common source of hidden bugs."},
-  {q:"What does astype() do to the original array?", options:["Modifies it in place and returns nothing", "Returns a new array with the target dtype, leaving the original unchanged", "Deletes the original array", "Only works on integer arrays"], correct:1, explain:"astype() always returns a new array with the requested dtype; the source array is left untouched."}
+  {q:"What does astype() do to the original array?", options:["Modifies it in place and returns nothing", "Returns a new array with the target dtype, leaving the original unchanged", "Deletes the original array", "Only works on integer arrays"], correct:1, explain:"astype() always returns a new array with the requested dtype; the source array is left untouched."},
+  {q:"What does arr[-1] return?", options:["An error", "The first element", "The last element", "A copy of the whole array"], correct:2, explain:"Negative indices count from the end — -1 is always the last element."},
+  {q:"What's the idiomatic way to index a 2D array at row 1, column 2?", options:["arr[1][2]", "arr[1, 2]", "arr(1, 2)", "arr.get(1, 2)"], correct:1, explain:"The comma form arr[row, col] indexes both axes in a single lookup and is the idiomatic NumPy style."},
+  {q:"In arr[1:4], is index 4 included?", options:["Yes", "No, slicing is exclusive on the stop value", "Only for 2D arrays", "Only if step is 1"], correct:1, explain:"Slicing follows Python's convention: the stop index is excluded."},
+  {q:"Do NumPy slices return copies or views by default?", options:["Copies", "Views", "Neither — a new empty array", "It depends on the dtype"], correct:1, explain:"Slices return views by default — they share memory with the original array."},
+  {q:"What's the key difference between flatten() and ravel()?", options:["No difference", "flatten() always copies; ravel() returns a view when possible", "ravel() only works on 1D arrays", "flatten() is deprecated"], correct:1, explain:"flatten() always returns an independent copy; ravel() returns a view whenever it can, which is faster but shares memory."},
+  {q:"What does the .T attribute do on a 2D array?", options:["Truncates the array", "Transposes it (swaps rows and columns)", "Returns the total sum", "Converts it to a tuple"], correct:1, explain:".T is shorthand for transpose() with no arguments — it swaps the array's axes."},
+  {q:"Which function stacks arrays as new rows?", options:["hstack()", "vstack()", "dstack()", "column_stack()"], correct:1, explain:"vstack() stacks arrays vertically, i.e. as new rows."},
+  {q:"What happens if np.split() can't divide the array evenly?", options:["It pads with zeros", "It raises a ValueError", "It silently drops elements", "It returns an empty list"], correct:1, explain:"np.split() requires an even division and raises a ValueError otherwise — use array_split() for uneven splits."},
+  {q:"Why is Copy vs View considered one of NumPy's most important topics?", options:["It affects import speed", "Modifying a view silently modifies the original array too, a common bug source", "It only matters for string arrays", "It determines the array's dtype"], correct:1, explain:"Because slicing/reshaping return views by default, editing what looks like a 'new' array can unexpectedly mutate the original — a frequent source of subtle bugs."},
+  {q:"How can you confirm whether an array is a view or an independent copy?", options:["Check arr.dtype", "Check arr.base — None means copy, otherwise it's a view", "Check arr.shape", "There is no way to check"], correct:1, explain:"A view's .base attribute points back to its source array; a copy's .base is None."},
+  {q:"What does a plain `for row in grid:` loop yield for a 2D array?", options:["Individual scalar elements", "Rows (sub-arrays), not individual elements", "Column indices", "A flattened 1D array"], correct:1, explain:"A bare for loop only iterates the outermost axis, yielding whole rows — not scalars."},
+  {q:"Which function also gives you the index alongside each element while iterating?", options:["nditer()", "ndenumerate()", "argsort()", "where()"], correct:1, explain:"ndenumerate() yields (index, value) pairs, unlike nditer() which yields values only."},
+  {q:"What does np.searchsorted() assume about its input array?", options:["It's random", "It's already sorted", "It's 2D", "It contains only integers"], correct:1, explain:"searchsorted() performs a binary search, which only gives correct results on an already-sorted array."},
+  {q:"What does argsort() return?", options:["The sorted values themselves", "The indices that would sort the array", "The maximum value's index only", "A boolean mask"], correct:1, explain:"argsort() returns the indices that, applied to the array, would produce sorted order — useful for sorting one array by another."},
+  {q:"Why does `arr[(arr > 5) and (arr < 10)]` raise an error?", options:["Syntax error in the comparisons", "Python's `and` doesn't work elementwise on arrays — use `&` instead", "arr is undefined", "You can't chain two conditions in NumPy"], correct:1, explain:"Python's and/or expect a single boolean, which is ambiguous for a whole array — NumPy requires the elementwise operators &, |, ~ instead."},
+  {q:"What does a boolean mask like `arr > 10` produce?", options:["A single True/False value", "An array of True/False, same shape as arr", "A list of matching values", "An error unless arr is 1D"], correct:1, explain:"Comparing an array to a value produces a boolean array of the same shape, which can then be used to index and filter."},
+  {q:"Are NumPy's arithmetic operators (+, -, *, /) applied elementwise or as matrix operations by default?", options:["Elementwise", "Matrix multiplication", "Only elementwise for addition", "It depends on array size"], correct:0, explain:"Standard arithmetic operators apply elementwise across arrays; matrix multiplication uses @ or np.matmul() instead."},
+  {q:"np.power(arr, 2) is equivalent to which expression?", options:["arr + 2", "arr ** 2", "arr // 2", "np.sqrt(arr)"], correct:1, explain:"np.power(arr, 2) computes the same elementwise result as arr ** 2."}
 ];
 
 /* ============================================================
@@ -852,7 +1046,12 @@ const interviewQuestions = [
   {q:"Why does reproducibility in NumPy require np.random.seed()?", a:"NumPy's random functions are pseudo-random — deterministic given a starting internal state. seed() fixes that starting state so the same sequence of 'random' numbers is generated every run, which matters for tests, debugging, and reproducible experiments."},
   {q:"How would you compute the memory footprint of an array without calling nbytes?", a:"Multiply size (total element count) by itemsize (bytes per element) — arr.size * arr.itemsize gives the same result as arr.nbytes, since that's literally how nbytes is defined."},
   {q:"What's a realistic bug caused by NumPy's automatic dtype upcasting?", a:"Building an array from mixed types — e.g. np.array([1, 2, 'three']) — silently produces a string/object array instead of raising an error. Downstream numeric operations (like .sum()) then fail or behave unexpectedly, and the root cause (a stray string in the source data) is easy to miss because no exception was raised at creation time."},
-  {q:"Does astype() modify an array in place?", a:"No — astype() always returns a new array with the target dtype; the original array and its dtype are left unchanged. If you want to replace the variable, you need to reassign it: arr = arr.astype(np.float32)."}
+  {q:"Does astype() modify an array in place?", a:"No — astype() always returns a new array with the target dtype; the original array and its dtype are left unchanged. If you want to replace the variable, you need to reassign it: arr = arr.astype(np.float32)."},
+  {q:"Walk through the difference between a view and a copy, and why it matters in production.", a:"A view shares underlying memory with its source array — slicing, reshaping, and transposing all return views by default. A copy owns independent memory. The practical danger is that mutating a view silently mutates the original array too, which can corrupt data elsewhere in a pipeline that assumed it had an independent array. When in doubt, call .copy() explicitly, and use arr.base to check which one you actually have."},
+  {q:"How would you sort one array based on the order of a different array?", a:"Use argsort() on the array you want to sort by to get the ordering indices, then index the other array with that same order: order = np.argsort(scores); names_sorted = names[order]. This works because fancy indexing with an index array reorders elements to match."},
+  {q:"Why does `arr[(arr > 5) & (arr < 10)]` need parentheses and `&` instead of `and`?", a:"NumPy overloads & as an elementwise AND across the whole boolean array, but it binds tighter than comparison operators, so each comparison must be parenthesized or Python evaluates the & first and errors. Python's built-in `and`/`or` expect a single boolean value and raise a ValueError on an array, since 'truth value of an array is ambiguous' when it has more than one element."},
+  {q:"What's the practical difference between np.split() and np.array_split()?", a:"np.split() requires the array to divide evenly into the requested number of parts and raises a ValueError otherwise. np.array_split() tolerates uneven divisions, distributing the remainder across the earlier chunks — useful whenever the input size isn't guaranteed to be a clean multiple."},
+  {q:"When would you reach for np.where() versus boolean masking?", a:"They overlap, but where(cond) returns matching indices (useful when you need positions, not just values), while where(cond, a, b) picks elementwise between two arrays — good for a vectorized if/else. Plain boolean masking (arr[arr > x]) is simplest when you just want the filtered values themselves."}
 ];
 
 /* ============================================================
@@ -868,7 +1067,15 @@ const flashcards = [
   {front:"What must you call for reproducible random arrays?", back:"np.random.seed(n) — fixes the internal RNG state."},
   {front:"Formula relating nbytes, size, and itemsize?", back:"nbytes = size × itemsize."},
   {front:"What happens if you mix an int and a string in np.array()?", back:"NumPy silently upcasts the whole array to string/object dtype — no error raised."},
-  {front:"Does astype() modify the array in place?", back:"No — it always returns a new array; the original is untouched."}
+  {front:"Does astype() modify the array in place?", back:"No — it always returns a new array; the original is untouched."},
+  {front:"Idiomatic way to index row 1, col 2 of a 2D array?", back:"arr[1, 2] — the comma form, not arr[1][2]."},
+  {front:"flatten() vs ravel() — which copies?", back:"flatten() always copies. ravel() returns a view when possible."},
+  {front:"Do slices return views or copies by default?", back:"Views — they share memory with the original array."},
+  {front:"How do you check if an array is a view or a copy?", back:"Check arr.base — None means it's a copy; otherwise it's a view pointing to the source."},
+  {front:"What does a bare `for row in grid:` yield for a 2D array?", back:"Whole rows (sub-arrays), not individual scalar elements."},
+  {front:"What does argsort() return?", back:"The indices that would sort the array — not the sorted values themselves."},
+  {front:"Why does `arr[(a>5) and (a<10)]` fail?", back:"Python's and/or need a single boolean; use the elementwise & | ~ operators instead, parenthesized."},
+  {front:"split() vs array_split() — which allows uneven division?", back:"array_split() tolerates uneven splits; split() requires an even division or raises an error."}
 ];
 
 /* ============================================================
@@ -1382,7 +1589,12 @@ const finalChecklistItems = [
   "Read shape, ndim, size, dtype, itemsize and nbytes off any array",
   "State the nbytes = size × itemsize relationship from memory",
   "Explain what astype() does and does not do",
-  "Set a random seed for reproducible NumPy code"
+  "Set a random seed for reproducible NumPy code",
+  "Index and slice 1D, 2D and 3D arrays confidently",
+  "Explain the difference between a view and a copy, and check which one you have via .base",
+  "Choose the right joining/splitting function for a given direction",
+  "Filter an array with a boolean mask using & | ~ instead of and/or",
+  "Use argsort() to sort one array by the order of another"
 ];
 const finalChecklistEl = document.getElementById('final-checklist');
 store.finalChecks = store.finalChecks || {};
